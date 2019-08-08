@@ -1,0 +1,55 @@
+<script type="text/javascript">
+    RED
+        .nodes
+        .registerType('ical-events', {
+            category: 'ical',
+            defaults: {
+                confignode: {
+                    value: "",
+                    type: "ical-config"
+                },
+                cron: {
+                    value: ""                   
+                },
+                name: {
+                    value: ""                   
+                },
+                offset: {
+                    value: ""                   
+                }
+            },
+            inputs: 0, // set the number of inputs - only 0 or 1
+            outputs: 1, // set the number of outputs - 0 to n         
+            color: "#E7AE24",
+            label: function () {
+                if (this.name) {
+                    return this.name;
+                } else if (this.confignode.name) {
+                    return this.confignode.name;
+                }
+
+                return "Calendar event";
+            },
+            icon: "calendar.png",
+            paletteLabel: "Event"
+        });
+</script>
+
+<script type="text/x-red" data-template-name="ical-events">
+    <div class="form-row">
+        <label for="node-input-confignode">Config</label>
+        <input type="text" id="node-input-confignode">
+    </div>
+    <div class="form-row">
+        <label for="node-input-cron">Cron</label>
+        <input type="text" id="node-input-cron">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-offset">Offset (in minutes)</label>
+        <input type="text" id="node-input-offset">
+    </div>
+</script>

@@ -1,0 +1,36 @@
+<script type="text/javascript">
+    RED
+        .nodes
+        .registerType('ical-config', {
+            category: 'config',
+            defaults: {
+                url: {
+                    value: ""
+                },
+                name: {
+                    value: ""
+                }
+            },
+            label: function () {
+                if(this.name){
+                    return this.name;
+                }
+                return "iCal Config";
+            },
+        });
+</script>
+
+<script type="text/x-red" data-template-name="ical-config">
+    <div class="form-row">
+        <label for="node-config-input-url">
+            <i class="fa fa-tag"></i>
+            iCal/ics URL:</label>
+        <input type="text" id="node-config-input-url" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name">
+            <i class="fa fa-tag"></i>
+            Name:</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+</script>
