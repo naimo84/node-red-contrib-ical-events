@@ -12,34 +12,42 @@ module.exports = function (RED: Red) {
 
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
-        configNode = RED.nodes.getNode(config.confignode) as unknown as Config;       
+        configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
         const job = new CronJob(config.cron || '0 * * * * *', cronCheckJob.bind(null, this, config));
         job.start();
 
     }
 
-    function cronCheckJob(node: Node,config: any) {
+    function cronCheckJob(node: Node, config: any) {
         var dateNow = new Date();
 
         ical.fromURL(configNode.url, {}, function (err, data) {
+            if(err){
+                node.error(err);
+                return;
+            }
             for (let k in data) {
                 if (data.hasOwnProperty(k)) {
                     var ev = data[k];
                     const eventStart = new Date(ev.start);
-                    if (ev.type == 'VEVENT') {                       
-                        if (eventStart.getTime() >= dateNow.getTime()) {                           
+                    if (ev.type == 'VEVENT') {
+                        if (eventStart.getTime() >= dateNow.getTime()) {
                             const event = {
                                 summary: ev.summary,
                                 location: ev.location,
                                 eventStart: ev.start
                             }
 
-                            if(config.offset){                              
-                                eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));                               
+                            if (config.offset) {
+                                eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
                             }
 
-                            const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));                          
-                            job2.start();
+                            try {
+                                const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));
+                                job2.start();
+                            } catch (job_err) {
+                                node.error(job_err);
+                            }
                         }
                     }
                 }
@@ -49,7 +57,7 @@ module.exports = function (RED: Red) {
 
     }
 
-    function cronJob(event: any, node: Node) {        
+    function cronJob(event: any, node: Node) {
         node.send({
             payload: event
         });

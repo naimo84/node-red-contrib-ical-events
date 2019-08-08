@@ -13,6 +13,10 @@ module.exports = function (RED) {
     function cronCheckJob(node, config) {
         var dateNow = new Date();
         ical.fromURL(configNode.url, {}, function (err, data) {
+            if (err) {
+                node.error(err);
+                return;
+            }
             for (var k in data) {
                 if (data.hasOwnProperty(k)) {
                     var ev = data[k];
@@ -27,8 +31,13 @@ module.exports = function (RED) {
                             if (config.offset) {
                                 eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
                             }
-                            var job2 = new CronJob(eventStart, cronJob.bind(null, event_1, node));
-                            job2.start();
+                            try {
+                                var job2 = new CronJob(eventStart, cronJob.bind(null, event_1, node));
+                                job2.start();
+                            }
+                            catch (job_err) {
+                                node.error(job_err);
+                            }
                         }
                     }
                 }
