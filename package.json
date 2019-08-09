@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-ical-events",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NodeRed iCal Adapter",
   "author": {
     "name": "naimo84",
@@ -22,6 +22,8 @@
   "keywords": [
     "node-red",
     "ical",
+    "calendar",
+    "ics",
     "Smart Home",
     "home automation"
   ],
@@ -35,8 +37,13 @@
     "type": "git",
     "url": "https://github.com/naimo84/node-red-contrib-ical-events"
   },
+  "scripts": {
+    "start": "gulp && node-red"
+  },
   "dependencies": {
+    "@types/crypto-js": "^3.1.43",
     "cron": "^1.7.1",
+    "crypto-js": "^3.1.9-1",
     "node-ical": "^0.9.2"
   },
   "devDependencies": {
