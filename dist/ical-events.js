@@ -1,16 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
-var ical = require('node-ical');
-var CronJob = require('cron').CronJob;
+var ical = require("node-ical");
+var cron_1 = require("cron");
 module.exports = function (RED) {
     var configNode;
     var newCronJobs = new Map();
     var startedCronJobs = new Map();
+    var job;
     function eventsNode(config) {
+        var _this = this;
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode);
-        var job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+        job = new cron_1.CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+        this.on('close', function () {
+            job.stop();
+            startedCronJobs.forEach(function (job_started, key) {
+                job_started.stop();
+                _this.debug(job_started.uid + " stopped");
+            });
+            startedCronJobs.clear();
+            _this.debug("cron stopped");
+        });
         job.start();
     }
     function cronCheckJob(node, config) {
@@ -37,26 +48,30 @@ module.exports = function (RED) {
                             else {
                                 eventStart.setMinutes(eventStart.getMinutes() - 1);
                             }
-                            var job2 = new CronJob(eventStart, cronJob.bind(null, event_1, node));
+                            var job2 = new cron_1.CronJob(eventStart, cronJob.bind(null, event_1, node));
                             var uid = crypto.MD5(ev.start + ev.summary).toString();
                             if (ev.uid) {
                                 uid = ev.uid;
                             }
                             if (!newCronJobs.has(uid) && !startedCronJobs.has(uid)) {
                                 newCronJobs.set(uid, job2);
-                                console.debug("new - " + uid);
+                                node.debug("new - " + uid);
                             }
                             else if (startedCronJobs.has(uid)) {
-                                console.debug("started - " + uid);
+                                node.debug("started - " + uid);
                             }
                         }
                     }
                 }
             }
-            console.debug(newCronJobs.size);
             newCronJobs.forEach(function (job, key) {
-                job.start();
-                startedCronJobs.set(key, job);
+                try {
+                    job.start();
+                    startedCronJobs.set(key, job);
+                }
+                catch (newCronErr) {
+                    node.error(newCronErr);
+                }
             });
             newCronJobs.clear();
         });
