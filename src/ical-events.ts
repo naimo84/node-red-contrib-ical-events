@@ -1,8 +1,8 @@
 
 import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
-var ical = require('node-ical');
-const CronJob = require('cron').CronJob;
+import * as  ical from 'node-ical';
+import { CronJob } from 'cron';
 
 export interface Config {
     url: string,
@@ -19,12 +19,22 @@ module.exports = function (RED: Red) {
 
     let newCronJobs = new Map();
     let startedCronJobs = new Map();
-
+    let job: CronJob;
 
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
-        const job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+        job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+        this.on('close', () => {
+            job.stop();
+            startedCronJobs.forEach((job_started, key) => {
+                job_started.stop();
+                this.debug(job_started.uid + " stopped")
+            });
+            startedCronJobs.clear();
+            this.debug("cron stopped")
+        });
+
         job.start();
     }
 
@@ -66,10 +76,10 @@ module.exports = function (RED: Red) {
 
                             if (!newCronJobs.has(uid) && !startedCronJobs.has(uid)) {
                                 newCronJobs.set(uid, job2);
-                                console.debug("new - " + uid);
+                                node.debug("new - " + uid);
                             }
                             else if (startedCronJobs.has(uid)) {
-                                console.debug("started - " + uid);
+                                node.debug("started - " + uid);
                             }
 
                         }
@@ -77,10 +87,14 @@ module.exports = function (RED: Red) {
                 }
             }
 
-            console.debug(newCronJobs.size);
             newCronJobs.forEach((job, key) => {
-                job.start();
-                startedCronJobs.set(key, job);
+                try {
+                    job.start();
+                    startedCronJobs.set(key, job);
+                } catch (newCronErr) {
+                    node.error(newCronErr);
+                }
+
             });
             newCronJobs.clear();
         });
