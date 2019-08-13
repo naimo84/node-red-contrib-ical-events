@@ -196,13 +196,14 @@ module.exports = function (RED) {
                 date = icalHelper_1.default.formatDate(ev.start, ev.end, true, true, config);
                 icalHelper_1.default.insertSorted(datesArray, {
                     date: date.text,
+                    summary: ev.summary,
                     event: reason,
-                    _date: new Date(ev.start.getTime()),
-                    _end: new Date(ev.end.getTime()),
-                    _section: ev.description,
-                    _IDID: ev.uid,
-                    _allDay: true,
-                    _rule: rule,
+                    eventStart: new Date(ev.start.getTime()),
+                    eventEnd: new Date(ev.end.getTime()),
+                    description: ev.description,
+                    id: ev.uid,
+                    allDay: true,
+                    rule: rule,
                     location: location
                 });
                 node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
@@ -215,12 +216,13 @@ module.exports = function (RED) {
                 icalHelper_1.default.insertSorted(datesArray, {
                     date: date.text,
                     event: reason,
-                    _date: new Date(ev.start.getTime()),
-                    _end: new Date(ev.end.getTime()),
-                    _section: ev.description,
-                    _IDID: ev.uid,
-                    _allDay: false,
-                    _rule: rule,
+                    summary: ev.summary,
+                    eventStart: new Date(ev.start.getTime()),
+                    eventEnd: new Date(ev.end.getTime()),
+                    description: ev.description,
+                    id: ev.uid,
+                    allDay: false,
+                    rule: rule,
                     location: location
                 });
                 node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
@@ -279,10 +281,10 @@ module.exports = function (RED) {
         var dayAfterTomorrow = new Date(tomorrow.getTime() + oneDay);
         if (datesArray.length && !lodash_1.isEqual(datesArray, datesArray_old)) {
             for (var t = 0; t < datesArray.length; t++) {
-                if (datesArray[t]._end.getTime() > today.getTime() && datesArray[t]._date.getTime() < tomorrow.getTime()) {
+                if (datesArray[t].eventEnd.getTime() > today.getTime() && datesArray[t].eventStart.getTime() < tomorrow.getTime()) {
                     todayEventcounter++;
                 }
-                if (datesArray[t]._end.getTime() > tomorrow.getTime() && datesArray[t]._date.getTime() < dayAfterTomorrow.getTime()) {
+                if (datesArray[t].eventEnd.getTime() > tomorrow.getTime() && datesArray[t].eventStart.getTime() < dayAfterTomorrow.getTime()) {
                     tomorrowEventcounter++;
                 }
             }

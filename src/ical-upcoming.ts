@@ -1,5 +1,5 @@
 import { Red, Node } from 'node-red';
-import { Config } from "./ical-events";
+import { Config, CalEvent } from "./ical-events";
 import { CronJob } from 'cron';
 import * as  ical from 'node-ical';
 import icalHelper from './icalHelper';
@@ -9,7 +9,8 @@ var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
 
 var ce = require('cloneextend');
-var datesArray = [];
+var datesArray:CalEvent[] = [];
+
 var datesArray_old = [];
 
 module.exports = function (RED: Red) {
@@ -217,13 +218,14 @@ module.exports = function (RED: Red) {
 
                 icalHelper.insertSorted(datesArray, {
                     date: date.text,
+                    summary: ev.summary,
                     event: reason,
-                    _date: new Date(ev.start.getTime()),
-                    _end: new Date(ev.end.getTime()),
-                    _section: ev.description,
-                    _IDID: ev.uid,
-                    _allDay: true,
-                    _rule: rule,
+                    eventStart: new Date(ev.start.getTime()),
+                    eventEnd: new Date(ev.end.getTime()),
+                    description: ev.description,
+                    id: ev.uid,
+                    allDay: true,
+                    rule: rule,
                     location: location
                 });
 
@@ -237,12 +239,13 @@ module.exports = function (RED: Red) {
                 icalHelper.insertSorted(datesArray, {
                     date: date.text,
                     event: reason,
-                    _date: new Date(ev.start.getTime()),
-                    _end: new Date(ev.end.getTime()),
-                    _section: ev.description,
-                    _IDID: ev.uid,
-                    _allDay: false,
-                    _rule: rule,
+                    summary: ev.summary,
+                    eventStart: new Date(ev.start.getTime()),
+                    eventEnd: new Date(ev.end.getTime()),
+                    description: ev.description,
+                    id: ev.uid,
+                    allDay: false,
+                    rule: rule,
                     location: location
                 });
                 node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
@@ -311,10 +314,10 @@ module.exports = function (RED: Red) {
 
         if (datesArray.length && !isEqual(datesArray, datesArray_old)) {
             for (var t = 0; t < datesArray.length; t++) {
-                if (datesArray[t]._end.getTime() > today.getTime() && datesArray[t]._date.getTime() < tomorrow.getTime()) {
+                if (datesArray[t].eventEnd.getTime() > today.getTime() && datesArray[t].eventStart.getTime() < tomorrow.getTime()) {
                     todayEventcounter++;
                 }
-                if (datesArray[t]._end.getTime() > tomorrow.getTime() && datesArray[t]._date.getTime() < dayAfterTomorrow.getTime()) {
+                if (datesArray[t].eventEnd.getTime() > tomorrow.getTime() && datesArray[t].eventStart.getTime() < dayAfterTomorrow.getTime()) {
                     tomorrowEventcounter++;
                 }
             }

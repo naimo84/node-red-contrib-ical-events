@@ -32,10 +32,10 @@ var icalHelper = /** @class */ (function () {
             arr.push(element);
         }
         else {
-            if (arr[0]._date > element._date) {
+            if (arr[0].eventStart > element.eventStart) {
                 arr.unshift(element);
             }
-            else if (arr[arr.length - 1]._date < element._date) {
+            else if (arr[arr.length - 1].eventStart < element.eventStart) {
                 arr.push(element);
             }
             else {
@@ -44,7 +44,7 @@ var icalHelper = /** @class */ (function () {
                 }
                 else {
                     for (var i = 0; i < arr.length - 1; i++) {
-                        if (arr[i]._date <= element._date && element._date < arr[i + 1]._date) {
+                        if (arr[i].eventStart <= element.eventStart && element.eventStart < arr[i + 1].eventStart) {
                             arr.splice(i + 1, 0, element);
                             element = null;
                             break;
@@ -67,7 +67,7 @@ var icalHelper = /** @class */ (function () {
         dayafter.setDate(today.getDate() + 2);
         dayafter.setHours(0, 0, 0, 0);
         for (var i = 0; i < datesArray.length; i++) {
-            var date = this.formatDate(datesArray[i]._date, datesArray[i]._end, true, datesArray[i]._allDay, config);
+            var date = this.formatDate(datesArray[i].eventStart, datesArray[i]._end, true, datesArray[i]._allDay, config);
             if (text)
                 text += '<br/>\n';
             text += date.text + ' ' + datesArray[i].event + '</span>';

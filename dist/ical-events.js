@@ -48,10 +48,16 @@ module.exports = function (RED) {
                     var eventStart = new Date(ev.start);
                     if (ev.type == 'VEVENT') {
                         if (eventStart.getTime() > dateNow.getTime()) {
+                            var uid = crypto.MD5(ev.start + ev.summary).toString();
+                            if (ev.uid) {
+                                uid = ev.uid;
+                            }
                             var event_1 = {
                                 summary: ev.summary,
+                                id: uid,
                                 location: ev.location,
-                                eventStart: ev.start
+                                eventStart: new Date(ev.start.getTime()),
+                                eventEnd: new Date(ev.end.getTime())
                             };
                             if (config.offset) {
                                 eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
@@ -60,10 +66,6 @@ module.exports = function (RED) {
                                 eventStart.setMinutes(eventStart.getMinutes() - 1);
                             }
                             var job2 = new cron_1.CronJob(eventStart, cronJob.bind(null, event_1, node));
-                            var uid = crypto.MD5(ev.start + ev.summary).toString();
-                            if (ev.uid) {
-                                uid = ev.uid;
-                            }
                             if (!newCronJobs.has(uid) && !startedCronJobs.has(uid)) {
                                 newCronJobs.set(uid, job2);
                                 node.debug("new - " + uid);

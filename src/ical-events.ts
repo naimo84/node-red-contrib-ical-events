@@ -16,6 +16,21 @@ export interface Job {
     cronjob: any
 }
 
+export interface CalEvent {
+    summary: string,
+    location: string,
+    eventStart: Date
+    eventEnd: Date,
+    date?: string,
+
+    event?: string,
+    description?: string,
+    id: string,
+    allDay?: boolean,
+    rule?: string
+
+}
+
 
 module.exports = function (RED: Red) {
     let configNode: Config;
@@ -29,7 +44,7 @@ module.exports = function (RED: Red) {
         configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
         try {
             var next = parser.parseExpression(config.cron);
-            this.status({fill:"green",shape:"dot",text:next.next().toISOString()})
+            this.status({ fill: "green", shape: "dot", text: next.next().toISOString() })
             job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
             this.on('close', () => {
                 job.stop();
@@ -43,9 +58,9 @@ module.exports = function (RED: Red) {
 
             job.start();
         }
-        catch (err) {            
+        catch (err) {
             this.error('Error: ' + err.message);
-            this.status({fill:"red",shape:"ring",text:err.message})
+            this.status({ fill: "red", shape: "ring", text: err.message })
         }
     }
 
@@ -58,7 +73,7 @@ module.exports = function (RED: Red) {
         ical.fromURL(configNode.url, {}, function (err, data) {
             if (err) {
                 node.error(err);
-                node.status({fill:"red",shape:"ring",text:err})
+                node.status({ fill: "red", shape: "ring", text: err })
                 return;
             }
             for (let k in data) {
@@ -68,10 +83,17 @@ module.exports = function (RED: Red) {
                     const eventStart = new Date(ev.start);
                     if (ev.type == 'VEVENT') {
                         if (eventStart.getTime() > dateNow.getTime()) {
-                            const event = {
+                            let uid = crypto.MD5(ev.start + ev.summary).toString();
+                            if (ev.uid) {
+                                uid = ev.uid;
+                            }
+
+                            const event: CalEvent = {
                                 summary: ev.summary,
+                                id: uid,
                                 location: ev.location,
-                                eventStart: ev.start
+                                eventStart: new Date(ev.start.getTime()),
+                                eventEnd: new Date(ev.end.getTime())
                             }
 
                             if (config.offset) {
@@ -82,10 +104,7 @@ module.exports = function (RED: Red) {
 
                             const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));
 
-                            let uid = crypto.MD5(ev.start + ev.summary).toString();
-                            if (ev.uid) {
-                                uid = ev.uid;
-                            }
+
 
                             if (!newCronJobs.has(uid) && !startedCronJobs.has(uid)) {
                                 newCronJobs.set(uid, job2);
