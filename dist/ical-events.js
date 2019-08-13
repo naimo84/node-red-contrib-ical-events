@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
 var ical = require("node-ical");
 var cron_1 = require("cron");
+var parser = require("cron-parser");
 module.exports = function (RED) {
     var configNode;
     var newCronJobs = new Map();
@@ -12,23 +13,33 @@ module.exports = function (RED) {
         var _this = this;
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode);
-        job = new cron_1.CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
-        this.on('close', function () {
-            job.stop();
-            startedCronJobs.forEach(function (job_started, key) {
-                job_started.stop();
-                _this.debug(job_started.uid + " stopped");
+        try {
+            var next = parser.parseExpression(config.cron);
+            this.status({ fill: "green", shape: "dot", text: next.next().toISOString() });
+            job = new cron_1.CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+            this.on('close', function () {
+                job.stop();
+                startedCronJobs.forEach(function (job_started, key) {
+                    job_started.stop();
+                    _this.debug(job_started.uid + " stopped");
+                });
+                startedCronJobs.clear();
+                _this.debug("cron stopped");
             });
-            startedCronJobs.clear();
-            _this.debug("cron stopped");
-        });
-        job.start();
+            job.start();
+        }
+        catch (err) {
+            this.error('Error: ' + err.message);
+            this.status({ fill: "red", shape: "ring", text: err.message });
+        }
     }
     function cronCheckJob(node, config) {
+        node.debug("events");
         var dateNow = new Date();
         ical.fromURL(configNode.url, {}, function (err, data) {
             if (err) {
                 node.error(err);
+                node.status({ fill: "red", shape: "ring", text: err });
                 return;
             }
             for (var k in data) {

@@ -4,8 +4,11 @@ import * as crypto from "crypto-js";
 import * as  ical from 'node-ical';
 import { CronJob } from 'cron';
 
+import * as parser from 'cron-parser';
+
 export interface Config {
     url: string,
+    language: string;
 }
 
 export interface Job {
@@ -24,28 +27,38 @@ module.exports = function (RED: Red) {
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
-        job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
-        this.on('close', () => {
-            job.stop();
-            startedCronJobs.forEach((job_started, key) => {
-                job_started.stop();
-                this.debug(job_started.uid + " stopped")
+        try {
+            var next = parser.parseExpression(config.cron);
+            this.status({fill:"green",shape:"dot",text:next.next().toISOString()})
+            job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+            this.on('close', () => {
+                job.stop();
+                startedCronJobs.forEach((job_started, key) => {
+                    job_started.stop();
+                    this.debug(job_started.uid + " stopped")
+                });
+                startedCronJobs.clear();
+                this.debug("cron stopped")
             });
-            startedCronJobs.clear();
-            this.debug("cron stopped")
-        });
 
-        job.start();
+            job.start();
+        }
+        catch (err) {            
+            this.error('Error: ' + err.message);
+            this.status({fill:"red",shape:"ring",text:err.message})
+        }
     }
 
 
     function cronCheckJob(node: Node, config: any) {
+        node.debug("events");
         var dateNow = new Date();
 
 
         ical.fromURL(configNode.url, {}, function (err, data) {
             if (err) {
                 node.error(err);
+                node.status({fill:"red",shape:"ring",text:err})
                 return;
             }
             for (let k in data) {
