@@ -9,7 +9,7 @@ This Node RED module gets the events from an ical-URL.
 If you like it, please consider:
 
 <a target="blank" href="https://paypal.me/NeumannBenjamin"><img src="https://img.shields.io/badge/Donate-PayPal-blue.svg"/></a>
-<a target="blank" href="https://blockchain.info/payment_request?address=3KDjCmXsGFYawmycXRsVwfFbphog117N8P"><img src="https://img.shields.io/badge/Donate-Bitcoin-green.svg"/></a>
+<a target="blank" href="https://blockchain.info/payment_request?address=3KDjCmXsGFYawmycXRsVwfFbphog117N8P"><img src="https://img.shields.io/badge/Donate-Bitcoin-green.svg"/></a> <a target="blank" href="https://brave.com/nai412"><img src="./examples/support_banner.png"/></a>
 
 ## Getting started
 
