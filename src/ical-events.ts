@@ -43,9 +43,9 @@ module.exports = function (RED: Red) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
         try {
-            var next = parser.parseExpression(config.cron);
-            this.status({ fill: "green", shape: "dot", text: next.next().toISOString() })
-            job = new CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+            parser.parseExpression(config.cron);
+
+            job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
             this.on('close', () => {
                 job.stop();
                 startedCronJobs.forEach((job_started, key) => {
@@ -67,10 +67,11 @@ module.exports = function (RED: Red) {
 
     function cronCheckJob(node: Node, config: any) {
         node.debug("events");
+        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() })
         var dateNow = new Date();
 
 
-        ical.fromURL(configNode.url, {}, function (err, data) {
+        ical.fromURL(configNode.url, {}, (err, data) => {
             if (err) {
                 node.error(err);
                 node.status({ fill: "red", shape: "ring", text: err })
@@ -93,7 +94,8 @@ module.exports = function (RED: Red) {
                                 id: uid,
                                 location: ev.location,
                                 eventStart: new Date(ev.start.getTime()),
-                                eventEnd: new Date(ev.end.getTime())
+                                eventEnd: new Date(ev.end.getTime()),
+                                description: ev.description
                             }
 
                             if (config.offset) {
@@ -114,6 +116,7 @@ module.exports = function (RED: Red) {
                                 node.debug("started - " + uid);
                             }
 
+
                         }
                     }
                 }
@@ -122,13 +125,15 @@ module.exports = function (RED: Red) {
             newCronJobs.forEach((job, key) => {
                 try {
                     job.start();
-                    startedCronJobs.set(key, job);
+                    startedCronJobs[key]= job;
                 } catch (newCronErr) {
                     node.error(newCronErr);
                 }
 
             });
+            
             newCronJobs.clear();
+
         });
     }
 

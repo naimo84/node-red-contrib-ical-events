@@ -16,10 +16,9 @@ module.exports = function (RED) {
         var _this = this;
         RED.nodes.createNode(this, config);
         try {
-            var next = parser.parseExpression(config.cron);
+            parser.parseExpression(config.cron);
             configNode = RED.nodes.getNode(config.confignode);
-            this.status({ fill: "green", shape: "dot", text: next.next().toISOString() });
-            job = new cron_1.CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, configNode));
+            job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
             this.on('close', function () {
                 job.stop();
                 _this.debug("cron stopped");
@@ -34,6 +33,7 @@ module.exports = function (RED) {
     }
     function cronCheckJob(node, config) {
         node.debug("upcoming events");
+        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
         datesArray_old = ce.clone(datesArray);
         datesArray = [];
         checkICal(config.url, function (err) {

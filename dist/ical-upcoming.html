@@ -9,13 +9,13 @@
                     type: "ical-config"
                 },
                 cron: {
-                    value: ""                   
+                    value: ""
                 },
                 name: {
-                    value: ""                   
+                    value: ""
                 },
                 offset: {
-                    value: ""                   
+                    value: ""
                 }
             },
             inputs: 0, // set the number of inputs - only 0 or 1
@@ -47,9 +47,40 @@
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-offset">Offset (in minutes)</label>
-        <input type="text" id="node-input-offset">
-    </div>
+    </div>   
+</script>
+
+<!-- Simple Help Text -->
+<script type="text/x-red" data-help-name="ical-upcoming">
+    <!--
+    <p>A node for upcoming events</p>
+    
+    <h3>How to use</h3>
+  
+    <p>Configuration</p>
+    <br/> • "Cron": Cron expression, how often the calendar is checked for new upcoming events. Default is every hour ('0 0 * * * *')
+    <br/> • "Name": Displayname
+     
+    <p>The msg.payload contains an array of the following values for each calendar entry</p>
+    <br/> • summary
+    <br/> • id
+    <br/> • location
+    <br/> • eventStart
+    <br/> • eventEnd
+    <br/> • description
+
+    <p>additional values:
+    <br/> • today: todayEventcounter
+    <br/> • tomorrow: tomorrowEventcounter
+    <br/> • total: datesArray.length
+
+    <p>example output:</p>
+    {
+        "summary": "meeting",
+        "id": "15ko5i37jhc634567dihn6g7h@google.com",
+        "location": "office",
+        "eventStart": "2019-08-13T12:45:00.000Z",
+        "eventEnd": "2019-08-13T13:45:00.000Z"
+    }
+-->
 </script>

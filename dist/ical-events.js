@@ -14,9 +14,8 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode);
         try {
-            var next = parser.parseExpression(config.cron);
-            this.status({ fill: "green", shape: "dot", text: next.next().toISOString() });
-            job = new cron_1.CronJob(config.cron || '0,30 * * * * *', cronCheckJob.bind(null, this, config));
+            parser.parseExpression(config.cron);
+            job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
             this.on('close', function () {
                 job.stop();
                 startedCronJobs.forEach(function (job_started, key) {
@@ -35,6 +34,7 @@ module.exports = function (RED) {
     }
     function cronCheckJob(node, config) {
         node.debug("events");
+        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
         var dateNow = new Date();
         ical.fromURL(configNode.url, {}, function (err, data) {
             if (err) {
@@ -57,7 +57,8 @@ module.exports = function (RED) {
                                 id: uid,
                                 location: ev.location,
                                 eventStart: new Date(ev.start.getTime()),
-                                eventEnd: new Date(ev.end.getTime())
+                                eventEnd: new Date(ev.end.getTime()),
+                                description: ev.description
                             };
                             if (config.offset) {
                                 eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
@@ -80,7 +81,7 @@ module.exports = function (RED) {
             newCronJobs.forEach(function (job, key) {
                 try {
                     job.start();
-                    startedCronJobs.set(key, job);
+                    startedCronJobs[key] = job;
                 }
                 catch (newCronErr) {
                     node.error(newCronErr);
