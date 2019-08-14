@@ -8,8 +8,9 @@ This Node RED module gets the events from an ical-URL.
 
 If you like it, please consider:
 
+<a target="blank" href="https://brave.com/nai412"><img src="./examples/support_banner.png"/></a>
 <a target="blank" href="https://paypal.me/NeumannBenjamin"><img src="https://img.shields.io/badge/Donate-PayPal-blue.svg"/></a>
-<a target="blank" href="https://blockchain.info/payment_request?address=3KDjCmXsGFYawmycXRsVwfFbphog117N8P"><img src="https://img.shields.io/badge/Donate-Bitcoin-green.svg"/></a> <a target="blank" href="https://brave.com/nai412"><img src="./examples/support_banner.png"/></a>
+<a target="blank" href="https://blockchain.info/payment_request?address=3KDjCmXsGFYawmycXRsVwfFbphog117N8P"><img src="https://img.shields.io/badge/Donate-Bitcoin-green.svg"/></a> 
 
 ## Getting started
 
@@ -25,6 +26,8 @@ Then open  the user data directory  `~/.node-red`  and install the package
 $ cd ~/.node-red
 $ npm install node-red-contrib-ical-events
 ```
+
+Or search for ical-events in the manage palette menu
 
 Then run
 
@@ -45,10 +48,13 @@ node-red
 
 ### Configuration:
 - ***URL*** URL to Calendar
+- ***Replace Dates with name*** Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
+- ***Language*** if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
 
 ## Credits
 * Thanks to https://github.com/kelektiv/node-cron
 * Thanks to https://github.com/jens-maus/node-ical
+* The whole module is inspired by ioBroker's adapter https://github.com/iobroker-community-adapters/ioBroker.ical. Many many thanks folks ;)
 
 ## The MIT License
 Permission is hereby granted, free of charge, to any person obtaining a copy
