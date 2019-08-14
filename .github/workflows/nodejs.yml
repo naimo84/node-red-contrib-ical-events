@@ -1,23 +1,22 @@
-name: Node CI
+workflow "Build, and Publish" {
+  on = "push"
+  resolves = ["Publish"]
+}
 
-on: [push]
+action "Build" {
+  uses = "actions/npm@master"
+  args = "install"
+}
 
-jobs:
-  build:
+action "Master" {
+  needs = "Build"
+  uses = "actions/bin/filter@master"
+  args = "branch master"
+}
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@master
-    - name: Use Node.js 10.x
-      uses: actions/setup-node@v1
-      with:
-        version: 10.x
-    - name: npm install
-      run: |
-        npm install
-        gulp        
-    - name: npm publish
-      run: npm publish
-      secrets: ["28bd3320-bf70-4597-a07d-858bfd8bdae4"]
-       
+action "Publish" {
+  needs = "Master"
+  uses = "actions/npm@master"
+  args = "publish --access public"
+  secrets = ["NPM_AUTH_TOKEN"]
+}
