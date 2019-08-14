@@ -9,10 +9,16 @@
                 },
                 name: {
                     value: ""
+                },
+                language: {
+                    value: ""
+                },
+                replacedates: {
+                    value: false
                 }
             },
             label: function () {
-                if(this.name){
+                if (this.name) {
                     return this.name;
                 }
                 return "iCal Config";
@@ -32,5 +38,26 @@
             <i class="fa fa-tag"></i>
             Name:</label>
         <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-language">
+            <i class="fa fa-tag"></i>
+            Language:</label>
+        <select id="node-config-input-language">
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="ru">русский</option>
+            <option value="pl">polski</option>
+            <option value="nl">Nederlands</option>
+            <option value="fr">français</option>
+            <option value="it">Italiano</option>
+            <option value="es">Espanol</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-replacedates">
+            <i class="fa fa-tag"></i>
+            Replace Dates with name:</label>
+        <input type="checkbox" id="node-config-input-replacedates" placeholder="">
     </div>
 </script>

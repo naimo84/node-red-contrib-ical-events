@@ -56,8 +56,8 @@ var icalHelper = /** @class */ (function () {
             }
         }
     };
-    icalHelper.brSeparatedList = function (datesArray, config) {
-        var text = '';
+    icalHelper.brSeparatedList = function (datesArray) {
+        var text = '<span>';
         var today = new Date();
         var tomorrow = new Date();
         var dayafter = new Date();
@@ -67,14 +67,14 @@ var icalHelper = /** @class */ (function () {
         dayafter.setDate(today.getDate() + 2);
         dayafter.setHours(0, 0, 0, 0);
         for (var i = 0; i < datesArray.length; i++) {
-            var date = this.formatDate(datesArray[i].eventStart, datesArray[i]._end, true, datesArray[i]._allDay, config);
+            var date = this.formatDate(datesArray[i].eventStart, datesArray[i].eventEnd, true, datesArray[i].allDay);
             if (text)
                 text += '<br/>\n';
             text += date.text + ' ' + datesArray[i].event + '</span>';
         }
         return text;
     };
-    icalHelper.formatDate = function (_date, _end, withTime, fullday, config) {
+    icalHelper.formatDate = function (_date, _end, withTime, fullday) {
         var day = _date.getDate();
         var month = _date.getMonth() + 1;
         var year = _date.getFullYear();
@@ -86,63 +86,52 @@ var icalHelper = /** @class */ (function () {
         if (withTime) {
             var hours = _date.getHours();
             var minutes = _date.getMinutes();
-            if (config.fulltime && fullday) {
-                _time = ' ' + config.fulltime;
+            if (!alreadyStarted) {
+                if (hours < 10)
+                    hours = '0' + hours.toString();
+                if (minutes < 10)
+                    minutes = '0' + minutes.toString();
+                _time = ' ' + hours + ':' + minutes;
             }
-            else {
+            var timeDiff = _end.getTime() - _date.getTime();
+            if (timeDiff === 0 && hours === 0 && minutes === 0) {
+                _time = ' ';
+            }
+            else if (timeDiff > 0) {
                 if (!alreadyStarted) {
-                    if (config.dataPaddingWithZeros) {
-                        if (hours < 10)
-                            hours = '0' + hours.toString();
-                    }
-                    if (minutes < 10)
-                        minutes = '0' + minutes.toString();
-                    _time = ' ' + hours + ':' + minutes;
+                    _time += '-';
                 }
-                var timeDiff = _end.getTime() - _date.getTime();
-                if (timeDiff === 0 && hours === 0 && minutes === 0) {
-                    _time = ' ';
+                else {
+                    _time += ' ';
                 }
-                else if (timeDiff > 0) {
+                var endhours = _end.getHours().toString();
+                var endminutes = _end.getMinutes().toString();
+                if (parseInt(endhours) < 10)
+                    endhours = '0' + endhours.toString();
+                if (parseInt(endminutes) < 10)
+                    endminutes = '0' + endminutes.toString();
+                _time += endhours + ':' + endminutes;
+                var startDayEnd = new Date();
+                startDayEnd.setFullYear(_date.getFullYear());
+                startDayEnd.setMonth(_date.getMonth());
+                startDayEnd.setDate(_date.getDate() + 1);
+                startDayEnd.setHours(0, 0, 0, 0);
+                if (_end > startDayEnd) {
+                    var start = new Date();
                     if (!alreadyStarted) {
-                        _time += '-';
+                        start.setDate(_date.getDate());
+                        start.setMonth(_date.getMonth());
+                        start.setFullYear(_date.getFullYear());
                     }
-                    else {
-                        _time += ' ';
+                    start.setHours(0, 0, 1, 0);
+                    var fullTimeDiff = timeDiff;
+                    timeDiff = _end.getTime() - start.getTime();
+                    if (fullTimeDiff >= 24 * 60 * 60 * 1000) {
+                        _time += '+' + Math.floor(timeDiff / (24 * 60 * 60 * 1000));
                     }
-                    var endhours = _end.getHours().toString();
-                    var endminutes = _end.getMinutes().toString();
-                    if (config.dataPaddingWithZeros) {
-                        if (parseInt(endhours) < 10)
-                            endhours = '0' + endhours.toString();
-                    }
-                    if (parseInt(endminutes) < 10)
-                        endminutes = '0' + endminutes.toString();
-                    _time += endhours + ':' + endminutes;
-                    var startDayEnd = new Date();
-                    startDayEnd.setFullYear(_date.getFullYear());
-                    startDayEnd.setMonth(_date.getMonth());
-                    startDayEnd.setDate(_date.getDate() + 1);
-                    startDayEnd.setHours(0, 0, 0, 0);
-                    // end is next day
-                    if (_end > startDayEnd) {
-                        var start = new Date();
-                        if (!alreadyStarted) {
-                            start.setDate(_date.getDate());
-                            start.setMonth(_date.getMonth());
-                            start.setFullYear(_date.getFullYear());
-                        }
-                        start.setHours(0, 0, 1, 0);
-                        var fullTimeDiff = timeDiff;
-                        timeDiff = _end.getTime() - start.getTime();
-                        //node.debug('    time difference: ' + timeDiff + ' (' + _date + '-' + _end + ' / ' + start + ') --> ' + (timeDiff / (24 * 60 * 60 * 1000)));
-                        if (fullTimeDiff >= 24 * 60 * 60 * 1000) {
-                            _time += '+' + Math.floor(timeDiff / (24 * 60 * 60 * 1000));
-                        }
-                    }
-                    else if (config.replaceDates && _end.getHours() === 0 && _end.getMinutes() === 0) {
-                        _time = ' ';
-                    }
+                }
+                else if (this.config.replacedates && _end.getHours() === 0 && _end.getMinutes() === 0) {
+                    _time = ' ';
                 }
             }
         }
@@ -152,16 +141,9 @@ var icalHelper = /** @class */ (function () {
         var d2 = new Date();
         d2.setDate(d.getDate() + 1);
         var todayOnly = false;
-        if (day === d.getDate() &&
-            month === (d.getMonth() + 1) &&
-            year === d.getFullYear() &&
-            endday === d2.getDate() &&
-            endmonth === (d2.getMonth() + 1) &&
-            endyear === d2.getFullYear() &&
-            fullday) {
+        if (day === d.getDate() && month === (d.getMonth() + 1) && year === d.getFullYear() && endday === d2.getDate() && endmonth === (d2.getMonth() + 1) && endyear === d2.getFullYear() && fullday) {
             todayOnly = true;
         }
-        //node.debug('    todayOnly = ' + todayOnly + ': (' + _date + '-' + _end + '), alreadyStarted=' + alreadyStarted);
         if (todayOnly || !alreadyStarted) {
             if (day === d.getDate() &&
                 month === (d.getMonth() + 1) &&
@@ -210,7 +192,7 @@ var icalHelper = /** @class */ (function () {
                 year === d.getFullYear()) {
                 _class = 'ical_oneweek';
             }
-            if (config.replaceDates) {
+            if (this.config.replacedates) {
                 if (_class === 'ical_today')
                     return { text: ((alreadyStarted && !todayOnly) ? '&#8594; ' : '') + this._('today') + _time, _class: _class };
                 if (_class === 'ical_tomorrow')
@@ -230,14 +212,10 @@ var icalHelper = /** @class */ (function () {
             }
         }
         else {
-            // check if date is in the past and if so we show the end time instead
             _class = 'ical_today';
             var daysleft = Math.round((_end.getDate() - new Date().getDate()) / (1000 * 60 * 60 * 24));
             var hoursleft = Math.round((_end.getDate() - new Date().getDate()) / (1000 * 60 * 60));
-            //node.debug('    time difference: ' + daysleft + '/' + hoursleft + ' (' + _date + '-' + _end + ' / ' + start + ') --> ' + (timeDiff / (24 * 60 * 60 * 1000)));
-            if (config.forceFullday && daysleft < 1)
-                daysleft = 1;
-            if (config.replaceDates) {
+            if (this.config.replacedates) {
                 var _left = (this._('left') !== ' ' ? ' ' + this._('left') : '');
                 var text;
                 if (daysleft === 42) {
@@ -259,7 +237,7 @@ var icalHelper = /** @class */ (function () {
                     text = this._('1week_left');
                 }
                 else if (daysleft >= 1) {
-                    if (config.language === 'ru') {
+                    if (this.config.language === 'ru') {
                         var c = daysleft % 10;
                         var cc = Math.floor(daysleft / 10) % 10;
                         if (daysleft === 1) {
@@ -277,7 +255,7 @@ var icalHelper = /** @class */ (function () {
                     }
                 }
                 else {
-                    if (config.language === 'ru') {
+                    if (this.config.language === 'ru') {
                         var c = hoursleft % 10;
                         var cc = Math.floor(hoursleft / 10) % 10;
                         if (hoursleft === 1) {
@@ -299,45 +277,32 @@ var icalHelper = /** @class */ (function () {
                 day = _end.getDate();
                 month = _end.getMonth() + 1;
                 year = _end.getFullYear();
-                if (config.dataPaddingWithZeros) {
-                    if (day < 10)
-                        day = '0' + day.toString();
-                    if (month < 10)
-                        month = '0' + month.toString();
-                }
+                if (day < 10)
+                    day = '0' + day.toString();
+                if (month < 10)
+                    month = '0' + month.toString();
                 text = '&#8594; ' + day + '.' + month + '.';
-                if (!config.hideYear) {
-                    text += year;
-                }
+                text += year;
                 if (withTime) {
-                    if (config.fulltime && fullday) {
-                        text += ' ' + config.fulltime;
+                    var endhours_1 = _end.getHours().toString();
+                    var endminutes_1 = _end.getMinutes().toString();
+                    if (parseInt(endhours_1) < 10) {
+                        endhours_1 = '0' + endhours_1.toString();
                     }
-                    else {
-                        var endhours_1 = _end.getHours().toString();
-                        var endminutes_1 = _end.getMinutes().toString();
-                        if (config.dataPaddingWithZeros) {
-                            if (parseInt(endhours_1) < 10) {
-                                endhours_1 = '0' + endhours_1.toString();
-                            }
-                        }
-                        if (parseInt(endminutes_1) < 10) {
-                            endminutes_1 = '0' + endminutes_1.toString();
-                        }
-                        text += ' ' + endhours_1 + ':' + endminutes_1;
+                    if (parseInt(endminutes_1) < 10) {
+                        endminutes_1 = '0' + endminutes_1.toString();
                     }
+                    text += ' ' + endhours_1 + ':' + endminutes_1;
                 }
             }
             return { text: text, _class: _class };
         }
-        if (config.dataPaddingWithZeros) {
-            if (day < 10)
-                day = '0' + day.toString();
-            if (month < 10)
-                month = '0' + month.toString();
-        }
+        if (day < 10)
+            day = '0' + day.toString();
+        if (month < 10)
+            month = '0' + month.toString();
         return {
-            text: day + '.' + month + ((config.hideYear) ? '.' : '.' + year) + _time,
+            text: day + '.' + month + '.' + year + _time,
             _class: _class
         };
     };

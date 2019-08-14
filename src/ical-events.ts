@@ -5,11 +5,8 @@ import * as  ical from 'node-ical';
 import { CronJob } from 'cron';
 
 import * as parser from 'cron-parser';
+import { Config } from './icalHelper';
 
-export interface Config {
-    url: string,
-    language: string;
-}
 
 export interface Job {
     id: string,

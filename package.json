@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-ical-events",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "NodeRed iCal Adapter",
   "author": {
     "name": "naimo84",
@@ -16,7 +16,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/naimo84/node-red-contrib-ical-events"
+      "url": "https://github.com/naimo84/node-red-contrib-ical-events/blob/master/LICENSE"
     }
   ],
   "keywords": [
