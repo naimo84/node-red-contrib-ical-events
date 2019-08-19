@@ -5,24 +5,23 @@ var ical = require("node-ical");
 var cron_1 = require("cron");
 var parser = require("cron-parser");
 module.exports = function (RED) {
-    var configNode;
     var newCronJobs = new Map();
     var startedCronJobs = new Map();
-    var job;
     function eventsNode(config) {
         var _this = this;
         RED.nodes.createNode(this, config);
-        configNode = RED.nodes.getNode(config.confignode);
+        var configNode = RED.nodes.getNode(config.confignode);
+        this.config = configNode;
         try {
             this.on('input', function () {
-                job.stop();
+                _this.job.stop();
                 cronCheckJob(_this, config);
             });
             parser.parseExpression(config.cron);
-            job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-            job.start();
+            this.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+            this.job.start();
             this.on('close', function () {
-                job.stop();
+                _this.job.stop();
                 startedCronJobs.forEach(function (job_started, key) {
                     job_started.stop();
                     _this.debug(job_started.uid + " stopped");
@@ -37,14 +36,14 @@ module.exports = function (RED) {
         }
     }
     function cronCheckJob(node, config) {
-        if (job.running) {
-            node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        if (node.job.running) {
+            node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
         }
         else {
             node.status({});
         }
         var dateNow = new Date();
-        ical.fromURL(configNode.url, {}, function (err, data) {
+        ical.fromURL(node.config.url, {}, function (err, data) {
             if (err) {
                 node.error(err);
                 node.status({ fill: "red", shape: "ring", text: err });

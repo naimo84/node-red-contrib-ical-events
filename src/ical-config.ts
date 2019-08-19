@@ -1,3 +1,9 @@
+export interface Config {
+    url: string,
+    language: string,
+    replacedates: boolean
+}
+
 module.exports = function (RED: any) {
     function icalConfig(config) {
         RED.nodes.createNode(this, config);

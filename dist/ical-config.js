@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 module.exports = function (RED) {
     function icalConfig(config) {
         RED.nodes.createNode(this, config);

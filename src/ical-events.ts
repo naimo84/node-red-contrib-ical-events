@@ -5,7 +5,7 @@ import * as  ical from 'node-ical';
 import { CronJob } from 'cron';
 
 import * as parser from 'cron-parser';
-import { Config } from './icalHelper';
+import { Config } from './ical-config';
 
 
 export interface Job {
@@ -30,28 +30,31 @@ export interface CalEvent {
 
 
 module.exports = function (RED: Red) {
-    let configNode: Config;
+
 
     let newCronJobs = new Map();
     let startedCronJobs = new Map();
-    let job: CronJob;
+   
 
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
-        configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
+        let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
+
+        
+        this.config = configNode;
         try {
             this.on('input', () => {
-                job.stop();
+                this.job.stop();
                 cronCheckJob(this, config);               
             });
 
             parser.parseExpression(config.cron);
 
-            job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-            job.start();
+            this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+            this.job.start();
 
             this.on('close', () => {
-                job.stop();
+                this.job.stop();
                 startedCronJobs.forEach((job_started, key) => {
                     job_started.stop();
                     this.debug(job_started.uid + " stopped")
@@ -67,9 +70,9 @@ module.exports = function (RED: Red) {
     }
 
 
-    function cronCheckJob(node: Node, config: any) {       
-        if (job.running){
-            node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+    function cronCheckJob(node: any, config: any) {       
+        if ( node.job.running){
+            node.status({ fill: "green", shape: "dot", text:  node.job.nextDate().toISOString() });
         }
         else {
             node.status({});
@@ -77,7 +80,7 @@ module.exports = function (RED: Red) {
         var dateNow = new Date();
 
 
-        ical.fromURL(configNode.url, {}, (err, data) => {
+        ical.fromURL(node.config.url, {}, (err, data) => {
             if (err) {
                 node.error(err);
                 node.status({ fill: "red", shape: "ring", text: err })
