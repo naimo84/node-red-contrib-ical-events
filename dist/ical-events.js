@@ -14,8 +14,13 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode);
         try {
+            this.on('input', function () {
+                job.stop();
+                cronCheckJob(_this, config);
+            });
             parser.parseExpression(config.cron);
             job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+            job.start();
             this.on('close', function () {
                 job.stop();
                 startedCronJobs.forEach(function (job_started, key) {
@@ -25,7 +30,6 @@ module.exports = function (RED) {
                 startedCronJobs.clear();
                 _this.debug("cron stopped");
             });
-            job.start();
         }
         catch (err) {
             this.error('Error: ' + err.message);
@@ -33,8 +37,12 @@ module.exports = function (RED) {
         }
     }
     function cronCheckJob(node, config) {
-        node.debug("events");
-        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        if (job.running) {
+            node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        }
+        else {
+            node.status({});
+        }
         var dateNow = new Date();
         ical.fromURL(configNode.url, {}, function (err, data) {
             if (err) {

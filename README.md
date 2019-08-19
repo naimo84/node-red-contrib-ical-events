@@ -50,6 +50,11 @@ node-red
 - ***URL*** URL to Calendar
 - ***Replace Dates with name*** Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
 - ***Language*** if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
+- ***Cron*** cron-expression for checking the url 
+
+instead of cron-expression, an input node can be used.
+
+![example.png](https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png)
 
 ## Credits
 * Thanks to https://github.com/kelektiv/node-cron

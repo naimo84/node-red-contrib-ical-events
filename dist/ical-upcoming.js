@@ -18,12 +18,16 @@ module.exports = function (RED) {
         try {
             parser.parseExpression(config.cron);
             configNode = RED.nodes.getNode(config.confignode);
+            icalHelper_1.default.config = configNode;
+            this.on('input', function () {
+                job.stop();
+                cronCheckJob(_this, configNode);
+            });
             job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
             this.on('close', function () {
                 job.stop();
                 _this.debug("cron stopped");
             });
-            icalHelper_1.default.config = configNode;
             job.start();
         }
         catch (err) {
@@ -32,8 +36,12 @@ module.exports = function (RED) {
         }
     }
     function cronCheckJob(node, config) {
-        node.debug("upcoming events");
-        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        if (job.running) {
+            node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        }
+        else {
+            node.status({});
+        }
         datesArray_old = ce.clone(datesArray);
         datesArray = [];
         checkICal(config.url, function (err) {
@@ -137,6 +145,7 @@ module.exports = function (RED) {
         }
     }
     function getICal(urlOrFile, callback) {
+        console.log(urlOrFile);
         if (urlOrFile.match(/^https?:\/\//)) {
             ical.fromURL(configNode.url, {}, function (err, data) {
                 if (err) {

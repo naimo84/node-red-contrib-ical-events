@@ -40,9 +40,16 @@ module.exports = function (RED: Red) {
         RED.nodes.createNode(this, config);
         configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
         try {
+            this.on('input', () => {
+                job.stop();
+                cronCheckJob(this, config);               
+            });
+
             parser.parseExpression(config.cron);
 
             job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+            job.start();
+
             this.on('close', () => {
                 job.stop();
                 startedCronJobs.forEach((job_started, key) => {
@@ -52,8 +59,6 @@ module.exports = function (RED: Red) {
                 startedCronJobs.clear();
                 this.debug("cron stopped")
             });
-
-            job.start();
         }
         catch (err) {
             this.error('Error: ' + err.message);
@@ -62,9 +67,13 @@ module.exports = function (RED: Red) {
     }
 
 
-    function cronCheckJob(node: Node, config: any) {
-        node.debug("events");
-        node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() })
+    function cronCheckJob(node: Node, config: any) {       
+        if (job.running){
+            node.status({ fill: "green", shape: "dot", text: job.nextDate().toISOString() });
+        }
+        else {
+            node.status({});
+        }
         var dateNow = new Date();
 
 
@@ -122,13 +131,13 @@ module.exports = function (RED: Red) {
             newCronJobs.forEach((job, key) => {
                 try {
                     job.start();
-                    startedCronJobs[key]= job;
+                    startedCronJobs[key] = job;
                 } catch (newCronErr) {
                     node.error(newCronErr);
                 }
 
             });
-            
+
             newCronJobs.clear();
 
         });
