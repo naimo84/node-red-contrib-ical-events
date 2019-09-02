@@ -40,7 +40,8 @@
   },
   "scripts": {
     "start": "gulp && node-red",
-    "test": "mocha \"test/**/*_spec.js\""
+    "test": "mocha \"test/**/*_spec.js\"",
+    "release": "gulp && standard-version"
   },
   "dependencies": {
     "cloneextend": "0.0.3",
@@ -64,6 +65,7 @@
     "mocha": "6.2.0",
     "node-red": "0.20.7",
     "node-red-node-test-helper": "^0.2.3",
+    "standard-version": "^7.0.0",
     "should": "13.2.3"
   }
 }
