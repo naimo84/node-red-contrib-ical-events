@@ -39,7 +39,8 @@
     "url": "https://github.com/naimo84/node-red-contrib-ical-events"
   },
   "scripts": {
-    "start": "gulp && node-red"
+    "start": "gulp && node-red",
+    "test": "mocha \"test/**/*_spec.js\""
   },
   "dependencies": {
     "cloneextend": "0.0.3",
@@ -59,6 +60,10 @@
     "@types/cron": "^1.7.1",
     "@types/crypto-js": "^3.1.43",
     "@types/lodash": "^4.14.136",
-    "@types/moment": "^2.13.0"
+    "@types/moment": "^2.13.0",
+    "mocha": "6.2.0",
+    "node-red": "0.20.7",
+    "node-red-node-test-helper": "^0.2.3",
+    "should": "13.2.3"
   }
 }
