@@ -43,6 +43,11 @@
     "test": "mocha \"test/**/*_spec.js\"",
     "release": "gulp && standard-version"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint --edit"
+    }
+  },
   "dependencies": {
     "cloneextend": "0.0.3",
     "cron": "^1.7.1",
@@ -56,6 +61,7 @@
     "gulp": "^4.0.2",
     "gulp-typescript": "^5.0.1",
     "typescript": "^3.5.2",
+    "commitlint": "^8.1.0",
     "@types/node": "^12.0.10",
     "@types/node-red": "^0.20.0",
     "@types/cron": "^1.7.1",
@@ -66,6 +72,38 @@
     "node-red": "0.20.7",
     "node-red-node-test-helper": "^0.2.3",
     "standard-version": "^7.0.0",
-    "should": "13.2.3"
+    "should": "13.2.3",
+    "husky": "3.0.3"
+  },
+  "commitlint": {
+    "format": {
+      "helpUrl": "test"
+    },
+    "rules": {
+      "body-leading-blank": [1, "always"],
+      "footer-leading-blank": [1, "always"],
+      "header-max-length": [2, "always", 72],
+      "scope-case": [2, "always", "lower-case"],
+      "subject-case": [2, "never", ["sentence-case", "start-case", "pascal-case", "upper-case"]],
+      "subject-empty": [2, "never"],
+      "subject-full-stop": [2, "never", "."],
+      "type-case": [2, "always", "lower-case"],
+      "type-empty": [2, "never"],
+      "type-enum": [2, "always",
+        [
+          "build",
+          "chore",
+          "ci",
+          "docs",
+          "feat",
+          "fix",
+          "perf",
+          "refactor",
+          "revert",
+          "style",
+          "test"
+        ]
+      ]
+    }
   }
 }
