@@ -14,14 +14,9 @@ module.exports = function (RED) {
         this.config = configNode;
         try {
             this.on('input', function () {
-                _this.job.stop();
                 cronCheckJob(_this, config);
             });
-            parser.parseExpression(config.cron);
-            this.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-            this.job.start();
             this.on('close', function () {
-                _this.job.stop();
                 startedCronJobs.forEach(function (job_started, key) {
                     job_started.stop();
                     _this.debug(job_started.uid + " stopped");
@@ -29,6 +24,14 @@ module.exports = function (RED) {
                 startedCronJobs.clear();
                 _this.debug("cron stopped");
             });
+            if (config.cron && config.cron !== "") {
+                parser.parseExpression(config.cron);
+                this.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+                this.job.start();
+                this.on('close', function () {
+                    _this.job.stop();
+                });
+            }
         }
         catch (err) {
             this.error('Error: ' + err.message);
@@ -36,7 +39,7 @@ module.exports = function (RED) {
         }
     }
     function cronCheckJob(node, config) {
-        if (node.job.running) {
+        if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
         }
         else {

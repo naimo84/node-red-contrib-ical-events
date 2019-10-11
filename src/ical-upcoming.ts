@@ -19,19 +19,21 @@ module.exports = function (RED: Red) {
             parser.parseExpression(config.cron);
             let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
             this.config = configNode;
-            this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
 
-            this.on('input', () => {
-                this.job.stop();
+            this.on('input', () => {             
                 cronCheckJob(this);
             });
 
-            this.on('close', () => {
-                this.job.stop();
-                this.debug("cron stopped")
-            });
+            if (config.cron && config.cron !== "") {
+                this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
 
-            this.job.start();
+                this.on('close', () => {
+                    this.job.stop();
+                    this.debug("cron stopped")
+                });
+
+                this.job.start();
+            }
         }
         catch (err) {
             this.error('Error: ' + err.message);
@@ -40,7 +42,7 @@ module.exports = function (RED: Red) {
     }
 
     function cronCheckJob(node: any) {
-        if (node.job.running) {
+        if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
         }
         else {

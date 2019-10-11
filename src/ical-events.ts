@@ -7,7 +7,6 @@ import { CronJob } from 'cron';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
 
-
 export interface Job {
     id: string,
     cronjob: any
@@ -25,36 +24,24 @@ export interface CalEvent {
     id: string,
     allDay?: boolean,
     rule?: string
-
 }
 
-
 module.exports = function (RED: Red) {
-
-
     let newCronJobs = new Map();
     let startedCronJobs = new Map();
-   
 
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
 
-        
+
         this.config = configNode;
         try {
-            this.on('input', () => {
-                this.job.stop();
-                cronCheckJob(this, config);               
+            this.on('input', () => {             
+                cronCheckJob(this, config);
             });
 
-            parser.parseExpression(config.cron);
-
-            this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-            this.job.start();
-
             this.on('close', () => {
-                this.job.stop();
                 startedCronJobs.forEach((job_started, key) => {
                     job_started.stop();
                     this.debug(job_started.uid + " stopped")
@@ -62,6 +49,17 @@ module.exports = function (RED: Red) {
                 startedCronJobs.clear();
                 this.debug("cron stopped")
             });
+
+            if (config.cron && config.cron !== "") {
+                parser.parseExpression(config.cron);
+
+                this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
+                this.job.start();
+
+                this.on('close', () => {
+                    this.job.stop();                    
+                });
+            }
         }
         catch (err) {
             this.error('Error: ' + err.message);
@@ -70,15 +68,14 @@ module.exports = function (RED: Red) {
     }
 
 
-    function cronCheckJob(node: any, config: any) {       
-        if ( node.job.running){
-            node.status({ fill: "green", shape: "dot", text:  node.job.nextDate().toISOString() });
+    function cronCheckJob(node: any, config: any) {
+        if (node.job && node.job.running) {
+            node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
         }
         else {
             node.status({});
         }
         var dateNow = new Date();
-
 
         ical.fromURL(node.config.url, {}, (err, data) => {
             if (err) {
