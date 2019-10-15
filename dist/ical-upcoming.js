@@ -13,6 +13,7 @@ module.exports = function (RED) {
             parser.parseExpression(config.cron);
             var configNode = RED.nodes.getNode(config.confignode);
             this.config = configNode;
+            this.endpreview = config.endpreview || 10;
             this.on('input', function () {
                 cronCheckJob(_this);
             });
@@ -39,7 +40,12 @@ module.exports = function (RED) {
         }
         node.datesArray_old = ce.clone(node.datesArray);
         node.datesArray = [];
-        checkICal(node.config.url, function (err) {
+        checkICal(node.config.url, function (data, err) {
+            if (err) {
+                node.error('Error: ' + err);
+                node.status({ fill: "red", shape: "ring", text: err.message });
+                return;
+            }
             displayDates(node, node.config);
         }, node, node.config);
     }
@@ -59,12 +65,11 @@ module.exports = function (RED) {
                     checkDates(ev, endpreview, today, realnow, ' ', node, config);
                 }
             }
-            if (++processedEntries > 100) {
+            if (++processedEntries > 1000) {
                 break;
             }
         }
         if (!Object.keys(data).length) {
-            callback("Object.keys(data).length");
             return;
         }
         else {
@@ -118,7 +123,7 @@ module.exports = function (RED) {
             }
         }
         else {
-            // Event with time         
+            // Event with time             
             if ((ev.start >= today && ev.start < endpreview && ev.end >= realnow) || (ev.end >= realnow && ev.end <= endpreview) || (ev.start < realnow && ev.end > realnow)) {
                 date = formatDate(ev.start, ev.end, true, false, config);
                 insertSorted(node.datesArray, {
@@ -161,13 +166,14 @@ module.exports = function (RED) {
                     var today = new Date();
                     today.setHours(0, 0, 0, 0);
                     var endpreview = new Date();
-                    endpreview.setDate(endpreview.getDate() + 10);
+                    endpreview.setDate(endpreview.getDate() + parseInt(node.endpreview));
                     var now2 = new Date();
                     now2.setHours(0, 0, 0, 0);
                     processData(data, realnow, today, endpreview, now2, callback, node, config);
+                    callback(data);
                 }
                 else {
-                    callback("no Data");
+                    callback(null, "no Data");
                 }
             }
             catch (e) {
