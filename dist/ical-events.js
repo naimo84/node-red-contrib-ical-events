@@ -46,7 +46,18 @@ module.exports = function (RED) {
             node.status({});
         }
         var dateNow = new Date();
-        ical.fromURL(node.config.url, {}, function (err, data) {
+        var header = {};
+        var username = node.config.username;
+        var password = node.config.password;
+        if (username && password) {
+            var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+            header = {
+                headers: {
+                    'Authorization': auth
+                }
+            };
+        }
+        ical.fromURL(node.config.url, header, function (err, data) {
             if (err) {
                 node.error(err);
                 node.status({ fill: "red", shape: "ring", text: err });

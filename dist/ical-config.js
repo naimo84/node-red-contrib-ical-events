@@ -4,6 +4,8 @@ module.exports = function (RED) {
     function icalConfig(config) {
         RED.nodes.createNode(this, config);
         this.url = config.url;
+        this.username = config.username;
+        this.password = config.password;
         this.name = config.name;
         this.language = config.language;
         this.replacedates = config.replacedates;

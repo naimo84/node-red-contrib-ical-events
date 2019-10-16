@@ -65,7 +65,7 @@ module.exports = function (RED) {
                     checkDates(ev, endpreview, today, realnow, ' ', node, config);
                 }
             }
-            if (++processedEntries > 1000) {
+            if (++processedEntries > 100) {
                 break;
             }
         }
@@ -144,7 +144,18 @@ module.exports = function (RED) {
     }
     function getICal(urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            ical.fromURL(config.url, {}, function (err, data) {
+            var header = {};
+            var username = config.username;
+            var password = config.password;
+            if (username && password) {
+                var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                header = {
+                    headers: {
+                        'Authorization': auth
+                    }
+                };
+            }
+            ical.fromURL(config.url, header, function (err, data) {
                 if (err) {
                     callback && callback(err, null);
                     return;

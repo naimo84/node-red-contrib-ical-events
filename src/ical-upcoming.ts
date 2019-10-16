@@ -165,7 +165,20 @@ module.exports = function (RED: Red) {
 
     function getICal(urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            ical.fromURL(config.url, {}, (err, data) => {
+            let header = {};
+            let username = config.username;
+            let password = config.password;
+
+            if (username && password) {
+                var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                header = {
+                    headers: {
+                        'Authorization': auth
+                    }
+                }
+            }
+
+            ical.fromURL(config.url, header, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;
