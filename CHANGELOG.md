@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.2.3...v0.3.0) (2019-10-16)
+
+
+### Bug Fixes
+
+* issue [#3](https://github.com/naimo84/node-red-contrib-ical-events/issues/3), CalDav with Basic Auth ([608d489](https://github.com/naimo84/node-red-contrib-ical-events/commit/608d489))
+
 ### [0.2.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.2.2...v0.2.3) (2019-10-15)
 
 
