@@ -9,6 +9,7 @@ module.exports = function (RED: any) {
         RED.nodes.createNode(this, config);
 		
         this.url = config.url;
+        this.caldav = config.caldav;
         this.username = config.username;
         this.password = config.password;
 

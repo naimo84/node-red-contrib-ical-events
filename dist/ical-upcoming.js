@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var cron_1 = require("cron");
 var ical = require("node-ical");
+var caldav_1 = require("./caldav");
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
 var ce = require('cloneextend');
@@ -91,12 +92,10 @@ module.exports = function (RED) {
             return;
         if (!ev.end)
             ev.end = ev.start;
-        if (!ev.start.getHours() &&
-            !ev.start.getMinutes() &&
-            !ev.start.getSeconds() &&
-            !ev.end.getHours() &&
-            !ev.end.getMinutes() &&
-            !ev.end.getSeconds()) {
+        ev.start = new Date(ev.start);
+        ev.end = new Date(ev.end);
+        if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()
+            && !ev.end.getHours() && !ev.end.getMinutes() && !ev.end.getSeconds()) {
             if (ev.end.getTime() == ev.start.getTime() && ev.datetype == 'date') {
                 ev.end.setDate(ev.end.getDate() + 1);
             }
@@ -142,30 +141,38 @@ module.exports = function (RED) {
             }
         }
     }
-    function getICal(urlOrFile, config, callback) {
+    function getICal(node, urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            var header = {};
-            var username = config.username;
-            var password = config.password;
-            if (username && password) {
-                var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
-                header = {
-                    headers: {
-                        'Authorization': auth
-                    }
-                };
+            if (config.caldav && JSON.parse(config.caldav) === true) {
+                node.debug("caldav");
+                caldav_1.CalDav(node, config, null, function (data) {
+                    callback(null, data);
+                });
             }
-            ical.fromURL(config.url, header, function (err, data) {
-                if (err) {
-                    callback && callback(err, null);
-                    return;
+            else {
+                var header = {};
+                var username = config.username;
+                var password = config.password;
+                if (username && password) {
+                    var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                    header = {
+                        headers: {
+                            'Authorization': auth
+                        }
+                    };
                 }
-                callback && callback(null, data);
-            });
+                ical.fromURL(config.url, header, function (err, data) {
+                    if (err) {
+                        callback && callback(err, null);
+                        return;
+                    }
+                    callback && callback(null, data);
+                });
+            }
         }
     }
     function checkICal(urlOrFile, callback, node, config) {
-        getICal(urlOrFile, config, function (err, data) {
+        getICal(node, urlOrFile, config, function (err, data) {
             if (err || !data) {
                 callback(err);
                 return;
