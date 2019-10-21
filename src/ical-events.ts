@@ -3,7 +3,7 @@ import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import * as  ical from 'node-ical';
 import { CronJob } from 'cron';
-
+import { CalDav } from './caldav';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
 
@@ -28,25 +28,23 @@ export interface CalEvent {
 
 module.exports = function (RED: Red) {
     let newCronJobs = new Map();
-    let startedCronJobs = new Map();
-
+   
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
 
-
         this.config = configNode;
         try {
-            this.on('input', () => {             
+            this.on('input', () => {
                 cronCheckJob(this, config);
             });
 
             this.on('close', () => {
-                startedCronJobs.forEach((job_started, key) => {
+                this.context().get('startedCronJobs').forEach((job_started, key) => {
                     job_started.stop();
                     this.debug(job_started.uid + " stopped")
                 });
-                startedCronJobs.clear();
+                this.context().get('startedCronJobs').clear();
                 this.debug("cron stopped")
             });
 
@@ -57,7 +55,7 @@ module.exports = function (RED: Red) {
                 this.job.start();
 
                 this.on('close', () => {
-                    this.job.stop();                    
+                    this.job.stop();
                 });
             }
         }
@@ -67,6 +65,36 @@ module.exports = function (RED: Red) {
         }
     }
 
+    function getICal(node, urlOrFile, config, callback) {
+        if (urlOrFile.match(/^https?:\/\//)) {
+            if (node.config.caldav && JSON.parse(node.config.caldav) === true) {                
+                CalDav(node, node.config, null, (data) => {
+                    callback(null, data);
+                });
+            } else {
+                let header = {};
+                let username = node.config.username;
+                let password = node.config.password;
+
+                if (username && password) {
+                    var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                    header = {
+                        headers: {
+                            'Authorization': auth
+                        }
+                    }
+                }
+
+                ical.fromURL(node.config.url, header, (err, data) => {
+                    if (err) {
+                        callback && callback(err, null);
+                        return;
+                    }
+                    callback && callback(null, data);
+                });
+            }
+        }
+    }
 
     function cronCheckJob(node: any, config: any) {
         if (node.job && node.job.running) {
@@ -76,86 +104,73 @@ module.exports = function (RED: Red) {
             node.status({});
         }
         var dateNow = new Date();
-
-        let header = {};
-        let username = node.config.username;
-        let password = node.config.password;
-
-        if (username && password) {
-            var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
-            header = {
-                headers: {
-                    'Authorization': auth
-                }
-            }
-        }
-
-        ical.fromURL(node.config.url, header, (err, data) => {
-            if (err) {
-                node.error(err);
-                node.status({ fill: "red", shape: "ring", text: err })
+       
+        getICal(node, node.config.url, node.config, (err, data) => {            
+            if (err || !data) {
                 return;
             }
-            for (let k in data) {
-                if (data.hasOwnProperty(k)) {
-                    var ev = data[k];
+           
+            node.debug('Ical read successfully ' + config.url);
 
-                    const eventStart = new Date(ev.start);
-                    if (ev.type == 'VEVENT') {
-                        if (eventStart.getTime() > dateNow.getTime()) {
-                            let uid = crypto.MD5(ev.start + ev.summary).toString();
-                            if (ev.uid) {
-                                uid = ev.uid;
+            if (data) {
+                for (let k in data) {
+                    if (data.hasOwnProperty(k)) {
+                        var ev = data[k];
+
+                        const eventStart = new Date(ev.start);
+                        if (ev.type == 'VEVENT') {
+                            if (eventStart > dateNow) {
+                                let uid = crypto.MD5(ev.start + ev.summary).toString();
+                                if (ev.uid) {
+                                    uid = ev.uid;
+                                }
+
+                                const event: CalEvent = {
+                                    summary: ev.summary,
+                                    id: uid,
+                                    location: ev.location,
+                                    eventStart: new Date(ev.start),
+                                    eventEnd: new Date(ev.end),
+                                    description: ev.description
+                                }
+
+                                if (config.offset) {
+                                    eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
+                                } else {
+                                    eventStart.setMinutes(eventStart.getMinutes() - 1);
+                                }
+
+                                const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));
+                                let startedCronJobs=node.context().get('startedCronJobs') || {};                               
+                                if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
+                                    newCronJobs.set(uid, job2);
+                                    node.debug("new - " + uid);
+                                }
+                                else if (startedCronJobs[uid]) {
+                                    node.debug("started - " + uid);
+                                }
                             }
-
-                            const event: CalEvent = {
-                                summary: ev.summary,
-                                id: uid,
-                                location: ev.location,
-                                eventStart: new Date(ev.start.getTime()),
-                                eventEnd: new Date(ev.end.getTime()),
-                                description: ev.description
-                            }
-
-                            if (config.offset) {
-                                eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
-                            } else {
-                                eventStart.setMinutes(eventStart.getMinutes() - 1);
-                            }
-
-                            const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));
-
-
-
-                            if (!newCronJobs.has(uid) && !startedCronJobs.has(uid)) {
-                                newCronJobs.set(uid, job2);
-                                node.debug("new - " + uid);
-                            }
-                            else if (startedCronJobs.has(uid)) {
-                                node.debug("started - " + uid);
-                            }
-
-
                         }
                     }
                 }
+
+                newCronJobs.forEach((job, key) => {
+                    try {
+                        job.start();
+                        node.debug("starting - " + key);
+                        var startedCronJobs = node.context().get('startedCronJobs') || {};
+                        startedCronJobs[key] = job;
+                        node.context().set('startedCronJobs',startedCronJobs);                        
+                    } catch (newCronErr) {
+                        node.error(newCronErr);
+                    }
+
+                });
+
+                newCronJobs.clear();
             }
-
-            newCronJobs.forEach((job, key) => {
-                try {
-                    job.start();
-                    startedCronJobs[key] = job;
-                } catch (newCronErr) {
-                    node.error(newCronErr);
-                }
-
-            });
-
-            newCronJobs.clear();
-
         });
     }
-
 
     function cronJob(event: any, node: Node) {
         node.send({
