@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.0...v0.4.1) (2019-10-21)
+
+
+### Features
+
+* caldav also implemented for events ([ce70782](https://github.com/naimo84/node-red-contrib-ical-events/commit/ce70782))
+
 ## [0.4.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.3.1...v0.4.0) (2019-10-20)
 
 ### [0.3.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.3.0...v0.3.1) (2019-10-20)
