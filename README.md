@@ -2,7 +2,7 @@
 
 ## under active development
 
-This Node RED module gets the events from an ical-URL.
+This Node RED module gets the events from an ical-URL or from a caldav-server.
 
 > Node-RED is a tool for wiring together hardware devices, APIs and online services in new and interesting ways.
 
@@ -50,7 +50,10 @@ node-red
 - ***URL*** URL to Calendar
 - ***Replace Dates with name*** Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
 - ***Language*** if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
-- ***Cron*** cron-expression for checking the url 
+- ***Cron*** cron-expression for checking the url, if no cron is specified, it's only checked on input.
+- ***Username*** HTTP Basic authentication user
+- ***Password*** HTTP Basic authentication user
+- ***Type*** Type can be ical or caldav
 
 instead of cron-expression, an input node can be used.
 
