@@ -76,10 +76,8 @@ module.exports = function (RED: Red) {
                         ev.end.setDate(ev.end.getDate() + 1);
                     }
                 }
-
-                if (ev.rrule === undefined) {
-                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
-                }
+                
+                checkDates(ev, endpreview, today, realnow, ' ', node, config);               
             }
 
             if (++processedEntries > 100) {

@@ -62,9 +62,10 @@ module.exports = function (RED) {
                         ev.end.setDate(ev.end.getDate() + 1);
                     }
                 }
-                if (ev.rrule === undefined) {
-                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
-                }
+                console.log(ev.rrule);
+                //if (ev.rrule === undefined) {
+                checkDates(ev, endpreview, today, realnow, ' ', node, config);
+                //}
             }
             if (++processedEntries > 100) {
                 break;
