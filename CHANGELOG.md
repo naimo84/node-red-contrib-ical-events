@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.2...v0.4.3) (2019-10-24)
+
+
+### Features
+
+* issue [#4](https://github.com/naimo84/node-red-contrib-ical-events/issues/4) and [#5](https://github.com/naimo84/node-red-contrib-ical-events/issues/5), supporting RRules ([1051ed6](https://github.com/naimo84/node-red-contrib-ical-events/commit/1051ed6))
+
 ### [0.4.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.1...v0.4.2) (2019-10-24)
 
 
