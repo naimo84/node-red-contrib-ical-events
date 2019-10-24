@@ -63,6 +63,75 @@ module.exports = function (RED: Red) {
         }, node, node.config);
     }
 
+    function processRRule(ev, endpreview, today, realnow, node, config) {
+        var eventLength = ev.end.getTime() - ev.start.getTime();
+
+        var options = RRule.parseString(ev.rrule.toString());        
+        options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
+        if (options.until) {
+            options.until = addOffset(options.until, -getTimezoneOffset(options.until));
+        }
+        node.debug('options:' + JSON.stringify(options));
+
+        var rule = new RRule(options);
+        var now2 = new Date();
+        now2.setHours(0, 0, 0, 0);
+        var now3 = new Date(now2.getTime() - eventLength);
+        if (now2 < now3) now3 = now2;
+        node.debug('RRule event:' + ev.summary + '; start:' + ev.start.toString() + '; endpreview:' + endpreview.toString() + '; today:' + today + '; now2:' + now2 + '; now3:' + now3 + '; rule:' + JSON.stringify(rule));
+
+        var dates = [];
+        try {
+            dates = rule.between(now3, endpreview, true);
+        } catch (e) {
+            node.error('Issue detected in RRule, event ignored; Please forward debug information to iobroker.ical developer: ' + e.stack + '\n' +
+                'RRule object: ' + JSON.stringify(rule) + '\n' +
+                'now3: ' + now3 + '\n' +
+                'endpreview: ' + endpreview + '\n' +
+                'string: ' + ev.rrule.toString() + '\n' +
+                'options: ' + JSON.stringify(options)
+            );
+        }
+
+        node.debug('dates:' + JSON.stringify(dates));
+      
+        if (dates.length > 0) {
+            for (var i = 0; i < dates.length; i++) {                
+                var ev2 = ce.clone(ev);
+                var start = dates[i];
+                ev2.start = addOffset(start, getTimezoneOffset(start));
+
+                var end = new Date(start.getTime() + eventLength);
+                ev2.end = addOffset(end, getTimezoneOffset(end));
+
+                node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
+             
+                var checkDate = true;
+                if (ev2.exdate) {
+                    for (var d in ev2.exdate) {
+                        if (new Date(d).getTime() === ev2.start.getTime()) {
+                            checkDate = false;
+                            node.debug('   ' + i + ': sort out');
+                            break;
+                        }
+                    }
+                }
+                if (checkDate && ev.recurrences) {
+                    for (var dOri in ev.recurrences) {
+                        if (new Date(dOri).getTime() === ev2.start.getTime()) {
+                            ev2 = ce.clone(ev.recurrences[dOri]);
+                            node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                        }
+                    }
+                }
+
+                if (checkDate) {
+                    checkDates(ev2, endpreview, today, realnow, ' rrule ', node, config);
+                }
+            }
+        }
+    }
+
     function processData(data, realnow, today, endpreview, now2, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
@@ -76,8 +145,12 @@ module.exports = function (RED: Red) {
                         ev.end.setDate(ev.end.getDate() + 1);
                     }
                 }
-                
-                checkDates(ev, endpreview, today, realnow, ' ', node, config);               
+
+                if (ev.rrule === undefined) {
+                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
+                } else {
+                    processRRule(ev, endpreview, today, realnow, node, config);
+                }
             }
 
             if (++processedEntries > 100) {
@@ -224,6 +297,19 @@ module.exports = function (RED: Red) {
                 callback("no Data" + e);
             }
         });
+    }
+
+    function getTimezoneOffset(date) {
+        var offset = 0;
+        var zone = moment.tz.zone(moment.tz.guess());
+        if (zone && date) {
+            offset = zone.utcOffset(date.getTime());
+        }
+        return offset;
+    }
+
+    function addOffset(time, offset) {
+        return new Date(time.getTime() + (offset * 60 * 1000));
     }
 
     function displayDates(node: any, config: Config) {

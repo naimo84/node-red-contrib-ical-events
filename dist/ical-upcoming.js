@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var cron_1 = require("cron");
 var ical = require("node-ical");
+var moment = require("moment");
 var caldav_1 = require("./caldav");
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
@@ -50,6 +51,76 @@ module.exports = function (RED) {
             displayDates(node, node.config);
         }, node, node.config);
     }
+    function processRRule(ev, endpreview, today, realnow, node, config) {
+        var eventLength = ev.end.getTime() - ev.start.getTime();
+        var options = RRule.parseString(ev.rrule.toString());
+        // convert times temporary to UTC
+        options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
+        if (options.until) {
+            options.until = addOffset(options.until, -getTimezoneOffset(options.until));
+        }
+        node.debug('options:' + JSON.stringify(options));
+        var rule = new RRule(options);
+        var now2 = new Date();
+        // clear time
+        now2.setHours(0, 0, 0, 0);
+        var now3 = new Date(now2.getTime() - eventLength);
+        if (now2 < now3)
+            now3 = now2;
+        node.debug('RRule event:' + ev.summary + '; start:' + ev.start.toString() + '; endpreview:' + endpreview.toString() + '; today:' + today + '; now2:' + now2 + '; now3:' + now3 + '; rule:' + JSON.stringify(rule));
+        var dates = [];
+        try {
+            dates = rule.between(now3, endpreview, true);
+        }
+        catch (e) {
+            node.error('Issue detected in RRule, event ignored; Please forward debug information to iobroker.ical developer: ' + e.stack + '\n' +
+                'RRule object: ' + JSON.stringify(rule) + '\n' +
+                'now3: ' + now3 + '\n' +
+                'endpreview: ' + endpreview + '\n' +
+                'string: ' + ev.rrule.toString() + '\n' +
+                'options: ' + JSON.stringify(options));
+        }
+        node.debug('dates:' + JSON.stringify(dates));
+        // event within the time window
+        if (dates.length > 0) {
+            for (var i = 0; i < dates.length; i++) {
+                // use deep-copy otherwise setDate etc. overwrites data from different events
+                var ev2 = ce.clone(ev);
+                // replace date & time for each event in RRule
+                // convert time back to local times
+                var start = dates[i];
+                ev2.start = addOffset(start, getTimezoneOffset(start));
+                // Set end date based on length in ms
+                var end = new Date(start.getTime() + eventLength);
+                ev2.end = addOffset(end, getTimezoneOffset(end));
+                node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
+                // we have to check if there is an exdate array
+                // which defines dates that - if matched - should
+                // be excluded.
+                var checkDate = true;
+                if (ev2.exdate) {
+                    for (var d in ev2.exdate) {
+                        if (new Date(d).getTime() === ev2.start.getTime()) {
+                            checkDate = false;
+                            node.debug('   ' + i + ': sort out');
+                            break;
+                        }
+                    }
+                }
+                if (checkDate && ev.recurrences) {
+                    for (var dOri in ev.recurrences) {
+                        if (new Date(dOri).getTime() === ev2.start.getTime()) {
+                            ev2 = ce.clone(ev.recurrences[dOri]);
+                            node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                        }
+                    }
+                }
+                if (checkDate) {
+                    checkDates(ev2, endpreview, today, realnow, ' rrule ', node, config);
+                }
+            }
+        }
+    }
     function processData(data, realnow, today, endpreview, now2, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
@@ -62,10 +133,12 @@ module.exports = function (RED) {
                         ev.end.setDate(ev.end.getDate() + 1);
                     }
                 }
-                console.log(ev.rrule);
-                //if (ev.rrule === undefined) {
-                checkDates(ev, endpreview, today, realnow, ' ', node, config);
-                //}
+                if (ev.rrule === undefined) {
+                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
+                }
+                else {
+                    processRRule(ev, endpreview, today, realnow, node, config);
+                }
             }
             if (++processedEntries > 100) {
                 break;
@@ -200,6 +273,17 @@ module.exports = function (RED) {
                 callback("no Data" + e);
             }
         });
+    }
+    function getTimezoneOffset(date) {
+        var offset = 0;
+        var zone = moment.tz.zone(moment.tz.guess());
+        if (zone && date) {
+            offset = zone.utcOffset(date.getTime());
+        }
+        return offset;
+    }
+    function addOffset(time, offset) {
+        return new Date(time.getTime() + (offset * 60 * 1000));
     }
     function displayDates(node, config) {
         var todayEventcounter = 0;
