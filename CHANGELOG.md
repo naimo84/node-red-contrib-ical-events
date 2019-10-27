@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.3...v0.4.4) (2019-10-27)
+
+
+### Bug Fixes
+
+* issue [#6](https://github.com/naimo84/node-red-contrib-ical-events/issues/6), Calendar Event fails to start ([14f6f4d](https://github.com/naimo84/node-red-contrib-ical-events/commit/14f6f4d))
+
 ### [0.4.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.2...v0.4.3) (2019-10-24)
 
 
