@@ -50,15 +50,28 @@ node-red
 
 #### events: 
 
-The calendar is checked for new events on input or cronjob. For events in the future, a separated cronjob is generated. It's fired on the start datetime of the ical event. 
+The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.
 
 #### upcoming:
 
-As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events within the preview timespan.
+As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
 Additional msg properties are:
 
 * msg.today - number of upcoming events today
-
+* msg.tomorrow - number of upcoming events tomorrow
+* msg.total - number of upcoming events totally
+* msg.htmlTable - a html formated table of upcoming events
+* msg.payload - arraylist of upcoming events
+  * date
+  * summary
+  * event
+  * eventStart
+  * eventEnd
+  * description
+  * id
+  * allDay
+  * rule
+  * location
 
 ### Configuration:
 - ***URL*** URL to Calendar
