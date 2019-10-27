@@ -28,46 +28,52 @@ export interface CalEvent {
 
 module.exports = function (RED: Red) {
     let newCronJobs = new Map();
-   
+
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
-
+        let node = this;
         this.config = configNode;
         try {
-            this.on('input', () => {
+            node.on('input', () => {
                 cronCheckJob(this, config);
             });
 
-            this.on('close', () => {
-                this.context().get('startedCronJobs').forEach((job_started, key) => {
-                    job_started.stop();
-                    this.debug(job_started.uid + " stopped")
-                });
-                this.context().get('startedCronJobs').clear();
-                this.debug("cron stopped")
+            node.on('close', () => {
+                node.debug("cron stopped")
+                let startedCronJobs = node.context().get('startedCronJobs');
+                if (startedCronJobs) {                  
+                    for (let key in startedCronJobs) {
+                        if (startedCronJobs.hasOwnProperty(key)) {
+                            node.debug(key + " stopped")
+                            startedCronJobs[key].stop();
+                        }
+                    }
+                    node.context().get('startedCronJobs').clear();
+                }
+
             });
 
             if (config.cron && config.cron !== "") {
                 parser.parseExpression(config.cron);
 
-                this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-                this.job.start();
+                node.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, node, config));
+                node.job.start();
 
-                this.on('close', () => {
-                    this.job.stop();
+                node.on('close', () => {
+                    node.job.stop();
                 });
             }
         }
         catch (err) {
-            this.error('Error: ' + err.message);
-            this.status({ fill: "red", shape: "ring", text: err.message })
+            node.error('Error: ' + err.message);
+            node.status({ fill: "red", shape: "ring", text: err.message })
         }
     }
 
     function getICal(node, urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            if (node.config.caldav && JSON.parse(node.config.caldav) === true) {                
+            if (node.config.caldav && JSON.parse(node.config.caldav) === true) {
                 CalDav(node, node.config, null, (data) => {
                     callback(null, data);
                 });
@@ -104,12 +110,12 @@ module.exports = function (RED: Red) {
             node.status({});
         }
         var dateNow = new Date();
-       
-        getICal(node, node.config.url, node.config, (err, data) => {            
+
+        getICal(node, node.config.url, node.config, (err, data) => {
             if (err || !data) {
                 return;
             }
-           
+
             node.debug('Ical read successfully ' + config.url);
 
             if (data) {
@@ -141,7 +147,7 @@ module.exports = function (RED: Red) {
                                 }
 
                                 const job2 = new CronJob(eventStart, cronJob.bind(null, event, node));
-                                let startedCronJobs=node.context().get('startedCronJobs') || {};                               
+                                let startedCronJobs = node.context().get('startedCronJobs') || {};
                                 if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
                                     newCronJobs.set(uid, job2);
                                     node.debug("new - " + uid);
@@ -160,7 +166,7 @@ module.exports = function (RED: Red) {
                         node.debug("starting - " + key);
                         var startedCronJobs = node.context().get('startedCronJobs') || {};
                         startedCronJobs[key] = job;
-                        node.context().set('startedCronJobs',startedCronJobs);                        
+                        node.context().set('startedCronJobs', startedCronJobs);
                     } catch (newCronErr) {
                         node.error(newCronErr);
                     }

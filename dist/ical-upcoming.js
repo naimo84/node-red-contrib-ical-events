@@ -54,7 +54,6 @@ module.exports = function (RED) {
     function processRRule(ev, endpreview, today, realnow, node, config) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
         var options = RRule.parseString(ev.rrule.toString());
-        // convert times temporary to UTC
         options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
         if (options.until) {
             options.until = addOffset(options.until, -getTimezoneOffset(options.until));
@@ -62,7 +61,6 @@ module.exports = function (RED) {
         node.debug('options:' + JSON.stringify(options));
         var rule = new RRule(options);
         var now2 = new Date();
-        // clear time
         now2.setHours(0, 0, 0, 0);
         var now3 = new Date(now2.getTime() - eventLength);
         if (now2 < now3)
@@ -81,22 +79,14 @@ module.exports = function (RED) {
                 'options: ' + JSON.stringify(options));
         }
         node.debug('dates:' + JSON.stringify(dates));
-        // event within the time window
         if (dates.length > 0) {
             for (var i = 0; i < dates.length; i++) {
-                // use deep-copy otherwise setDate etc. overwrites data from different events
                 var ev2 = ce.clone(ev);
-                // replace date & time for each event in RRule
-                // convert time back to local times
                 var start = dates[i];
                 ev2.start = addOffset(start, getTimezoneOffset(start));
-                // Set end date based on length in ms
                 var end = new Date(start.getTime() + eventLength);
                 ev2.end = addOffset(end, getTimezoneOffset(end));
                 node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
-                // we have to check if there is an exdate array
-                // which defines dates that - if matched - should
-                // be excluded.
                 var checkDate = true;
                 if (ev2.exdate) {
                     for (var d in ev2.exdate) {

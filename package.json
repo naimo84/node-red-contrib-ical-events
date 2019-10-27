@@ -42,7 +42,7 @@
   "scripts": {
     "start": "gulp && node-red",
     "test": "mocha \"test/**/*_spec.js\"",
-    "release": "gulp && standard-version"
+    "release": "standard-version"
   },
   "husky": {
     "hooks": {

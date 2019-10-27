@@ -11,31 +11,37 @@ module.exports = function (RED) {
         var _this = this;
         RED.nodes.createNode(this, config);
         var configNode = RED.nodes.getNode(config.confignode);
+        var node = this;
         this.config = configNode;
         try {
-            this.on('input', function () {
+            node.on('input', function () {
                 cronCheckJob(_this, config);
             });
-            this.on('close', function () {
-                _this.context().get('startedCronJobs').forEach(function (job_started, key) {
-                    job_started.stop();
-                    _this.debug(job_started.uid + " stopped");
-                });
-                _this.context().get('startedCronJobs').clear();
-                _this.debug("cron stopped");
+            node.on('close', function () {
+                node.debug("cron stopped");
+                var startedCronJobs = node.context().get('startedCronJobs');
+                if (startedCronJobs) {
+                    for (var key in startedCronJobs) {
+                        if (startedCronJobs.hasOwnProperty(key)) {
+                            node.debug(key + " stopped");
+                            startedCronJobs[key].stop();
+                        }
+                    }
+                    node.context().get('startedCronJobs').clear();
+                }
             });
             if (config.cron && config.cron !== "") {
                 parser.parseExpression(config.cron);
-                this.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, config));
-                this.job.start();
-                this.on('close', function () {
-                    _this.job.stop();
+                node.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, node, config));
+                node.job.start();
+                node.on('close', function () {
+                    node.job.stop();
                 });
             }
         }
         catch (err) {
-            this.error('Error: ' + err.message);
-            this.status({ fill: "red", shape: "ring", text: err.message });
+            node.error('Error: ' + err.message);
+            node.status({ fill: "red", shape: "ring", text: err.message });
         }
     }
     function getICal(node, urlOrFile, config, callback) {
