@@ -6,6 +6,7 @@ import { Config } from './ical-config';
 import { isEqual } from 'lodash';
 import * as moment from 'moment';
 import { CalDav } from './caldav';
+import { loadEventsForDay } from './icloud'
 
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
@@ -66,7 +67,7 @@ module.exports = function (RED: Red) {
     function processRRule(ev, endpreview, today, realnow, node, config) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
 
-        var options = RRule.parseString(ev.rrule.toString());        
+        var options = RRule.parseString(ev.rrule.toString());
         options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
         if (options.until) {
             options.until = addOffset(options.until, -getTimezoneOffset(options.until));
@@ -94,9 +95,9 @@ module.exports = function (RED: Red) {
         }
 
         node.debug('dates:' + JSON.stringify(dates));
-      
+
         if (dates.length > 0) {
-            for (var i = 0; i < dates.length; i++) {                
+            for (var i = 0; i < dates.length; i++) {
                 var ev2 = ce.clone(ev);
                 var start = dates[i];
                 ev2.start = addOffset(start, getTimezoneOffset(start));
@@ -105,7 +106,7 @@ module.exports = function (RED: Red) {
                 ev2.end = addOffset(end, getTimezoneOffset(end));
 
                 node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
-             
+
                 var checkDate = true;
                 if (ev2.exdate) {
                     for (var d in ev2.exdate) {
@@ -232,14 +233,27 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function getICal(node: Node, urlOrFile, config, callback) {
+    function getICal(node, urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            if (config.caldav && JSON.parse(config.caldav) === true) {
+            if (config.caldav && config.caldav === 'icloud') {
+                const now = moment();
+                const when = now.toDate();
+                loadEventsForDay(moment(when), {
+                    url: urlOrFile,
+                    username: config.username,
+                    password: config.password,
+                    type: "caldav",
+                    endpreview:node.endpreview
+                }, (list, start, end) => {
+                    callback && callback(null, list);
+                });
+            } else if (config.caldav && JSON.parse(config.caldav) === true) {
                 node.debug("caldav")
                 CalDav(node, config, null, (data) => {
                     callback(null, data);
                 });
-            } else {
+            }
+            else {
                 let header = {};
                 let username = config.username;
                 let password = config.password;

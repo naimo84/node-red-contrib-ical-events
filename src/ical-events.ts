@@ -43,7 +43,7 @@ module.exports = function (RED: Red) {
             node.on('close', () => {
                 node.debug("cron stopped")
                 let startedCronJobs = node.context().get('startedCronJobs');
-                if (startedCronJobs) {                  
+                if (startedCronJobs) {
                     for (let key in startedCronJobs) {
                         if (startedCronJobs.hasOwnProperty(key)) {
                             node.debug(key + " stopped")
@@ -128,9 +128,9 @@ module.exports = function (RED: Red) {
                         const eventEnd = new Date(ev.end);
                         if (ev.type == 'VEVENT') {
                             if (eventStart > dateNow) {
-                                let uid = crypto.MD5(ev.created + ev.summary+"start").toString();
+                                let uid = crypto.MD5(ev.created + ev.summary + "start").toString();
                                 if (ev.uid) {
-                                    uid = ev.uid+"start";
+                                    uid = ev.uid + "start";
                                 }
 
                                 const event: CalEvent = {
@@ -162,9 +162,9 @@ module.exports = function (RED: Red) {
                                 }
                             }
                             if (eventEnd > dateNow) {
-                                let uid = crypto.MD5(ev.created + ev.summary+"end").toString();
+                                let uid = crypto.MD5(ev.created + ev.summary + "end").toString();
                                 if (ev.uid) {
-                                    uid = ev.uid+"end";
+                                    uid = ev.uid + "end";
                                 }
 
                                 const event: CalEvent = {
@@ -220,11 +220,11 @@ module.exports = function (RED: Red) {
     function cronJobStart(event: any, node: Node) {
         node.send([{
             payload: event
-        },null]);
+        }, null]);
     }
 
     function cronJobEnd(event: any, node: Node) {
-        node.send([null,{
+        node.send([null, {
             payload: event
         }]);
     }
