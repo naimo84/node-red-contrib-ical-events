@@ -156,6 +156,8 @@ module.exports = function (RED: Red) {
                                 }
                                 else if (startedCronJobs[uid]) {
                                     startedCronJobs[uid].setTime(new CronTime(eventStart));
+                                    startedCronJobs[uid].start();
+                                    node.context().set('startedCronJobs', startedCronJobs);
                                     node.debug("started - " + uid);
                                 }
                             }
@@ -188,6 +190,8 @@ module.exports = function (RED: Red) {
                                 }
                                 else if (startedCronJobs[uid]) {
                                     startedCronJobs[uid].setTime(new CronTime(eventEnd));
+                                    startedCronJobs[uid].start();
+                                    node.context().set('startedCronJobs', startedCronJobs);
                                     node.debug("started - " + uid);
                                 }
                             }
