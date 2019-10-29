@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.4...v0.5.0) (2019-10-29)
+
+
+### Features
+
+* additional end events ([e05caad](https://github.com/naimo84/node-red-contrib-ical-events/commit/e05caad))
+* first try to implement icloud, issue [#8](https://github.com/naimo84/node-red-contrib-ical-events/issues/8) ([7b1744c](https://github.com/naimo84/node-red-contrib-ical-events/commit/7b1744c))
+
 ### [0.4.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.3...v0.4.4) (2019-10-27)
 
 
