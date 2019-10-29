@@ -111,14 +111,13 @@ module.exports = function (RED: Red) {
             node.status({});
         }
         var dateNow = new Date();
-
+        var possibleUids = [];
         getICal(node, node.config.url, node.config, (err, data) => {
             if (err || !data) {
                 return;
             }
 
             node.debug('Ical read successfully ' + config.url);
-
             if (data) {
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {
@@ -132,7 +131,7 @@ module.exports = function (RED: Red) {
                                 if (ev.uid) {
                                     uid = ev.uid + "start";
                                 }
-
+                                possibleUids.push(uid);
                                 const event: CalEvent = {
                                     summary: ev.summary,
                                     id: uid,
@@ -166,7 +165,7 @@ module.exports = function (RED: Red) {
                                 if (ev.uid) {
                                     uid = ev.uid + "end";
                                 }
-
+                                possibleUids.push(uid);
                                 const event: CalEvent = {
                                     summary: ev.summary,
                                     id: uid,
@@ -214,6 +213,20 @@ module.exports = function (RED: Red) {
 
                 newCronJobs.clear();
             }
+            var startedCronJobs = node.context().get('startedCronJobs');
+            for (let key in startedCronJobs){
+                if(startedCronJobs.hasOwnProperty(key)){
+                    if(startedCronJobs[key].running == false){
+                        delete startedCronJobs[key];
+                    }
+                    else if(!(possibleUids.includes(key,0))){
+                        startedCronJobs[key].stop();
+                        delete startedCronJobs[key];
+                    }
+                }
+            }
+            node.context().set('startedCronJobs', startedCronJobs);
+            //possibleUids.length = 0;
         });
     }
 
