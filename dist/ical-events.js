@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
 var ical = require("node-ical");
 var cron_1 = require("cron");
+var cron_2 = require("cron");
 var caldav_1 = require("./caldav");
 var parser = require("cron-parser");
 module.exports = function (RED) {
@@ -91,11 +92,12 @@ module.exports = function (RED) {
                     if (data.hasOwnProperty(k)) {
                         var ev = data[k];
                         var eventStart = new Date(ev.start);
+                        var eventEnd = new Date(ev.end);
                         if (ev.type == 'VEVENT') {
                             if (eventStart > dateNow) {
-                                var uid = crypto.MD5(ev.start + ev.summary).toString();
+                                var uid = crypto.MD5(ev.created + ev.summary + "start").toString();
                                 if (ev.uid) {
-                                    uid = ev.uid;
+                                    uid = ev.uid + "start";
                                 }
                                 var event_1 = {
                                     summary: ev.summary,
@@ -111,13 +113,44 @@ module.exports = function (RED) {
                                 else {
                                     eventStart.setMinutes(eventStart.getMinutes() - 1);
                                 }
-                                var job2 = new cron_1.CronJob(eventStart, cronJob.bind(null, event_1, node));
+                                var job2 = new cron_1.CronJob(eventStart, cronJobStart.bind(null, event_1, node));
                                 var startedCronJobs = node.context().get('startedCronJobs') || {};
                                 if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
                                     newCronJobs.set(uid, job2);
                                     node.debug("new - " + uid);
                                 }
                                 else if (startedCronJobs[uid]) {
+                                    startedCronJobs[uid].setTime(new cron_2.CronTime(eventStart));
+                                    node.debug("started - " + uid);
+                                }
+                            }
+                            if (eventEnd > dateNow) {
+                                var uid = crypto.MD5(ev.created + ev.summary + "end").toString();
+                                if (ev.uid) {
+                                    uid = ev.uid + "end";
+                                }
+                                var event_2 = {
+                                    summary: ev.summary,
+                                    id: uid,
+                                    location: ev.location,
+                                    eventStart: new Date(ev.start),
+                                    eventEnd: new Date(ev.end),
+                                    description: ev.description
+                                };
+                                if (config.offset) {
+                                    eventStart.setMinutes(eventEnd.getMinutes() + parseInt(config.offset));
+                                }
+                                else {
+                                    eventStart.setMinutes(eventEnd.getMinutes() - 1);
+                                }
+                                var job2 = new cron_1.CronJob(eventEnd, cronJobEnd.bind(null, event_2, node));
+                                var startedCronJobs = node.context().get('startedCronJobs') || {};
+                                if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
+                                    newCronJobs.set(uid, job2);
+                                    node.debug("new - " + uid);
+                                }
+                                else if (startedCronJobs[uid]) {
+                                    startedCronJobs[uid].setTime(new cron_2.CronTime(eventEnd));
                                     node.debug("started - " + uid);
                                 }
                             }
@@ -140,10 +173,15 @@ module.exports = function (RED) {
             }
         });
     }
-    function cronJob(event, node) {
-        node.send({
-            payload: event
-        });
+    function cronJobStart(event, node) {
+        node.send([{
+                payload: event
+            }, null]);
+    }
+    function cronJobEnd(event, node) {
+        node.send([null, {
+                payload: event
+            }]);
     }
     RED.nodes.registerType("ical-events", eventsNode);
 };
