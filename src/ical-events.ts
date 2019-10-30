@@ -7,6 +7,8 @@ import { CronTime } from 'cron';
 import { CalDav } from './caldav';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
+import { loadEventsForDay } from './icloud'
+import * as moment from 'moment';
 
 export interface Job {
     id: string,
@@ -72,12 +74,25 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function getICal(node, urlOrFile, config, callback) {
+    function getICal(node, urlOrFile, config, callback) {        
         if (urlOrFile.match(/^https?:\/\//)) {
-            if (node.config.caldav && JSON.parse(node.config.caldav) === true) {
-                CalDav(node, node.config, null, (data) => {
-                    callback(null, data);
+            if (config.caldav && config.caldav === 'icloud') {
+                const now = moment();
+                const when = now.toDate();
+                loadEventsForDay(moment(when), {
+                    url: urlOrFile,
+                    username: config.username,
+                    password: config.password,
+                    type: "caldav",
+                    endpreview:node.endpreview
+                }, (list, start, end) => {
+                    callback && callback(null, list);
                 });
+            } else if (config.caldav && JSON.parse(config.caldav) === true) {
+                node.debug("caldav")
+                CalDav(node, config, null, (data) => {
+                    callback(null, data);
+                });            
             } else {
                 let header = {};
                 let username = node.config.username;
