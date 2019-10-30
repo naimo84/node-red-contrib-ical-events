@@ -82,6 +82,7 @@ module.exports = function (RED) {
             node.status({});
         }
         var dateNow = new Date();
+        var possibleUids = [];
         getICal(node, node.config.url, node.config, function (err, data) {
             if (err || !data) {
                 return;
@@ -99,6 +100,7 @@ module.exports = function (RED) {
                                 if (ev.uid) {
                                     uid = ev.uid + "start";
                                 }
+                                possibleUids.push(uid);
                                 var event_1 = {
                                     summary: ev.summary,
                                     id: uid,
@@ -114,13 +116,15 @@ module.exports = function (RED) {
                                     eventStart.setMinutes(eventStart.getMinutes() - 1);
                                 }
                                 var job2 = new cron_1.CronJob(eventStart, cronJobStart.bind(null, event_1, node));
-                                var startedCronJobs = node.context().get('startedCronJobs') || {};
-                                if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
+                                var startedCronJobs_1 = node.context().get('startedCronJobs') || {};
+                                if (!newCronJobs.has(uid) && !startedCronJobs_1[uid]) {
                                     newCronJobs.set(uid, job2);
                                     node.debug("new - " + uid);
                                 }
-                                else if (startedCronJobs[uid]) {
-                                    startedCronJobs[uid].setTime(new cron_2.CronTime(eventStart));
+                                else if (startedCronJobs_1[uid]) {
+                                    startedCronJobs_1[uid].setTime(new cron_2.CronTime(eventStart));
+                                    startedCronJobs_1[uid].start();
+                                    node.context().set('startedCronJobs', startedCronJobs_1);
                                     node.debug("started - " + uid);
                                 }
                             }
@@ -129,6 +133,7 @@ module.exports = function (RED) {
                                 if (ev.uid) {
                                     uid = ev.uid + "end";
                                 }
+                                possibleUids.push(uid);
                                 var event_2 = {
                                     summary: ev.summary,
                                     id: uid,
@@ -144,13 +149,15 @@ module.exports = function (RED) {
                                     eventStart.setMinutes(eventEnd.getMinutes() - 1);
                                 }
                                 var job2 = new cron_1.CronJob(eventEnd, cronJobEnd.bind(null, event_2, node));
-                                var startedCronJobs = node.context().get('startedCronJobs') || {};
-                                if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
+                                var startedCronJobs_2 = node.context().get('startedCronJobs') || {};
+                                if (!newCronJobs.has(uid) && !startedCronJobs_2[uid]) {
                                     newCronJobs.set(uid, job2);
                                     node.debug("new - " + uid);
                                 }
-                                else if (startedCronJobs[uid]) {
-                                    startedCronJobs[uid].setTime(new cron_2.CronTime(eventEnd));
+                                else if (startedCronJobs_2[uid]) {
+                                    startedCronJobs_2[uid].setTime(new cron_2.CronTime(eventEnd));
+                                    startedCronJobs_2[uid].start();
+                                    node.context().set('startedCronJobs', startedCronJobs_2);
                                     node.debug("started - " + uid);
                                 }
                             }
@@ -171,6 +178,20 @@ module.exports = function (RED) {
                 });
                 newCronJobs.clear();
             }
+            var startedCronJobs = node.context().get('startedCronJobs');
+            for (var key in startedCronJobs) {
+                if (startedCronJobs.hasOwnProperty(key)) {
+                    if (startedCronJobs[key].running == false) {
+                        delete startedCronJobs[key];
+                    }
+                    else if (!(possibleUids.includes(key, 0))) {
+                        startedCronJobs[key].stop();
+                        delete startedCronJobs[key];
+                    }
+                }
+            }
+            node.context().set('startedCronJobs', startedCronJobs);
+            //possibleUids.length = 0;
         });
     }
     function cronJobStart(event, node) {
