@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.0...v0.5.1) (2019-10-30)
+
+
+### Bug Fixes
+
+* built ([ea55e57](https://github.com/naimo84/node-red-contrib-ical-events/commit/ea55e57))
+* icloud config also for events ([6fe7854](https://github.com/naimo84/node-red-contrib-ical-events/commit/6fe7854))
+
+
+### Features
+
+* handle deleted calendar entries ([60e4738](https://github.com/naimo84/node-red-contrib-ical-events/commit/60e4738))
+
 ## [0.5.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.4.4...v0.5.0) (2019-10-29)
 
 
