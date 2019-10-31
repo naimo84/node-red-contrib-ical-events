@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.1...v0.5.2) (2019-10-31)
+
+
+### Bug Fixes
+
+* forgot gulp task, js was not built ([1dbbeb3](https://github.com/naimo84/node-red-contrib-ical-events/commit/1dbbeb3))
+
 ### [0.5.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.0...v0.5.1) (2019-10-30)
 
 
