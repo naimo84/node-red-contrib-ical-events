@@ -6,6 +6,8 @@ var cron_1 = require("cron");
 var cron_2 = require("cron");
 var caldav_1 = require("./caldav");
 var parser = require("cron-parser");
+var icloud_1 = require("./icloud");
+var moment = require("moment");
 module.exports = function (RED) {
     var newCronJobs = new Map();
     function eventsNode(config) {
@@ -47,8 +49,22 @@ module.exports = function (RED) {
     }
     function getICal(node, urlOrFile, config, callback) {
         if (urlOrFile.match(/^https?:\/\//)) {
-            if (node.config.caldav && JSON.parse(node.config.caldav) === true) {
-                caldav_1.CalDav(node, node.config, null, function (data) {
+            if (config.caldav && config.caldav === 'icloud') {
+                var now = moment();
+                var when = now.toDate();
+                icloud_1.loadEventsForDay(moment(when), {
+                    url: urlOrFile,
+                    username: config.username,
+                    password: config.password,
+                    type: "caldav",
+                    endpreview: node.endpreview
+                }, function (list, start, end) {
+                    callback && callback(null, list);
+                });
+            }
+            else if (config.caldav && JSON.parse(config.caldav) === true) {
+                node.debug("caldav");
+                caldav_1.CalDav(node, config, null, function (data) {
                     callback(null, data);
                 });
             }
