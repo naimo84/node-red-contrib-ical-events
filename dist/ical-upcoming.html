@@ -59,9 +59,11 @@
 
 <!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-upcoming">
-    <!--
     <p>A node for upcoming events</p>
     
+    <p>As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
+    Additional msg properties are:</p>
+
     <h3>How to use</h3>
   
     <p>Configuration</p>
@@ -83,12 +85,11 @@
     <br/> • total: datesArray.length
 
     <p>example output:</p>
-    {
+    <pre>{
         "summary": "meeting",
         "id": "15ko5i37jhc634567dihn6g7h@google.com",
         "location": "office",
         "eventStart": "2019-08-13T12:45:00.000Z",
         "eventEnd": "2019-08-13T13:45:00.000Z"
-    }
--->
+    }</pre>
 </script>
