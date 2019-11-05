@@ -32,6 +32,7 @@
     "nodes": {
       "ical-config": "dist/ical-config.js",
       "ical-events": "dist/ical-events.js",
+      "ical-sensor": "dist/ical-sensor.js",
       "ical-upcoming": "dist/ical-upcoming.js"
     }
   },

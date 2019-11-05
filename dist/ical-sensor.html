@@ -1,7 +1,7 @@
 <script type="text/javascript">
     RED
         .nodes
-        .registerType('ical-events', {
+        .registerType('ical-sensor', {
             category: 'ical',
             defaults: {
                 confignode: {
@@ -19,8 +19,7 @@
                 }
             },
             inputs: 1,
-            outputs: 2,
-            outputLabels: ["Start Message","End Message"],
+            outputs: 1,            
             color: "#E7AE24",
             label: function () {
                 if (this.name) {
@@ -29,14 +28,14 @@
                     return this.confignode.name;
                 }
 
-                return "event trigger";
+                return "event sensor";
             },
             icon: "calendar.png",
-            paletteLabel: "Trigger"
+            paletteLabel: "Sensor"
         });
 </script>
 
-<script type="text/x-red" data-template-name="ical-events">
+<script type="text/x-red" data-template-name="ical-sensor">
     <div class="form-row">
         <label for="node-input-confignode">Config</label>
         <input type="text" id="node-input-confignode">
@@ -56,7 +55,7 @@
 </script>
 
 <!-- Simple Help Text -->
-<script type="text/x-red" data-help-name="ical-events">
+<script type="text/x-red" data-help-name="ical-sensor">
     <p>A node for upcoming events</p>
     
     <p>The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.</p>

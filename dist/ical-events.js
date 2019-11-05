@@ -1,13 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
-var ical = require("node-ical");
 var cron_1 = require("cron");
 var cron_2 = require("cron");
-var caldav_1 = require("./caldav");
 var parser = require("cron-parser");
-var icloud_1 = require("./icloud");
-var moment = require("moment");
+var helper_1 = require("./helper");
 module.exports = function (RED) {
     var newCronJobs = new Map();
     function eventsNode(config) {
@@ -47,49 +44,6 @@ module.exports = function (RED) {
             node.status({ fill: "red", shape: "ring", text: err.message });
         }
     }
-    function getICal(node, urlOrFile, config, callback) {
-        if (urlOrFile.match(/^https?:\/\//)) {
-            if (config.caldav && config.caldav === 'icloud') {
-                var now = moment();
-                var when = now.toDate();
-                icloud_1.loadEventsForDay(moment(when), {
-                    url: urlOrFile,
-                    username: config.username,
-                    password: config.password,
-                    type: "caldav",
-                    endpreview: node.endpreview
-                }, function (list, start, end) {
-                    callback && callback(null, list);
-                });
-            }
-            else if (config.caldav && JSON.parse(config.caldav) === true) {
-                node.debug("caldav");
-                caldav_1.CalDav(node, config, null, function (data) {
-                    callback(null, data);
-                });
-            }
-            else {
-                var header = {};
-                var username = node.config.username;
-                var password = node.config.password;
-                if (username && password) {
-                    var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
-                    header = {
-                        headers: {
-                            'Authorization': auth
-                        }
-                    };
-                }
-                ical.fromURL(node.config.url, header, function (err, data) {
-                    if (err) {
-                        callback && callback(err, null);
-                        return;
-                    }
-                    callback && callback(null, data);
-                });
-            }
-        }
-    }
     function cronCheckJob(node, config) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
@@ -99,7 +53,7 @@ module.exports = function (RED) {
         }
         var dateNow = new Date();
         var possibleUids = [];
-        getICal(node, node.config.url, node.config, function (err, data) {
+        helper_1.getICal(node, node.config.url, node.config, function (err, data) {
             if (err || !data) {
                 return;
             }
