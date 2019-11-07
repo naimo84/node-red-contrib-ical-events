@@ -2,10 +2,8 @@
 import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import { CronJob } from 'cron';
-import * as parser from 'cron-parser';
 import { Config } from './ical-config';
-import { CalEvent } from './ical-events';
-import { getICal } from './helper';
+import { getICal,CalEvent} from './helper';
 
 module.exports = function (RED: Red) {
     function sensorNode(config: any) {
@@ -19,16 +17,34 @@ module.exports = function (RED: Red) {
                 cronCheckJob(this, config);
             });
 
-            if (config.cron && config.cron !== "") {
-                parser.parseExpression(config.cron);
+            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+                let cron = '0 0 * * * *';
 
-                node.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, node, config));
+                switch (config.timeoutUnits) {                    
+                    case 'seconds':
+                        cron = `*/${config.timeout} * * * * *`;
+                        break;
+                    case 'minutes':
+                        cron = `0 */${config.timeout} * * * *`;
+                        break;
+                    case 'hours':
+                        cron = `0 0 */${config.timeout} * * *`;
+                        break;
+                    case 'days':
+                        cron = `0 0 0 */${config.timeout} * *`;
+                        break;
+                    default:
+                        break;
+                }               
+                node.job = new CronJob(cron, cronCheckJob.bind(null, node, config));
                 node.job.start();
 
                 node.on('close', () => {
                     node.job.stop();
                 });
             }
+
+            cronCheckJob(this, config);
         }
         catch (err) {
             node.error('Error: ' + err.message);
@@ -59,7 +75,7 @@ module.exports = function (RED: Red) {
 
                         const eventStart = new Date(ev.start);
                         const eventEnd = new Date(ev.end);
-                        if (ev.type == 'VEVENT') {                           
+                        if (ev.type == 'VEVENT') {
                             if (eventStart <= dateNow && dateNow <= eventEnd) {
                                 let uid = crypto.MD5(ev.created + ev.summary).toString();
                                 if (ev.uid) {
@@ -73,8 +89,7 @@ module.exports = function (RED: Red) {
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
                                     description: ev.description,
-                                    on: true,
-                                    off:false
+                                    on: true
                                 }
 
                                 node.send(event);
@@ -86,8 +101,7 @@ module.exports = function (RED: Red) {
 
                 if (!current) {
                     const event = {
-                        on: false,
-                        off:true
+                        on: false
                     }
 
                     node.send(event);

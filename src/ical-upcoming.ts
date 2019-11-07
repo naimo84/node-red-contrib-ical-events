@@ -1,13 +1,8 @@
 import { Red, Node } from 'node-red';
-import { CalEvent } from "./ical-events";
 import { CronJob } from 'cron';
-import * as  ical from 'node-ical';
 import { Config } from './ical-config';
-import { isEqual } from 'lodash';
 import * as moment from 'moment';
-import { CalDav } from './caldav';
-import { loadEventsForDay } from './icloud'
-import { getICal } from './helper';
+import { getICal,CalEvent } from './helper';
 
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;

@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
 var cron_1 = require("cron");
-var parser = require("cron-parser");
 var helper_1 = require("./helper");
 module.exports = function (RED) {
     function sensorNode(config) {
@@ -15,14 +14,31 @@ module.exports = function (RED) {
             node.on('input', function () {
                 cronCheckJob(_this, config);
             });
-            if (config.cron && config.cron !== "") {
-                parser.parseExpression(config.cron);
-                node.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, node, config));
+            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+                var cron = '0 0 * * * *';
+                switch (config.timeoutUnits) {
+                    case 'seconds':
+                        cron = "*/" + config.timeout + " * * * * *";
+                        break;
+                    case 'minutes':
+                        cron = "0 */" + config.timeout + " * * * *";
+                        break;
+                    case 'hours':
+                        cron = "0 0 */" + config.timeout + " * * *";
+                        break;
+                    case 'days':
+                        cron = "0 0 0 */" + config.timeout + " * *";
+                        break;
+                    default:
+                        break;
+                }
+                node.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, node, config));
                 node.job.start();
                 node.on('close', function () {
                     node.job.stop();
                 });
             }
+            cronCheckJob(this, config);
         }
         catch (err) {
             node.error('Error: ' + err.message);
@@ -62,8 +78,7 @@ module.exports = function (RED) {
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
                                     description: ev.description,
-                                    on: true,
-                                    off: false
+                                    on: true
                                 };
                                 node.send(event_1);
                                 current = true;
@@ -73,8 +88,7 @@ module.exports = function (RED) {
                 }
                 if (!current) {
                     var event_2 = {
-                        on: false,
-                        off: true
+                        on: false
                     };
                     node.send(event_2);
                 }

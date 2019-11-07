@@ -8,18 +8,18 @@
                     value: "",
                     type: "ical-config"
                 },
-                cron: {
-                    value: ""                   
+                timeout: {
+                    value: ""
+                },
+                timeoutUnits: {
+                    value: ""
                 },
                 name: {
-                    value: ""                   
-                },
-                offset: {
-                    value: ""                   
-                }
+                    value: ""
+                }              
             },
             inputs: 1,
-            outputs: 1,            
+            outputs: 1,
             color: "#E7AE24",
             label: function () {
                 if (this.name) {
@@ -31,43 +31,60 @@
                 return "event sensor";
             },
             icon: "calendar.png",
-            paletteLabel: "Sensor"
+            paletteLabel: "Sensor",
+            oneditprepare: function () {
+                var node = this;
+                $("#node-input-timeout").spinner({ min: 1 });
+
+                $('.ui-spinner-button').on("click", function () {
+                    $(this).siblings('input').trigger("change");
+                });
+
+                if (!this.timeoutUnits) {
+                    $("#node-input-timeoutUnits option").filter(function () {
+                        return $(this).val() == 'seconds';
+                    }).attr('selected', true);
+                }
+            }
         });
 </script>
 
 <script type="text/x-red" data-template-name="ical-sensor">
     <div class="form-row">
-        <label for="node-input-confignode">Config</label>
+        <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
+    </div>    
+    <div class="form-row" id="delay-details-for">
+        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
+        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
+        <select id="node-input-timeoutUnits" style="width:200px !important">          
+          <option value="seconds">Seconds</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
+        </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-cron">Cron</label>
-        <input type="text" id="node-input-cron">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name">Name</label>
+    <div class="form-row">        
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-offset">Offset (in minutes)</label>
-        <input type="text" id="node-input-offset">
-    </div>
+    </div>   
 </script>
 
 <!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-sensor">
-    <p>A node for upcoming events</p>
+    <p>A sensor node for events</p>
     
-    <p>The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.</p>
+    <p>The calendar is checked for running events on input or configurable timeout.</p>
 
     <h3>How to use</h3>
   
     <p>Configuration</p>
-    <br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *')
+    <br/> • "Check every": how often the calendar is checked for new events
     <br/> • "Name": Displayname
-    <br/> • "Offset": positive or negative value in minutes, when msg.payload is triggered before/after the ical-startdate
     
-    <p>The msg.payload contains the following values of the calendar entry</p>
+    <p>If an event is running at time of checking, msg.on is true, otherwise false.</p>
+
+    <p>The message additionaly contains the following values of the calendar entry</p>
     <br/> • summary
     <br/> • id
     <br/> • location

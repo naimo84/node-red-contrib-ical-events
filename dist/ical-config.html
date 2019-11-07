@@ -32,48 +32,57 @@
                 }
                 return "iCal Config";
             },
+            oneditprepare: function () {
+                var node = this;  
+
+                if (this.caldav == undefined) {
+                    $("#node-config-input-caldav option").filter(function () {
+                        return $(this).val() == 'false';
+                    }).attr('selected', true);
+                }
+            }
         });
 </script>
 
 <script type="text/x-red" data-template-name="ical-config">
     <div class="form-row">
-        <label for="node-config-input-url">
-            <i class="fa fa-tag"></i>
-            iCal / ics / caldav URL:</label>
-        <input type="text" id="node-config-input-url" placeholder="">
+        <label for="node-config-input-url" style="width:160px !important">
+            <i class="fa fa-link"></i>
+            <span>iCal / ics / caldav URL:</span></label>
+        <input type="text" id="node-config-input-url" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-caldav">
-            <i class="fa fa-tag"></i>
-            Type:</label>
+        <label for="node-config-input-caldav" style="width:160px !important">
+            <i class="far fa-calendar"></i>
+            <span>Type:</span></label>
             <select id="node-config-input-caldav">
-                <option value="false" selected>iCal</option>
+                <option value="false">iCal</option>
                 <option value="true">CalDav</option>
                 <option value="icloud">iCloud</option>
             </select>     
     </div>
     <div class="form-row">
-        <label for="node-config-input-username">
-            <i class="fa fa-tag"></i>
-            Username:</label>
-        <input type="text" id="node-config-input-username" placeholder="">
+        <label for="node-config-input-username" style="width:160px !important">
+            <i class="fa fa-user"></i>
+            <span>Username:</span></label>
+        <input type="text" id="node-config-input-username" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-password">
-            <i class="fa fa-tag"></i>
-            Password:</label>
-        <input type="password" id="node-config-input-password" placeholder="">
+        <label for="node-config-input-password" style="width:160px !important">
+            <i class="fa fa-key"></i>
+            <span>Password:</span></label>
+        <input type="password" id="node-config-input-password" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name">
-            <i class="fa fa-tag"></i>
-            Name:</label>
-        <input type="text" id="node-config-input-name" placeholder="">
+        <label for="node-config-input-name" style="width:160px !important">
+            <i class="fa fa-user"></i>
+            <span>Name:</span></label>
+        <input type="text" id="node-config-input-name" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-language">
-            <i class="fa fa-tag"></i>
-            Language:</label>
+        <label for="node-config-input-language" style="width:160px !important">
+            <i class="fa fa-language"></i>
+            <span>Language:</span></label>
         <select id="node-config-input-language">
             <option value="de">Deutsch</option>
             <option value="en">English</option>
@@ -86,10 +95,10 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-config-input-replacedates">
-            <i class="fa fa-tag"></i>
-            Replace Dates with name:</label>
-        <input type="checkbox" id="node-config-input-replacedates" placeholder="">
+        <label for="node-config-input-replacedates" style="width:160px !important">
+            <i class="fa fa-edit"></i>
+            <span>Replace Dates with name:</span></label>
+        <input type="checkbox" id="node-config-input-replacedates" placeholder="" style="width:16px !important">
     </div>
 </script>
 

@@ -3,6 +3,27 @@ import { loadEventsForDay } from "./icloud";
 import { CalDav } from "./caldav";
 import * as  ical from 'node-ical';
 
+export interface Job {
+    id: string,
+    cronjob: any
+}
+
+export interface CalEvent {
+    summary: string,
+    location: string,
+    eventStart: Date
+    eventEnd: Date,
+    date?: string,
+
+    event?: string,
+    description?: string,
+    id: string,
+    allDay?: boolean,
+    rule?: string,
+    on?:boolean,
+    off?:boolean
+}
+
 export function getICal(node, urlOrFile, config, callback) {        
     if (urlOrFile.match(/^https?:\/\//)) {
         if (config.caldav && config.caldav === 'icloud') {

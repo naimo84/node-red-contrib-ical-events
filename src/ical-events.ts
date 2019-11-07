@@ -1,36 +1,11 @@
 
 import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
-import * as  ical from 'node-ical';
 import { CronJob } from 'cron';
 import { CronTime } from 'cron';
-import { CalDav } from './caldav';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
-import { loadEventsForDay } from './icloud'
-import * as moment from 'moment';
-import { getICal } from './helper';
-
-export interface Job {
-    id: string,
-    cronjob: any
-}
-
-export interface CalEvent {
-    summary: string,
-    location: string,
-    eventStart: Date
-    eventEnd: Date,
-    date?: string,
-
-    event?: string,
-    description?: string,
-    id: string,
-    allDay?: boolean,
-    rule?: string,
-    on?:boolean,
-    off?:boolean
-}
+import { getICal, CalEvent } from './helper';
 
 module.exports = function (RED: Red) {
     let newCronJobs = new Map();
