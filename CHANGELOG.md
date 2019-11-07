@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.2...v0.6.0) (2019-11-07)
+
+
+### Features
+
+* first try to implement sensor node ([c93b273](https://github.com/naimo84/node-red-contrib-ical-events/commit/c93b273))
+* sensor node final ([9b7fb6c](https://github.com/naimo84/node-red-contrib-ical-events/commit/9b7fb6c))
+
 ### [0.5.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.1...v0.5.2) (2019-10-31)
 
 
