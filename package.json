@@ -50,6 +50,10 @@
     "hooks": {
       "commit-msg": "commitlint --edit"
     }
+  }, 
+  "funding": {
+    "type" : "paypal",
+    "url" : "https://paypal.me/NeumannBenjamin"
   },
   "dependencies": {
     "cloneextend": "0.0.3",
