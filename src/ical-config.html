@@ -33,13 +33,34 @@
                 return "iCal Config";
             },
             oneditprepare: function () {
-                var node = this;  
+                var node = this;
 
                 if (this.caldav == undefined) {
                     $("#node-config-input-caldav option").filter(function () {
                         return $(this).val() == 'false';
                     }).attr('selected', true);
                 }
+
+                $('#node-config-input-caldav').change(function () {
+                    var value = $('#node-config-input-caldav').val();              
+                    if(value === "false"){
+                        $('#node-config-input-username').parent().hide();
+                        $('#node-config-input-password').parent().hide();
+                    }else{
+                        $('#node-config-input-username').parent().show();
+                        $('#node-config-input-password').parent().show();
+                    }
+                });
+
+                $('#node-config-input-replacedates').change(function () {
+                    var value = $('#node-config-input-replacedates').is(':checked');                    
+                    if (value) {
+                        $('#node-config-input-language').parent().show();
+                    }
+                    else {
+                        $('#node-config-input-language').parent().hide();
+                    }
+                });
             }
         });
 </script>
@@ -48,7 +69,7 @@
     <div class="form-row">
         <label for="node-config-input-url" style="width:160px !important">
             <i class="fa fa-link"></i>
-            <span>iCal / ics / caldav URL:</span></label>
+            <span>iCal / ics / caldav URL or filepath to ics:</span></label>
         <input type="text" id="node-config-input-url" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
@@ -80,6 +101,12 @@
         <input type="text" id="node-config-input-name" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
+        <label for="node-config-input-replacedates" style="width:160px !important">
+            <i class="fa fa-edit"></i>
+            <span>Replace Dates with name:</span></label>
+        <input type="checkbox" id="node-config-input-replacedates" placeholder="" style="width:16px !important">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-language" style="width:160px !important">
             <i class="fa fa-language"></i>
             <span>Language:</span></label>
@@ -94,12 +121,7 @@
             <option value="es">Espanol</option>
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-config-input-replacedates" style="width:160px !important">
-            <i class="fa fa-edit"></i>
-            <span>Replace Dates with name:</span></label>
-        <input type="checkbox" id="node-config-input-replacedates" placeholder="" style="width:16px !important">
-    </div>
+   
 </script>
 
 <script type="text/x-red" data-help-name="ical-config">

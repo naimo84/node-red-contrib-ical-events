@@ -70,7 +70,7 @@ module.exports = function (RED) {
             dates = rule.between(now3, endpreview, true);
         }
         catch (e) {
-            node.error('Issue detected in RRule, event ignored; Please forward debug information to iobroker.ical developer: ' + e.stack + '\n' +
+            node.error('Issue detected in RRule, event ignored; ' + e.stack + '\n' +
                 'RRule object: ' + JSON.stringify(rule) + '\n' +
                 'now3: ' + now3 + '\n' +
                 'endpreview: ' + endpreview + '\n' +
