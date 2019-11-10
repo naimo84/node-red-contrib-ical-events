@@ -73,6 +73,7 @@ module.exports = function (RED) {
                                 }
                                 var event_1 = {
                                     summary: ev.summary,
+                                    topic: ev.summary,
                                     id: uid,
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
@@ -80,7 +81,9 @@ module.exports = function (RED) {
                                     description: ev.description,
                                     on: true
                                 };
-                                node.send(event_1);
+                                node.send({
+                                    payload: event_1
+                                });
                                 current = true;
                             }
                         }

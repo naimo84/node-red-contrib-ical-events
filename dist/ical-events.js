@@ -73,6 +73,7 @@ module.exports = function (RED) {
                                 possibleUids.push(uid);
                                 var event_1 = {
                                     summary: ev.summary,
+                                    topic: ev.summary,
                                     id: uid,
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
@@ -106,6 +107,7 @@ module.exports = function (RED) {
                                 possibleUids.push(uid);
                                 var event_2 = {
                                     summary: ev.summary,
+                                    topic: ev.summary,
                                     id: uid,
                                     location: ev.location,
                                     eventStart: new Date(ev.start),

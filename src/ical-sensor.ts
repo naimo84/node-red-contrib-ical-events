@@ -3,7 +3,7 @@ import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
-import { getICal,CalEvent} from './helper';
+import { getICal, CalEvent } from './helper';
 
 module.exports = function (RED: Red) {
     function sensorNode(config: any) {
@@ -20,7 +20,7 @@ module.exports = function (RED: Red) {
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
                 let cron = '0 0 * * * *';
 
-                switch (config.timeoutUnits) {                    
+                switch (config.timeoutUnits) {
                     case 'seconds':
                         cron = `*/${config.timeout} * * * * *`;
                         break;
@@ -35,7 +35,7 @@ module.exports = function (RED: Red) {
                         break;
                     default:
                         break;
-                }               
+                }
                 node.job = new CronJob(cron, cronCheckJob.bind(null, node, config));
                 node.job.start();
 
@@ -69,6 +69,7 @@ module.exports = function (RED: Red) {
             node.debug('Ical read successfully ' + config.url);
             if (data) {
                 let current = false;
+
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {
                         var ev = data[k];
@@ -84,6 +85,7 @@ module.exports = function (RED: Red) {
 
                                 const event: CalEvent = {
                                     summary: ev.summary,
+                                    topic: ev.summary,
                                     id: uid,
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
@@ -92,7 +94,9 @@ module.exports = function (RED: Red) {
                                     on: true
                                 }
 
-                                node.send(event);
+                                node.send({
+                                    payload: event
+                                });
                                 current = true;
                             }
                         }

@@ -10,6 +10,7 @@ export interface Job {
 
 export interface CalEvent {
     summary: string,
+    topic: string,
     location: string,
     eventStart: Date
     eventEnd: Date,
@@ -24,16 +25,17 @@ export interface CalEvent {
     off?: boolean
 }
 
-export function getICal(node, urlOrFile, config, callback) {
+export function getICal(node, urlOrFile, config, callback) {  
     if (config.caldav && config.caldav === 'icloud') {
         const now = moment();
         const when = now.toDate();
+        
         loadEventsForDay(moment(when), {
             url: urlOrFile,
             username: config.username,
             password: config.password,
             type: "caldav",
-            endpreview: node.endpreview
+            endpreview: node.endpreview || 1
         }, (list, start, end) => {
             callback && callback(null, list);
         });

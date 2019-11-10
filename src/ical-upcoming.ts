@@ -195,6 +195,7 @@ module.exports = function (RED: Red) {
                 insertSorted(node.datesArray, {
                     date: date.text,
                     summary: ev.summary,
+                    topic: ev.summary,
                     event: reason,
                     eventStart: new Date(ev.start.getTime()),
                     eventEnd: new Date(ev.end.getTime()),
@@ -216,6 +217,7 @@ module.exports = function (RED: Red) {
                     date: date.text,
                     event: reason,
                     summary: ev.summary,
+                    topic: ev.summary,
                     eventStart: new Date(ev.start.getTime()),
                     eventEnd: new Date(ev.end.getTime()),
                     description: ev.description,
