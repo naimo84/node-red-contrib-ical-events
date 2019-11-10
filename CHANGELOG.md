@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.6.0...v0.7.0) (2019-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* output is in payload, not in msg
+
+### Bug Fixes
+
+* issue [#12](https://github.com/naimo84/node-red-contrib-ical-events/issues/12), sensor output to payload ([22ed787](https://github.com/naimo84/node-red-contrib-ical-events/commit/22ed787))
+
+
+### Features
+
+* filehandling ([842310d](https://github.com/naimo84/node-red-contrib-ical-events/commit/842310d))
+
 ## [0.6.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.5.2...v0.6.0) (2019-11-07)
 
 
