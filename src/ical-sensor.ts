@@ -49,7 +49,7 @@ module.exports = function (RED: Red) {
         catch (err) {
             node.error('Error: ' + err.message);
             node.status({ fill: "red", shape: "ring", text: err.message })
-        }
+        }     
     }
 
     function cronCheckJob(node: any, config: any) {
@@ -108,7 +108,9 @@ module.exports = function (RED: Red) {
                         on: false
                     }
 
-                    node.send(event);
+                    node.send({
+                        payload: event
+                    });
                 }
             }
         });

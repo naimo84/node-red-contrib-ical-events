@@ -93,7 +93,9 @@ module.exports = function (RED) {
                     var event_2 = {
                         on: false
                     };
-                    node.send(event_2);
+                    node.send({
+                        payload: event_2
+                    });
                 }
             }
         });
