@@ -1,4 +1,5 @@
 <script type="text/javascript">
+
     RED
         .nodes
         .registerType('ical-sensor', {
@@ -16,11 +17,27 @@
                 },
                 name: {
                     value: ""
-                }              
+                },
+                trigger: {
+                    value: ""
+                },
+                filter: {
+                    value: "",
+                    required: false,
+                    validate: function (v) {
+                        try {
+                            new RegExp(v)
+                            return true;
+                        }
+                        catch (e) {
+                            return false;
+                        }
+                    }
+                }
             },
             inputs: 1,
-            outputs:2,
-            outputLabels:["output on every tick","output only on changes"],
+            outputs: 2,
+            outputLabels: ["output on every tick", "output only on changes"],
             color: "#E7AE24",
             label: function () {
                 if (this.name) {
@@ -46,6 +63,12 @@
                         return $(this).val() == 'seconds';
                     }).attr('selected', true);
                 }
+             
+                if (!this.trigger) {
+                    $("#node-input-trigger option").filter(function () {
+                        return $(this).val() == 'always';
+                    }).attr('selected', true);
+                }
             }
         });
 </script>
@@ -65,9 +88,21 @@
           <option value="days">Days</option>
         </select>
     </div>
+    <div class="form-row">
+        <label for="node-input-trigger"><i class="fa fa-clock-o"></i> <span>Trigger</span></label>        
+        <select id="node-input-trigger" style="width:250px !important">          
+          <option value="always">Always</option>
+          <option value="match">Match</option>
+          <option value="nomatch">No match</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-filter"><i class="icon-filter"></i> Filter</label>
+        <input type="text" id="node-input-filter"  style="width:250px !important">
+      </div>
     <div class="form-row">        
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name">
+        <input type="text" id="node-input-name"  style="width:250px !important">
     </div>   
 </script>
 

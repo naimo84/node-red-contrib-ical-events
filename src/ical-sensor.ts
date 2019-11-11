@@ -10,6 +10,8 @@ module.exports = function (RED: Red) {
         RED.nodes.createNode(this, config);
         let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
         let node = this;
+        node.trigger = config.trigger;
+        node.filter = config.filter;
         this.config = configNode;
 
         try {
@@ -49,7 +51,7 @@ module.exports = function (RED: Red) {
         catch (err) {
             node.error('Error: ' + err.message);
             node.status({ fill: "red", shape: "ring", text: err.message })
-        }     
+        }
     }
 
     function cronCheckJob(node: any, config: any) {
@@ -67,23 +69,44 @@ module.exports = function (RED: Red) {
             }
 
             node.debug('Ical read successfully ' + config.url);
-            if (data) {
-                let current = false;
-                let last = node.context().get('on');
-                for (let k in data) {
-                    if (data.hasOwnProperty(k)) {
-                        var ev = data[k];
+            if (!data) return;
 
+            let current = false;
+            let last = node.context().get('on');
+
+            for (let k in data) {
+                if (data.hasOwnProperty(k)) {
+                    var ev = data[k];
+
+                    if (ev.type == 'VEVENT') {
                         const eventStart = new Date(ev.start);
                         const eventEnd = new Date(ev.end);
-                        if (ev.type == 'VEVENT') {
-                            if (eventStart <= dateNow && dateNow <= eventEnd) {
-                                let uid = crypto.MD5(ev.created + ev.summary).toString();
-                                if (ev.uid) {
-                                    uid = ev.uid;
-                                }
 
-                                const event: CalEvent = {
+                        if (eventStart <= dateNow && eventEnd >= dateNow) {
+
+                            let output = false;
+                            if (node.trigger == 'match') {
+                                let regex = new RegExp(node.filter)
+                                if (regex.test(ev.summary)) output = true;
+                            } else if (node.trigger == 'nomatch') {
+                                let regex = new RegExp(node.filter)
+                                if (!regex.test(ev.summary)) output = true;
+                            } else {
+                                output = true;
+                            }
+
+
+                            let uid = crypto.MD5(ev.created + ev.summary).toString();
+                            if (ev.uid) {
+                                uid = ev.uid;
+                            }
+
+                            let event: CalEvent = {
+                                on: false
+                            }
+
+                            if (output) {
+                                event = {
                                     summary: ev.summary,
                                     topic: ev.summary,
                                     id: uid,
@@ -93,40 +116,41 @@ module.exports = function (RED: Red) {
                                     description: ev.description,
                                     on: true
                                 }
+                            }
 
-                                node.send({
+                            node.send({
+                                payload: event
+                            });
+                            current = true;
+
+                            if (last != current) {
+                                node.send([null, {
                                     payload: event
-                                });
-                                current = true;
-
-                                if(last != current){
-                                    node.send([null,{
-                                        payload: event
-                                    }]);
-                                }
+                                }]);
                             }
                         }
                     }
                 }
+            }
 
-                if (!current) {
-                    const event = {
-                        on: false
-                    }
-
-                    node.send({
-                        payload: event
-                    });
-                    
-                    if(last != current){
-                        node.send([null,{
-                            payload: event
-                        }]);
-                    }
+            if (!current) {
+                const event = {
+                    on: false
                 }
 
-                node.context().set('on', current);
+                node.send({
+                    payload: event
+                });
+
+                if (last != current) {
+                    node.send([null, {
+                        payload: event
+                    }]);
+                }
             }
+
+            node.context().set('on', current);
+
         });
     }
 

@@ -9,16 +9,15 @@ export interface Job {
 }
 
 export interface CalEvent {
-    summary: string,
-    topic: string,
-    location: string,
-    eventStart: Date
-    eventEnd: Date,
+    summary?: string,
+    topic?: string,
+    location?: string,
+    eventStart?: Date
+    eventEnd?: Date,
     date?: string,
-
     event?: string,
     description?: string,
-    id: string,
+    id?: string,
     allDay?: boolean,
     rule?: string,
     on?: boolean,

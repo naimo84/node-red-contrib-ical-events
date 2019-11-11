@@ -9,6 +9,8 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         var configNode = RED.nodes.getNode(config.confignode);
         var node = this;
+        node.trigger = config.trigger;
+        node.filter = config.filter;
         this.config = configNode;
         try {
             node.on('input', function () {
@@ -58,21 +60,40 @@ module.exports = function (RED) {
                 return;
             }
             node.debug('Ical read successfully ' + config.url);
-            if (data) {
-                var current = false;
-                var last = node.context().get('on');
-                for (var k in data) {
-                    if (data.hasOwnProperty(k)) {
-                        var ev = data[k];
+            if (!data)
+                return;
+            var current = false;
+            var last = node.context().get('on');
+            for (var k in data) {
+                if (data.hasOwnProperty(k)) {
+                    var ev = data[k];
+                    if (ev.type == 'VEVENT') {
                         var eventStart = new Date(ev.start);
                         var eventEnd = new Date(ev.end);
-                        if (ev.type == 'VEVENT') {
-                            if (eventStart <= dateNow && dateNow <= eventEnd) {
-                                var uid = crypto.MD5(ev.created + ev.summary).toString();
-                                if (ev.uid) {
-                                    uid = ev.uid;
-                                }
-                                var event_1 = {
+                        if (eventStart <= dateNow && eventEnd >= dateNow) {
+                            var output = false;
+                            if (node.trigger == 'match') {
+                                var regex = new RegExp(node.filter);
+                                if (regex.test(ev.summary))
+                                    output = true;
+                            }
+                            else if (node.trigger == 'nomatch') {
+                                var regex = new RegExp(node.filter);
+                                if (!regex.test(ev.summary))
+                                    output = true;
+                            }
+                            else {
+                                output = true;
+                            }
+                            var uid = crypto.MD5(ev.created + ev.summary).toString();
+                            if (ev.uid) {
+                                uid = ev.uid;
+                            }
+                            var event_1 = {
+                                on: false
+                            };
+                            if (output) {
+                                event_1 = {
                                     summary: ev.summary,
                                     topic: ev.summary,
                                     id: uid,
@@ -82,34 +103,34 @@ module.exports = function (RED) {
                                     description: ev.description,
                                     on: true
                                 };
-                                node.send({
-                                    payload: event_1
-                                });
-                                current = true;
-                                if (last != current) {
-                                    node.send([null, {
-                                            payload: event_1
-                                        }]);
-                                }
+                            }
+                            node.send({
+                                payload: event_1
+                            });
+                            current = true;
+                            if (last != current) {
+                                node.send([null, {
+                                        payload: event_1
+                                    }]);
                             }
                         }
                     }
                 }
-                if (!current) {
-                    var event_2 = {
-                        on: false
-                    };
-                    node.send({
-                        payload: event_2
-                    });
-                    if (last != current) {
-                        node.send([null, {
-                                payload: event_2
-                            }]);
-                    }
-                }
-                node.context().set('on', current);
             }
+            if (!current) {
+                var event_2 = {
+                    on: false
+                };
+                node.send({
+                    payload: event_2
+                });
+                if (last != current) {
+                    node.send([null, {
+                            payload: event_2
+                        }]);
+                }
+            }
+            node.context().set('on', current);
         });
     }
     RED.nodes.registerType("ical-sensor", sensorNode);
