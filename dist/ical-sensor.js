@@ -60,6 +60,7 @@ module.exports = function (RED) {
             node.debug('Ical read successfully ' + config.url);
             if (data) {
                 var current = false;
+                var last = node.context().get('on');
                 for (var k in data) {
                     if (data.hasOwnProperty(k)) {
                         var ev = data[k];
@@ -85,6 +86,11 @@ module.exports = function (RED) {
                                     payload: event_1
                                 });
                                 current = true;
+                                if (last != current) {
+                                    node.send([null, {
+                                            payload: event_1
+                                        }]);
+                                }
                             }
                         }
                     }
@@ -96,7 +102,13 @@ module.exports = function (RED) {
                     node.send({
                         payload: event_2
                     });
+                    if (last != current) {
+                        node.send([null, {
+                                payload: event_2
+                            }]);
+                    }
                 }
+                node.context().set('on', current);
             }
         });
     }
