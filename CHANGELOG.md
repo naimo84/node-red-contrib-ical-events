@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.7.0...v0.8.0) (2019-11-12)
+
+
+### Bug Fixes
+
+* [#12](https://github.com/naimo84/node-red-contrib-ical-events/issues/12), if no event, send on: false in payload ([bd46d00](https://github.com/naimo84/node-red-contrib-ical-events/commit/bd46d00))
+
+
+### Features
+
+* [#12](https://github.com/naimo84/node-red-contrib-ical-events/issues/12), output on every tick and output only on changes ([7695ee3](https://github.com/naimo84/node-red-contrib-ical-events/commit/7695ee3))
+* [#12](https://github.com/naimo84/node-red-contrib-ical-events/issues/12), regex filter for sensor node ([bbdb26f](https://github.com/naimo84/node-red-contrib-ical-events/commit/bbdb26f))
+
 ## [0.7.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.6.0...v0.7.0) (2019-11-10)
 
 
