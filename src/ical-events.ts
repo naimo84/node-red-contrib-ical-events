@@ -52,7 +52,7 @@ module.exports = function (RED: Red) {
         }
     }
 
-   
+
     function cronCheckJob(node: any, config: any) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
@@ -150,28 +150,30 @@ module.exports = function (RED: Red) {
                     }
                 }
 
-                newCronJobs.forEach((job, key) => {
-                    try {
-                        job.start();
-                        node.debug("starting - " + key);
-                        var startedCronJobs = node.context().get('startedCronJobs') || {};
-                        startedCronJobs[key] = job;
-                        node.context().set('startedCronJobs', startedCronJobs);
-                    } catch (newCronErr) {
-                        node.error(newCronErr);
-                    }
+                if (newCronJobs) {
+                    newCronJobs.forEach((job, key) => {
+                        try {
+                            job.start();
+                            node.debug("starting - " + key);
+                            var startedCronJobs = node.context().get('startedCronJobs') || {};
+                            startedCronJobs[key] = job;
+                            node.context().set('startedCronJobs', startedCronJobs);
+                        } catch (newCronErr) {
+                            node.error(newCronErr);
+                        }
 
-                });
+                    });
+                }
 
                 newCronJobs.clear();
             }
             var startedCronJobs = node.context().get('startedCronJobs');
-            for (let key in startedCronJobs){
-                if(startedCronJobs.hasOwnProperty(key)){
-                    if(startedCronJobs[key].running == false){
+            for (let key in startedCronJobs) {
+                if (startedCronJobs.hasOwnProperty(key)) {
+                    if (startedCronJobs[key].running == false) {
                         delete startedCronJobs[key];
                     }
-                    else if(!(possibleUids.includes(key,0))){
+                    else if (!(possibleUids.includes(key, 0))) {
                         startedCronJobs[key].stop();
                         delete startedCronJobs[key];
                     }

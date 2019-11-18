@@ -18,8 +18,31 @@ module.exports = function (RED) {
             this.on('input', function () {
                 cronCheckJob(_this);
             });
+            var cron = '';
             if (config.cron && config.cron !== "") {
-                this.job = new cron_1.CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
+                cron = config.cron;
+            }
+            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+                switch (config.timeoutUnits) {
+                    case 'seconds':
+                        cron = "*/" + config.timeout + " * * * * *";
+                        break;
+                    case 'minutes':
+                        cron = "0 */" + config.timeout + " * * * *";
+                        break;
+                    case 'hours':
+                        cron = "0 0 */" + config.timeout + " * * *";
+                        break;
+                    case 'days':
+                        cron = "0 0 0 */" + config.timeout + " * *";
+                        break;
+                    default:
+                        break;
+                }
+            }
+            this.debug('cron: -' + cron + '-');
+            if (cron !== '') {
+                this.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, this, configNode));
                 this.on('close', function () {
                     _this.job.stop();
                     _this.debug("cron stopped");

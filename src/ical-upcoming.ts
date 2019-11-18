@@ -2,7 +2,7 @@ import { Red, Node } from 'node-red';
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
 import * as moment from 'moment';
-import { getICal,CalEvent } from './helper';
+import { getICal, CalEvent } from './helper';
 
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
@@ -23,8 +23,32 @@ module.exports = function (RED: Red) {
                 cronCheckJob(this);
             });
 
+            let cron = '';
+
             if (config.cron && config.cron !== "") {
-                this.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, this, configNode));
+                cron = config.cron;
+            }
+            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+                switch (config.timeoutUnits) {
+                    case 'seconds':
+                        cron = `*/${config.timeout} * * * * *`;
+                        break;
+                    case 'minutes':
+                        cron = `0 */${config.timeout} * * * *`;
+                        break;
+                    case 'hours':
+                        cron = `0 0 */${config.timeout} * * *`;
+                        break;
+                    case 'days':
+                        cron = `0 0 0 */${config.timeout} * *`;
+                        break;
+                    default:
+                        break;
+                }
+            }
+           
+            if (cron !== '') {
+                this.job = new CronJob(cron, cronCheckJob.bind(null, this, configNode));
 
                 this.on('close', () => {
                     this.job.stop();
@@ -33,6 +57,7 @@ module.exports = function (RED: Red) {
 
                 this.job.start();
             }
+
         }
         catch (err) {
             this.error('Error: ' + err.message);

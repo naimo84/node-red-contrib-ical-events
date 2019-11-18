@@ -1,26 +1,28 @@
 const Moment = require('moment');
-const    MomentRange = require('moment-range'),
+const MomentRange = require('moment-range'),
     moment = MomentRange.extendMoment(Moment),
     https = require('https'),
     icalExpander = require('ical-expander'),
     xmlParser = require('xml-js');
 
-function process(reslist,start,end,ics) {
+function process(reslist, start, end, ics) {
     const cal = new icalExpander({ ics, maxIterations: 1000 });
     const events = cal.between(start.toDate(), end.toDate());
 
     convertEvents(events).forEach(event => {
         reslist[event.uid] = event;
     })
-   
+
 }
 
 function convertEvents(events) {
     let retEntries = [];
-    events.events.forEach(event => {
-        let ev = _convertEvent(event);
-        retEntries.push(ev);
-    });
+    if (events && events.events) {
+        events.events.forEach(event => {
+            let ev = _convertEvent(event);
+            retEntries.push(ev);
+        });
+    }
     return retEntries;
 }
 
@@ -68,7 +70,7 @@ export function loadEventsForDay(whenMoment, config, cb) {
         start = whenMoment.clone().startOf('day'),
         end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
 
-       
+
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +
         '  <D:prop>\n' +
@@ -111,17 +113,17 @@ export function loadEventsForDay(whenMoment, config, cb) {
 
         req.on('close', function () {
             var reslist = {};
-            try {               
+            try {
                 const json = JSON.parse(xmlParser.xml2json(s, { compact: true, spaces: 0 }));
 
                 if (json && json.multistatus && json.multistatus.response) {
                     var ics;
-                    if (json.multistatus.response.propstat) {                      
-                        process(reslist,start,end,json.multistatus.response.propstat.prop['calendar-data']._cdata);
+                    if (json.multistatus.response.propstat) {
+                        process(reslist, start, end, json.multistatus.response.propstat.prop['calendar-data']._cdata);
                     } else {
-                        json.multistatus.response.forEach(response => process(reslist,start,end,response.propstat.prop['calendar-data']._cdata));
+                        json.multistatus.response.forEach(response => process(reslist, start, end, response.propstat.prop['calendar-data']._cdata));
                     }
-                }               
+                }
                 cb(reslist, start, end);
             } catch (e) {
                 console.error("Error parsing response", e)

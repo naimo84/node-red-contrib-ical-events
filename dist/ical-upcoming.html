@@ -11,6 +11,12 @@
                 cron: {
                     value: ""
                 },
+                timeout: {
+                    value: ""
+                },
+                timeoutUnits: {
+                    value: ""
+                },
                 name: {
                     value: ""
                 },
@@ -34,7 +40,21 @@
                 return "upcoming events";
             },
             icon: "calendar.png",
-            paletteLabel: "Upcoming"
+            paletteLabel: "Upcoming",
+            oneditprepare: function () {
+                var node = this;
+                $("#node-input-timeout").spinner({ min: 1 });
+
+                $('.ui-spinner-button').on("click", function () {
+                    $(this).siblings('input').trigger("change");
+                });
+
+                if (!this.timeoutUnits) {
+                    $("#node-input-timeoutUnits option").filter(function () {
+                        return $(this).val() == 'seconds';
+                    }).attr('selected', true);
+                }
+            }
         });
 </script>
 
@@ -42,6 +62,16 @@
     <div class="form-row">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
+    </div>
+    <div class="form-row" id="delay-details-for">
+        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
+        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
+        <select id="node-input-timeoutUnits" style="width:200px !important">          
+          <option value="seconds">Seconds</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>

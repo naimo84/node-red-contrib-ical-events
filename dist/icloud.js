@@ -11,10 +11,12 @@ function process(reslist, start, end, ics) {
 }
 function convertEvents(events) {
     var retEntries = [];
-    events.events.forEach(function (event) {
-        var ev = _convertEvent(event);
-        retEntries.push(ev);
-    });
+    if (events && events.events) {
+        events.events.forEach(function (event) {
+            var ev = _convertEvent(event);
+            retEntries.push(ev);
+        });
+    }
     return retEntries;
 }
 function _convertEvent(e) {

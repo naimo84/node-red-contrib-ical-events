@@ -136,18 +136,20 @@ module.exports = function (RED) {
                         }
                     }
                 }
-                newCronJobs.forEach(function (job, key) {
-                    try {
-                        job.start();
-                        node.debug("starting - " + key);
-                        var startedCronJobs = node.context().get('startedCronJobs') || {};
-                        startedCronJobs[key] = job;
-                        node.context().set('startedCronJobs', startedCronJobs);
-                    }
-                    catch (newCronErr) {
-                        node.error(newCronErr);
-                    }
-                });
+                if (newCronJobs) {
+                    newCronJobs.forEach(function (job, key) {
+                        try {
+                            job.start();
+                            node.debug("starting - " + key);
+                            var startedCronJobs = node.context().get('startedCronJobs') || {};
+                            startedCronJobs[key] = job;
+                            node.context().set('startedCronJobs', startedCronJobs);
+                        }
+                        catch (newCronErr) {
+                            node.error(newCronErr);
+                        }
+                    });
+                }
                 newCronJobs.clear();
             }
             var startedCronJobs = node.context().get('startedCronJobs');
