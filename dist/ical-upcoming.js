@@ -10,16 +10,19 @@ module.exports = function (RED) {
     function upcomingNode(config) {
         var _this = this;
         RED.nodes.createNode(this, config);
+        var configNode = RED.nodes.getNode(config.confignode);
+        this.config = configNode;
+        this.filter = config.filter;
+        this.trigger = config.trigger || 'always';
+        this.endpreview = config.endpreview || 10;
+        this.endpreviewUnits = config.endpreviewUnits || 'd';
+        this.on('input', function () {
+            cronCheckJob(_this);
+        });
         try {
-            parser.parseExpression(config.cron);
-            var configNode = RED.nodes.getNode(config.confignode);
-            this.config = configNode;
-            this.endpreview = config.endpreview || 10;
-            this.on('input', function () {
-                cronCheckJob(_this);
-            });
             var cron = '';
             if (config.cron && config.cron !== "") {
+                parser.parseExpression(config.cron);
                 cron = config.cron;
             }
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
@@ -40,7 +43,6 @@ module.exports = function (RED) {
                         break;
                 }
             }
-            this.debug('cron: -' + cron + '-');
             if (cron !== '') {
                 this.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, this, configNode));
                 this.on('close', function () {
@@ -189,43 +191,59 @@ module.exports = function (RED) {
                 fullday = true;
             }
         }
-        if (fullday) {
-            if ((ev.start < endpreview && ev.start >= today) || (ev.end > today && ev.end <= endpreview) || (ev.start < today && ev.end > today)) {
-                date = formatDate(ev.start, ev.end, true, true, config);
-                insertSorted(node.datesArray, {
-                    date: date.text,
-                    summary: ev.summary,
-                    topic: ev.summary,
-                    event: reason,
-                    eventStart: new Date(ev.start.getTime()),
-                    eventEnd: new Date(ev.end.getTime()),
-                    description: ev.description,
-                    id: ev.uid,
-                    allDay: true,
-                    rule: rule,
-                    location: location
-                });
-                node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
-            }
+        var output = false;
+        if (node.trigger == 'match') {
+            var regex = new RegExp(node.filter);
+            if (regex.test(ev.summary))
+                output = true;
+        }
+        else if (node.trigger == 'nomatch') {
+            var regex = new RegExp(node.filter);
+            if (!regex.test(ev.summary))
+                output = true;
         }
         else {
-            // Event with time             
-            if ((ev.start >= today && ev.start < endpreview && ev.end >= realnow) || (ev.end >= realnow && ev.end <= endpreview) || (ev.start < realnow && ev.end > realnow)) {
-                date = formatDate(ev.start, ev.end, true, false, config);
-                insertSorted(node.datesArray, {
-                    date: date.text,
-                    event: reason,
-                    summary: ev.summary,
-                    topic: ev.summary,
-                    eventStart: new Date(ev.start.getTime()),
-                    eventEnd: new Date(ev.end.getTime()),
-                    description: ev.description,
-                    id: ev.uid,
-                    allDay: false,
-                    rule: rule,
-                    location: location
-                });
-                node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
+            output = true;
+        }
+        if (output) {
+            if (fullday) {
+                if ((ev.start < endpreview && ev.start >= today) || (ev.end > today && ev.end <= endpreview) || (ev.start < today && ev.end > today)) {
+                    date = formatDate(ev.start, ev.end, true, true, config);
+                    insertSorted(node.datesArray, {
+                        date: date.text,
+                        summary: ev.summary,
+                        topic: ev.summary,
+                        event: reason,
+                        eventStart: new Date(ev.start.getTime()),
+                        eventEnd: new Date(ev.end.getTime()),
+                        description: ev.description,
+                        id: ev.uid,
+                        allDay: true,
+                        rule: rule,
+                        location: location
+                    });
+                    node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
+                }
+            }
+            else {
+                // Event with time             
+                if ((ev.start >= today && ev.start < endpreview && ev.end >= realnow) || (ev.end >= realnow && ev.end <= endpreview) || (ev.start < realnow && ev.end > realnow)) {
+                    date = formatDate(ev.start, ev.end, true, false, config);
+                    insertSorted(node.datesArray, {
+                        date: date.text,
+                        event: reason,
+                        summary: ev.summary,
+                        topic: ev.summary,
+                        eventStart: new Date(ev.start.getTime()),
+                        eventEnd: new Date(ev.end.getTime()),
+                        description: ev.description,
+                        id: ev.uid,
+                        allDay: false,
+                        rule: rule,
+                        location: location
+                    });
+                    node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
+                }
             }
         }
     }
@@ -242,7 +260,9 @@ module.exports = function (RED) {
                     var today = new Date();
                     today.setHours(0, 0, 0, 0);
                     var endpreview = new Date();
-                    endpreview.setDate(endpreview.getDate() + parseInt(node.endpreview));
+                    endpreview = moment(endpreview).add(node.endpreview, node.endpreviewUnits.charAt(0)).toDate();
+                    node.debug("endpreview " + endpreview);
+                    //endpreview.setDate(endpreview.getDate() + parseInt(node.endpreview));
                     var now2 = new Date();
                     now2.setHours(0, 0, 0, 0);
                     processData(data, realnow, today, endpreview, now2, callback, node, config);

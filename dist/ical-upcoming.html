@@ -25,6 +25,25 @@
                 },
                 endpreview:{
                     value: ""
+                },
+                endpreviewUnits:{
+                    value: ""
+                },
+                trigger:{
+                    value: ""
+                },
+                filter: {
+                    value: "",
+                    required: false,
+                    validate: function (v) {
+                        try {
+                            new RegExp(v)
+                            return true;
+                        }
+                        catch (e) {
+                            return false;
+                        }
+                    }
                 }
             },
             inputs: 1,
@@ -44,6 +63,7 @@
             oneditprepare: function () {
                 var node = this;
                 $("#node-input-timeout").spinner({ min: 1 });
+                $("#node-input-endpreview").spinner({ min: 1 });
 
                 $('.ui-spinner-button').on("click", function () {
                     $(this).siblings('input').trigger("change");
@@ -52,6 +72,18 @@
                 if (!this.timeoutUnits) {
                     $("#node-input-timeoutUnits option").filter(function () {
                         return $(this).val() == 'seconds';
+                    }).attr('selected', true);
+                }
+
+                if (!this.endpreviewUnits) {
+                    $("#node-input-endpreviewUnits option").filter(function () {
+                        return $(this).val() == 'days';
+                    }).attr('selected', true);
+                }
+
+                if (!this.trigger) {
+                    $("#node-input-trigger option").filter(function () {
+                        return $(this).val() == 'always';
                     }).attr('selected', true);
                 }
             }
@@ -78,9 +110,27 @@
         <input type="text" id="node-input-cron">
     </div>
     <div class="form-row">
-        <label for="node-input-endpreview"><i class="fa fa-clock-o"></i> <span>End of preview (in days)</span></label>
-        <input type="text" id="node-input-endpreview">
+        <label for="node-input-trigger"><i class="fa fa-clock-o"></i> <span>Trigger</span></label>        
+        <select id="node-input-trigger" style="width:250px !important">          
+          <option value="always">Always</option>
+          <option value="match">Match</option>
+          <option value="nomatch">No match</option>
+        </select>
     </div>
+    <div class="form-row">
+        <label for="node-input-filter"><i class="icon-filter"></i> Filter</label>
+        <input type="text" id="node-input-filter"  style="width:250px !important">
+      </div>
+      <div class="form-row" id="delay-details-for">
+        <label for="node-input-endpreview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
+        <input type="text" id="node-input-endpreview" style="text-align:end; width:50px !important">
+        <select id="node-input-endpreviewUnits" style="width:200px !important">          
+          <option value="seconds">Seconds</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
+        </select>
+    </div>   
     <div class="form-row">        
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name">
