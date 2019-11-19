@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.8.0...v0.9.0) (2019-11-19)
+
+
+### Features
+
+* [#13](https://github.com/naimo84/node-red-contrib-ical-events/issues/13), regex filter for upcoming node ([339c0d3](https://github.com/naimo84/node-red-contrib-ical-events/commit/339c0d329afed10fa7278cc1d9c1e56914da0da7))
+* check every for upcoming node ([2d976c3](https://github.com/naimo84/node-red-contrib-ical-events/commit/2d976c3bf42d2dc571ded71782a612a328060ba5))
+
 ## [0.8.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.7.0...v0.8.0) (2019-11-12)
 
 
