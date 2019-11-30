@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dav = require('dav');
 var moment = require('moment');
 var IcalExpander = require('ical-expander');
-function CalDav(node, config, calName, callback) {
+function CalDav(node, config, calName) {
     this.server = config.server;
     this.calendar = config.calendar;
     this.pastWeeks = config.pastWeeks || 0;
@@ -30,37 +30,35 @@ function CalDav(node, config, calName, callback) {
         password: config.password
     }));
     var calDavUri = config.url;
-    dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
+    return dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
         .then(function (account) {
+        var promises = [];
         if (!account.calendars) {
             node.error('CalDAV -> no calendars found.');
             return;
         }
-        node.debug(account.calendars);
-        var retEntries = {};
-        account.calendars.forEach(function (calendar) {
+        for (var _i = 0, _a = account.calendars; _i < _a.length; _i++) {
+            var calendar = _a[_i];
             if (!calName || !calName.length || (calName && calName.length && calName === calendar.displayName)) {
-                dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
+                promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
                     .then(function (calendarEntries) {
-                    calendarEntries.forEach(function (calendarEntry) {
-                        try {
-                            var ics = calendarEntry.calendarData;
-                            var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
-                            var events = icalExpander.between(startDate.toDate(), endDate.toDate());
-                            convertEvents(events).forEach(function (event) {
-                                retEntries[event.uid] = event;
-                            });
-                        }
-                        catch (error) {
-                            node.error('Error parsing calendar data: ' + error);
-                        }
-                    });
-                    callback(retEntries);
-                }, function () {
-                    node.error('CalDAV -> get ics went wrong.');
-                });
+                    var retEntries = {};
+                    for (var _i = 0, calendarEntries_1 = calendarEntries; _i < calendarEntries_1.length; _i++) {
+                        var calendarEntry = calendarEntries_1[_i];
+                        var ics = calendarEntry.calendarData;
+                        var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
+                        var events = icalExpander.between(startDate.toDate(), endDate.toDate());
+                        convertEvents(events).forEach(function (event) {
+                            retEntries[event.uid] = event;
+                        });
+                    }
+                    ;
+                    return retEntries;
+                }));
             }
-        });
+        }
+        ;
+        return Promise.all(promises);
     }, function () {
         node.error('CalDAV -> get calendars went wrong.');
     });

@@ -24,11 +24,11 @@ export interface CalEvent {
     off?: boolean
 }
 
-export function getICal(node, urlOrFile, config, callback) {  
+export function getICal(node, urlOrFile, config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
         const now = moment();
         const when = now.toDate();
-        
+
         loadEventsForDay(moment(when), {
             url: urlOrFile,
             username: config.username,
@@ -36,12 +36,20 @@ export function getICal(node, urlOrFile, config, callback) {
             type: "caldav",
             endpreview: node.endpreview || 1
         }, (list, start, end) => {
+
             callback && callback(null, list);
         });
     } else if (config.caldav && JSON.parse(config.caldav) === true) {
         node.debug("caldav")
-        CalDav(node, config, null, (data) => {
-            callback(null, data);
+        CalDav(node, config, null).then((data) => {
+            let retEntries = {};
+            for (let events of data) {
+                for (let event in events) {
+                    var ev = events[event];
+                    retEntries[ev.uid] = ev;
+                }
+            }
+            callback(null, retEntries);
         });
     } else {
         if (urlOrFile.match(/^https?:\/\//)) {
@@ -63,10 +71,13 @@ export function getICal(node, urlOrFile, config, callback) {
                     callback && callback(err, null);
                     return;
                 }
+                console.log('data');
+                console.log(data);
+                console.log('data');
                 callback && callback(null, data);
             });
         } else {
-            ical.parseFile(node.config.url, (err, data) => {              
+            ical.parseFile(node.config.url, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;

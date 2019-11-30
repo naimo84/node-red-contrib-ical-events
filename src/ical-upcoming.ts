@@ -159,7 +159,7 @@ module.exports = function (RED: Red) {
     function processData(data, realnow, today, endpreview, now2, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
-            var ev = data[k];
+            var ev = data[k];           
             delete data[k];
 
             if ((ev.summary !== undefined) && (ev.type === 'VEVENT')) {

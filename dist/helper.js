@@ -20,8 +20,17 @@ function getICal(node, urlOrFile, config, callback) {
     }
     else if (config.caldav && JSON.parse(config.caldav) === true) {
         node.debug("caldav");
-        caldav_1.CalDav(node, config, null, function (data) {
-            callback(null, data);
+        caldav_1.CalDav(node, config, null).then(function (data) {
+            var retEntries = {};
+            for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+                var events = data_1[_i];
+                for (var event_1 in events) {
+                    var ev = events[event_1];
+                    retEntries[ev.uid] = ev;
+                }
+            }
+            console.debug(retEntries);
+            callback(null, retEntries);
         });
     }
     else {
@@ -42,6 +51,9 @@ function getICal(node, urlOrFile, config, callback) {
                     callback && callback(err, null);
                     return;
                 }
+                console.log('data');
+                console.log(data);
+                console.log('data');
                 callback && callback(null, data);
             });
         }

@@ -2,7 +2,7 @@ const dav = require('dav')
 const moment = require('moment')
 const IcalExpander = require('ical-expander')
 
-export function CalDav(node, config, calName, callback) {
+export function CalDav(node, config, calName) {
     this.server = config.server
     this.calendar = config.calendar
     this.pastWeeks = config.pastWeeks || 0
@@ -34,44 +34,41 @@ export function CalDav(node, config, calName, callback) {
     )
 
     let calDavUri = config.url
-
-    dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
-        .then(function (account) {
+    
+   
+    return dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
+        .then((account) => {
+            let promises = [];
             if (!account.calendars) {
                 node.error('CalDAV -> no calendars found.')
                 return
             }
-            node.debug(account.calendars)
-            let retEntries = {};
-            account.calendars.forEach((calendar) => {
+
+            for (let calendar of account.calendars) {
                 if (!calName || !calName.length || (calName && calName.length && calName === calendar.displayName)) {
-                    dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
+                    promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
                         .then((calendarEntries) => {
-                            calendarEntries.forEach((calendarEntry) => {
-                                try {
-                                    const ics = calendarEntry.calendarData
-                                    const icalExpander = new IcalExpander({ ics, maxIterations: 100 })
-                                    const events = icalExpander.between(startDate.toDate(), endDate.toDate())
+                            let retEntries = {};
+                            for (let calendarEntry of calendarEntries) {
+                                const ics = calendarEntry.calendarData
+                                const icalExpander = new IcalExpander({ ics, maxIterations: 100 })
+                                const events = icalExpander.between(startDate.toDate(), endDate.toDate())
 
-                                    convertEvents(events).forEach(event => {
-                                        retEntries[event.uid] = event;
-                                    })
-
-
-                                } catch (error) {
-                                    node.error('Error parsing calendar data: ' + error)
-                                }
-                            })
-                            callback(retEntries);
-                        }, () => {
-                            node.error('CalDAV -> get ics went wrong.')
-                        });
+                                convertEvents(events).forEach(event => {
+                                    retEntries[event.uid] = event;
+                                });
+                            };                           
+                            return retEntries;
+                        })
+                    );
                 }
-            });
-
+            };
+          
+            return Promise.all(promises);
         }, function () {
             node.error('CalDAV -> get calendars went wrong.')
-        })
+        });
+    
 }
 
 function convertEvents(events) {
