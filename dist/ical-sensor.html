@@ -112,13 +112,17 @@
     
     <p>The calendar is checked for running events on input or configurable timeout.</p>
 
-    <h3>How to use</h3>
-  
-    <p>Configuration</p>
-    <br/> • "Check every": how often the calendar is checked for new events
-    <br/> • "Name": Displayname
+    <h3>Configuration</h3>
+    <br/> • <b>"Check every"</b>: how often the calendar is checked for new events
+    <span><br/> • <b>"Trigger"</b>: possible values: 
+        <br/>&emsp;     Always (Filter expression is ignored)
+        <br/> &emsp;      Match (only events that match the Filter expression are processed)
+        <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
+    </span>
+    <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+    <br/> • <b>"Name"</b>: Displayname
     
-    <p>If an event is running at time of checking, msg.on is true, otherwise false.</p>
+    <p>If an event is running at time of checking, <b>msg.on</b> is true, otherwise false.</p>
 
     <p>The message additionaly contains the following values of the calendar entry</p>
     <br/> • summary

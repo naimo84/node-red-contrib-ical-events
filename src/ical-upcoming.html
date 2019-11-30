@@ -139,31 +139,37 @@
 
 <!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-upcoming">
-    <p>A node for upcoming events</p>
+    <h1>A node for upcoming events</h1>
     
-    <p>As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
-    Additional msg properties are:</p>
-
-    <h3>How to use</h3>
-  
-    <p>Configuration</p>
-    <br/> • "Cron": Cron expression, how often the calendar is checked for new upcoming events. Default is every hour ('0 0 * * * *')
-    <br/> • "Name": Displayname
-    <br/> • "End of preview (in days)": Only Events within now and this value, in days, is checked.
-     
-    <p>The msg.payload contains an array of the following values for each calendar entry</p>
+    <p>As of the events node, its checked on input or cronjob.</p>
+      <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
+    <h3>Configuration</h3>
+    <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>
+    <br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. 
+    <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
+    <span><br/> • <b>"Trigger"</b>: possible values: 
+        <br/>&emsp;     Always (Filter expression is ignored)
+        <br/> &emsp;      Match (only events that match the Filter expression are processed)
+        <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
+    </span>
+    <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+    <br/> • <b>"Preview"</b>: Only Events within now and this value is checked.
+    <br/> • <b>"Name"</b>: Displayname
+    <br/><br/>
+    <p>The <b>msg.payload</b> contains an array of the following values for each calendar entry
     <br/> • summary
     <br/> • id
     <br/> • location
     <br/> • eventStart
     <br/> • eventEnd
     <br/> • description
-
-    <p>additional values:
+</p>
+ <br/>
+    <p><b>additional msg. values:</b>
     <br/> • today: todayEventcounter
     <br/> • tomorrow: tomorrowEventcounter
     <br/> • total: datesArray.length
-
+    </p>
     <p>example output:</p>
     <pre>{
         "summary": "meeting",

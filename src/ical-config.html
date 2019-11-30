@@ -79,7 +79,7 @@
             <select id="node-config-input-caldav">
                 <option value="false">iCal</option>
                 <option value="true">CalDav</option>
-                <option value="icloud">iCloud</option>
+                <option value="icloud">iCloud secure</option>
             </select>     
     </div>
     <div class="form-row">
@@ -127,15 +127,13 @@
 <script type="text/x-red" data-help-name="ical-config">
     <p>Configuration</p>
     <ul>
-        <li>***URL*** URL to Calendar
-        <li> ***Replace Dates with name*** Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
-        <li> ***Language*** if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
-        <li> ***Cron*** cron-expression for checking the url, if no cron is specified, it's only checked on input.
-        <li> ***Username*** HTTP Basic authentication user
-        <li> ***Password*** HTTP Basic authentication user
-        <li> ***Type*** Type can be ical or caldav
+        <li><b>URL</b> URL to Calendar
+        <li><b>Replace Dates with name</b> Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
+        <li><b>Language</b> if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
+        <li><b>Cron</b> cron-expression for checking the url, if no cron is specified, it's only checked on input.
+        <li><b>Username</b> HTTP Basic authentication user
+        <li><b>Password</b> HTTP Basic authentication user
+        <li><b>Type</b> Type can be ical, caldav or iCloud secure (for iCloud, see <a href="https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6">https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6</a> to find the url, username and password to access an iCloud calendar)
     </ul>
-    <p>Instead of cron-expression, an input node can be used.</p>
-
-    <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
+    
 </script>

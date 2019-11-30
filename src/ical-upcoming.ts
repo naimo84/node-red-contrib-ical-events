@@ -26,11 +26,7 @@ module.exports = function (RED: Red) {
         try {
             let cron = '';
 
-            if (config.cron && config.cron !== "") {
-                parser.parseExpression(config.cron);
-                cron = config.cron;
-            }
-            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+            if (config.timeout && config.timeout !== "" && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== "") {
                 switch (config.timeoutUnits) {
                     case 'seconds':
                         cron = `*/${config.timeout} * * * * *`;
@@ -47,6 +43,10 @@ module.exports = function (RED: Red) {
                     default:
                         break;
                 }
+            }
+            if (config.cron && config.cron !== "") {
+                parser.parseExpression(config.cron);
+                cron = config.cron;
             }
 
             if (cron !== '') {

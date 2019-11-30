@@ -21,11 +21,7 @@ module.exports = function (RED) {
         });
         try {
             var cron = '';
-            if (config.cron && config.cron !== "") {
-                parser.parseExpression(config.cron);
-                cron = config.cron;
-            }
-            if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
+            if (config.timeout && config.timeout !== "" && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== "") {
                 switch (config.timeoutUnits) {
                     case 'seconds':
                         cron = "*/" + config.timeout + " * * * * *";
@@ -42,6 +38,10 @@ module.exports = function (RED) {
                     default:
                         break;
                 }
+            }
+            if (config.cron && config.cron !== "") {
+                parser.parseExpression(config.cron);
+                cron = config.cron;
             }
             if (cron !== '') {
                 this.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, this, configNode));

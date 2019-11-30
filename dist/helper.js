@@ -29,7 +29,6 @@ function getICal(node, urlOrFile, config, callback) {
                     retEntries[ev.uid] = ev;
                 }
             }
-            console.debug(retEntries);
             callback(null, retEntries);
         });
     }
