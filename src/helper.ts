@@ -48,7 +48,7 @@ export function getICal(node, urlOrFile, config, callback) {
                     var ev = events[event];
                     retEntries[ev.uid] = ev;
                 }
-            }
+            }       
             callback(null, retEntries);
         });
     } else {

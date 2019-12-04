@@ -1,6 +1,7 @@
 const dav = require('dav')
 const moment = require('moment')
 const IcalExpander = require('ical-expander')
+import * as  ical from 'node-ical';
 
 export function CalDav(node, config, calName) {
     this.server = config.server
@@ -34,8 +35,7 @@ export function CalDav(node, config, calName) {
     )
 
     let calDavUri = config.url
-    
-   
+    let url = new URL(calDavUri);
     return dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
         .then((account) => {
             let promises = [];
@@ -51,24 +51,60 @@ export function CalDav(node, config, calName) {
                             let retEntries = {};
                             for (let calendarEntry of calendarEntries) {
                                 const ics = calendarEntry.calendarData
-                                const icalExpander = new IcalExpander({ ics, maxIterations: 100 })
-                                const events = icalExpander.between(startDate.toDate(), endDate.toDate())
+                                if (ics) {
+                                    const icalExpander = new IcalExpander({ ics, maxIterations: 100 })
+                                    const events = icalExpander.between(startDate.toDate(), endDate.toDate())
 
-                                convertEvents(events).forEach(event => {
-                                    retEntries[event.uid] = event;
-                                });
-                            };                           
+                                    convertEvents(events).forEach(event => {
+                                        retEntries[event.uid] = event;
+                                    });
+                                }
+                            };
                             return retEntries;
+                        })
+                    );
+
+                    promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
+                        .then((calendarEntries) => {
+                            let retEntries = {};
+                            for (let calendarEntry of calendarEntries) {
+                                if (calendarEntry.calendar.objects) {
+                                    for (let calendarObject of calendarEntry.calendar.objects) {
+                                        if (calendarObject.data && calendarObject.data.href) {
+                                            let ics = url.origin + calendarObject.data.href;
+                                            let header = {};
+                                            let username = node.config.username;
+                                            let password = node.config.password;
+                                            if (username && password) {
+                                                var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                                                header = {
+                                                    headers: {
+                                                        'Authorization': auth
+                                                    }
+                                                }
+                                            }
+
+                                           return ical.fromURL(ics, header).then(data => {
+                                                for (var k in data) {
+                                                    var ev = data[k];
+                                                    retEntries[ev.uid] = ev;
+                                                }                                              
+                                                return retEntries;
+                                            });
+                                        }
+                                    }
+                                }
+                            }
                         })
                     );
                 }
             };
-          
+
             return Promise.all(promises);
         }, function () {
             node.error('CalDAV -> get calendars went wrong.')
         });
-    
+
 }
 
 function convertEvents(events) {

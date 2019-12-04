@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dav = require('dav');
 var moment = require('moment');
 var IcalExpander = require('ical-expander');
+var ical = require("node-ical");
 function CalDav(node, config, calName) {
     this.server = config.server;
     this.calendar = config.calendar;
@@ -30,6 +31,7 @@ function CalDav(node, config, calName) {
         password: config.password
     }));
     var calDavUri = config.url;
+    var url = new URL(calDavUri);
     return dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
         .then(function (account) {
         var promises = [];
@@ -46,14 +48,49 @@ function CalDav(node, config, calName) {
                     for (var _i = 0, calendarEntries_1 = calendarEntries; _i < calendarEntries_1.length; _i++) {
                         var calendarEntry = calendarEntries_1[_i];
                         var ics = calendarEntry.calendarData;
-                        var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
-                        var events = icalExpander.between(startDate.toDate(), endDate.toDate());
-                        convertEvents(events).forEach(function (event) {
-                            retEntries[event.uid] = event;
-                        });
+                        if (ics) {
+                            var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
+                            var events = icalExpander.between(startDate.toDate(), endDate.toDate());
+                            convertEvents(events).forEach(function (event) {
+                                retEntries[event.uid] = event;
+                            });
+                        }
                     }
                     ;
                     return retEntries;
+                }));
+                promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
+                    .then(function (calendarEntries) {
+                    var retEntries = {};
+                    for (var _i = 0, calendarEntries_2 = calendarEntries; _i < calendarEntries_2.length; _i++) {
+                        var calendarEntry = calendarEntries_2[_i];
+                        if (calendarEntry.calendar.objects) {
+                            for (var _a = 0, _b = calendarEntry.calendar.objects; _a < _b.length; _a++) {
+                                var calendarObject = _b[_a];
+                                if (calendarObject.data && calendarObject.data.href) {
+                                    var ics = url.origin + calendarObject.data.href;
+                                    var header = {};
+                                    var username = node.config.username;
+                                    var password = node.config.password;
+                                    if (username && password) {
+                                        var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+                                        header = {
+                                            headers: {
+                                                'Authorization': auth
+                                            }
+                                        };
+                                    }
+                                    return ical.fromURL(ics, header).then(function (data) {
+                                        for (var k in data) {
+                                            var ev = data[k];
+                                            retEntries[ev.uid] = ev;
+                                        }
+                                        return retEntries;
+                                    });
+                                }
+                            }
+                        }
+                    }
                 }));
             }
         }
