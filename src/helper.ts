@@ -70,10 +70,7 @@ export function getICal(node, urlOrFile, config, callback) {
                 if (err) {
                     callback && callback(err, null);
                     return;
-                }
-                console.log('data');
-                console.log(data);
-                console.log('data');
+                }               
                 callback && callback(null, data);
             });
         } else {

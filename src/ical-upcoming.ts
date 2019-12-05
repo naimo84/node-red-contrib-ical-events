@@ -9,16 +9,18 @@ var RRule = require('rrule').RRule;
 
 var ce = require('cloneextend');
 
-module.exports = function (RED: Red) {
+module.exports = function(RED: Red) {
     function upcomingNode(config: any) {
         RED.nodes.createNode(this, config);
 
-        let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
+        let configNode = (RED.nodes.getNode(config.confignode) as unknown) as Config;
         this.config = configNode;
         this.filter = config.filter;
         this.trigger = config.trigger || 'always';
         this.endpreview = config.endpreview || 10;
         this.endpreviewUnits = config.endpreviewUnits || 'd';
+        this.pastview = config.pastview || 0;
+        this.pastviewUnits = config.pastviewUnits || 'd';
 
         this.on('input', () => {
             cronCheckJob(this);
@@ -26,7 +28,7 @@ module.exports = function (RED: Red) {
         try {
             let cron = '';
 
-            if (config.timeout && config.timeout !== "" && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== "") {
+            if (config.timeout && config.timeout !== '' && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== '') {
                 switch (config.timeoutUnits) {
                     case 'seconds':
                         cron = `*/${config.timeout} * * * * *`;
@@ -44,7 +46,7 @@ module.exports = function (RED: Red) {
                         break;
                 }
             }
-            if (config.cron && config.cron !== "") {
+            if (config.cron && config.cron !== '') {
                 parser.parseExpression(config.cron);
                 cron = config.cron;
             }
@@ -54,37 +56,39 @@ module.exports = function (RED: Red) {
 
                 this.on('close', () => {
                     this.job.stop();
-                    this.debug("cron stopped")
+                    this.debug('cron stopped');
                 });
 
                 this.job.start();
             }
-
-        }
-        catch (err) {
+        } catch (err) {
             this.error('Error: ' + err.message);
-            this.status({ fill: "red", shape: "ring", text: err.message })
+            this.status({ fill: 'red', shape: 'ring', text: err.message });
         }
     }
 
     function cronCheckJob(node: any) {
         if (node.job && node.job.running) {
-            node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
-        }
-        else {
+            node.status({ fill: 'green', shape: 'dot', text: node.job.nextDate().toISOString() });
+        } else {
             node.status({});
         }
 
         node.datesArray_old = ce.clone(node.datesArray);
         node.datesArray = [];
-        checkICal(node.config.url, (data, err) => {
-            if (err) {
-                node.error('Error: ' + err);
-                node.status({ fill: "red", shape: "ring", text: err.message })
-                return;
-            }
-            displayDates(node, node.config);
-        }, node, node.config);
+        checkICal(
+            node.config.url,
+            (data, err) => {
+                if (err) {
+                    node.error('Error: ' + err);
+                    node.status({ fill: 'red', shape: 'ring', text: err.message });
+                    return;
+                }
+                displayDates(node, node.config);
+            },
+            node,
+            node.config
+        );
     }
 
     function processRRule(ev, endpreview, today, realnow, node, config) {
@@ -102,18 +106,45 @@ module.exports = function (RED: Red) {
         now2.setHours(0, 0, 0, 0);
         var now3 = new Date(now2.getTime() - eventLength);
         if (now2 < now3) now3 = now2;
-        node.debug('RRule event:' + ev.summary + '; start:' + ev.start.toString() + '; endpreview:' + endpreview.toString() + '; today:' + today + '; now2:' + now2 + '; now3:' + now3 + '; rule:' + JSON.stringify(rule));
+        node.debug(
+            'RRule event:' +
+                ev.summary +
+                '; start:' +
+                ev.start.toString() +
+                '; endpreview:' +
+                endpreview.toString() +
+                '; today:' +
+                today +
+                '; now2:' +
+                now2 +
+                '; now3:' +
+                now3 +
+                '; rule:' +
+                JSON.stringify(rule)
+        );
 
         var dates = [];
         try {
             dates = rule.between(now3, endpreview, true);
         } catch (e) {
-            node.error('Issue detected in RRule, event ignored; ' + e.stack + '\n' +
-                'RRule object: ' + JSON.stringify(rule) + '\n' +
-                'now3: ' + now3 + '\n' +
-                'endpreview: ' + endpreview + '\n' +
-                'string: ' + ev.rrule.toString() + '\n' +
-                'options: ' + JSON.stringify(options)
+            node.error(
+                'Issue detected in RRule, event ignored; ' +
+                    e.stack +
+                    '\n' +
+                    'RRule object: ' +
+                    JSON.stringify(rule) +
+                    '\n' +
+                    'now3: ' +
+                    now3 +
+                    '\n' +
+                    'endpreview: ' +
+                    endpreview +
+                    '\n' +
+                    'string: ' +
+                    ev.rrule.toString() +
+                    '\n' +
+                    'options: ' +
+                    JSON.stringify(options)
             );
         }
 
@@ -156,13 +187,13 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function processData(data, realnow, today, endpreview, now2, callback, node, config) {
+    function processData(data, realnow, today, endpreview, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
-            var ev = data[k];           
+            var ev = data[k];
             delete data[k];
 
-            if ((ev.summary !== undefined) && (ev.type === 'VEVENT')) {
+            if (ev.summary !== undefined && ev.type === 'VEVENT') {
                 if (!ev.end) {
                     ev.end = ce.clone(ev.start);
                     if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()) {
@@ -184,7 +215,7 @@ module.exports = function (RED: Red) {
         if (!Object.keys(data).length) {
             return;
         } else {
-            processData(data, realnow, today, endpreview, now2, callback, node, config);
+            processData(data, realnow, today, endpreview, callback, node, config);
         }
     }
 
@@ -204,9 +235,15 @@ module.exports = function (RED: Red) {
         if (!ev.start) return;
         if (!ev.end) ev.end = ev.start;
         ev.start = new Date(ev.start);
-        ev.end = new Date(ev.end)
-        if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()
-            && !ev.end.getHours() && !ev.end.getMinutes() && !ev.end.getSeconds()) {
+        ev.end = new Date(ev.end);
+        if (
+            !ev.start.getHours() &&
+            !ev.start.getMinutes() &&
+            !ev.start.getSeconds() &&
+            !ev.end.getHours() &&
+            !ev.end.getMinutes() &&
+            !ev.end.getSeconds()
+        ) {
             if (ev.end.getTime() == ev.start.getTime() && ev.datetype == 'date') {
                 ev.end.setDate(ev.end.getDate() + 1);
             }
@@ -217,17 +254,21 @@ module.exports = function (RED: Red) {
 
         let output = false;
         if (node.trigger == 'match') {
-            let regex = new RegExp(node.filter)
+            let regex = new RegExp(node.filter);
             if (regex.test(ev.summary)) output = true;
         } else if (node.trigger == 'nomatch') {
-            let regex = new RegExp(node.filter)
+            let regex = new RegExp(node.filter);
             if (!regex.test(ev.summary)) output = true;
         } else {
             output = true;
         }
         if (output) {
             if (fullday) {
-                if ((ev.start < endpreview && ev.start >= today) || (ev.end > today && ev.end <= endpreview) || (ev.start < today && ev.end > today)) {
+                if (
+                    (ev.start < endpreview && ev.start >= today) ||
+                    (ev.end > today && ev.end <= endpreview) ||
+                    (ev.start < today && ev.end > today)
+                ) {
                     date = formatDate(ev.start, ev.end, true, true, config);
 
                     insertSorted(node.datesArray, {
@@ -241,15 +282,18 @@ module.exports = function (RED: Red) {
                         id: ev.uid,
                         allDay: true,
                         rule: rule,
-                        location: location
+                        location: location,
                     });
 
                     node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }
             } else {
-                // Event with time             
-                if ((ev.start >= today && ev.start < endpreview && ev.end >= realnow) || (ev.end >= realnow && ev.end <= endpreview) || (ev.start < realnow && ev.end > realnow)) {
-
+                // Event with time
+                if (
+                    (ev.start >= today && ev.start < endpreview && ev.end >= realnow) ||
+                    (ev.end >= realnow && ev.end <= endpreview) ||
+                    (ev.start < realnow && ev.end > realnow)
+                ) {
                     date = formatDate(ev.start, ev.end, true, false, config);
                     insertSorted(node.datesArray, {
                         date: date.text,
@@ -262,7 +306,7 @@ module.exports = function (RED: Red) {
                         id: ev.uid,
                         allDay: false,
                         rule: rule,
-                        location: location
+                        location: location,
                     });
                     node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }
@@ -282,26 +326,24 @@ module.exports = function (RED: Red) {
             try {
                 if (data) {
                     var realnow = new Date();
-                    var today = new Date();
-                    today.setHours(0, 0, 0, 0);
                     var endpreview = new Date();
+                    var pastview = new Date();
 
-                    endpreview = moment(endpreview).add(node.endpreview, node.endpreviewUnits.charAt(0)).toDate();
-                    node.debug(`endpreview ${endpreview}`);
-                    //endpreview.setDate(endpreview.getDate() + parseInt(node.endpreview));
-                    var now2 = new Date();
-                    now2.setHours(0, 0, 0, 0);
+                    endpreview = moment(endpreview)
+                        .add(node.endpreview, node.endpreviewUnits.charAt(0))
+                        .toDate();
+                    pastview = moment(pastview)
+                        .subtract(node.pastview, node.pastviewUnits.charAt(0))
+                        .toDate();
 
-                    processData(data, realnow, today, endpreview, now2, callback, node, config);
+                    processData(data, realnow, pastview, endpreview, callback, node, config);
                     callback(data);
+                } else {
+                    callback(null, 'no Data');
                 }
-                else {
-                    callback(null, "no Data");
-                }
-
             } catch (e) {
                 node.debug(JSON.stringify(e));
-                callback("no Data" + e);
+                callback('no Data' + e);
             }
         });
     }
@@ -316,11 +358,10 @@ module.exports = function (RED: Red) {
     }
 
     function addOffset(time, offset) {
-        return new Date(time.getTime() + (offset * 60 * 1000));
+        return new Date(time.getTime() + offset * 60 * 1000);
     }
 
     function displayDates(node: any, config: Config) {
-
         let todayEventcounter = 0;
         let tomorrowEventcounter = 0;
         let today = new Date();
@@ -343,32 +384,175 @@ module.exports = function (RED: Red) {
             tomorrow: tomorrowEventcounter,
             total: node.datesArray.length,
             htmlTable: brSeparatedList(node.datesArray, config),
-            payload: node.datesArray
+            payload: node.datesArray,
         });
-
     }
 
     let dictionary = {
-        'today': { 'en': 'Today', 'it': 'Oggi', 'es': 'Hoy', 'pl': 'Dzisiaj', 'fr': 'Aujourd\'hui', 'de': 'Heute', 'ru': 'Сегодня', 'nl': 'Vandaag' },
-        'tomorrow': { 'en': 'Tomorrow', 'it': 'Domani', 'es': 'Mañana', 'pl': 'Jutro', 'fr': 'Demain', 'de': 'Morgen', 'ru': 'Завтра', 'nl': 'Morgen' },
-        'dayafter': { 'en': 'Day After Tomorrow', 'it': 'Dopodomani', 'es': 'Pasado mañana', 'pl': 'Pojutrze', 'fr': 'Après demain', 'de': 'Übermorgen', 'ru': 'Послезавтра', 'nl': 'Overmorgen' },
-        '3days': { 'en': 'In 3 days', 'it': 'In 3 giorni', 'es': 'En 3 días', 'pl': 'W 3 dni', 'fr': 'Dans 3 jours', 'de': 'In 3 Tagen', 'ru': 'Через 2 дня', 'nl': 'Over 3 dagen' },
-        '4days': { 'en': 'In 4 days', 'it': 'In 4 giorni', 'es': 'En 4 días', 'pl': 'W 4 dni', 'fr': 'Dans 4 jours', 'de': 'In 4 Tagen', 'ru': 'Через 3 дня', 'nl': 'Over 4 dagen' },
-        '5days': { 'en': 'In 5 days', 'it': 'In 5 giorni', 'es': 'En 5 días', 'pl': 'W ciągu 5 dni', 'fr': 'Dans 5 jours', 'de': 'In 5 Tagen', 'ru': 'Через 4 дня', 'nl': 'Over 5 dagen' },
-        '6days': { 'en': 'In 6 days', 'it': 'In 6 giorni', 'es': 'En 6 días', 'pl': "W ciągu 6 dni", 'fr': "Dans 6 jours", 'de': 'In 6 Tagen', 'ru': 'Через 5 дней', 'nl': 'Over 6 dagen' },
-        'oneweek': { 'en': 'In one week', 'it': 'In una settimana', 'es': 'En una semana', 'pl': 'W jeden tydzień', 'fr': 'Dans une semaine', 'de': 'In einer Woche', 'ru': 'Через неделю', 'nl': 'Binnen een week' },
-        '1week_left': { 'en': 'One week left', 'it': 'Manca una settimana', 'es': 'Queda una semana', 'pl': 'Został jeden tydzień', 'fr': 'Reste une semaine', 'de': 'Noch eine Woche', 'ru': 'Ещё неделя', 'nl': 'Over een week' },
-        '2week_left': { 'en': 'Two weeks left', 'it': 'Due settimane rimaste', 'es': 'Dos semanas restantes', 'pl': 'Zostały dwa tygodnie', 'fr': 'Il reste deux semaines', 'de': 'Noch zwei Wochen', 'ru': 'Ещё две недели', 'nl': 'Over twee weken' },
-        '3week_left': { 'en': 'Three weeks left', 'it': 'Tre settimane rimanenti', 'es': 'Tres semanas quedan', 'pl': "Pozostały trzy tygodnie", 'fr': 'Trois semaines restantes', 'de': 'Noch drei Wochen', 'ru': 'Ещё три недели', 'nl': 'Over drie weken' },
-        '4week_left': { 'en': 'Four weeks left', 'it': 'Quattro settimane rimaste', 'es': 'Cuatro semanas quedan', 'pl': 'Pozostały cztery tygodnie', 'fr': 'Quatre semaines à gauche', 'de': 'Noch vier Wochen', 'ru': 'Ещё три недели', 'nl': 'Over vier weken' },
-        '5week_left': { 'en': 'Five weeks left', 'it': 'Cinque settimane rimaste', 'es': 'Quedan cinco semanas', 'pl': 'Pozostało pięć tygodni', 'fr': 'Cinq semaines à gauche', 'de': 'Noch fünf Wochen', 'ru': 'Ещё пять недель', 'nl': 'Over vijf weken' },
-        '6week_left': { 'en': 'Six weeks left', 'it': 'Sei settimane a sinistra', 'es': 'Seis semanas restantes', 'pl': 'Pozostało sześć tygodni', 'fr': 'Six semaines à gauche', 'de': 'Noch sechs Wochen', 'ru': 'Ещё шесть недель', 'nl': 'Over zes weken' },
-        'left': { 'en': 'left', 'it': 'sinistra', 'es': 'izquierda', 'pl': 'lewo', 'fr': 'la gauche', 'de': ' ', 'ru': 'осталось', 'nl': 'over' },
-        'still': { 'en': ' ', 'it': '', 'es': '', 'pl': '', 'fr': '', 'de': 'Noch', 'ru': ' ', 'nl': 'nog' },
-        'days': { 'en': 'days', 'it': 'Giorni', 'es': 'dias', 'pl': 'dni', 'fr': 'journées', 'de': 'Tage', 'ru': 'дней', 'nl': 'dagen' },
-        'day': { 'en': 'day', 'it': 'giorno', 'es': 'día', 'pl': 'dzień', 'fr': 'journée', 'de': 'Tag', 'ru': 'день', 'nl': 'dag' },
-        'hours': { 'en': 'hours', 'it': 'ore', 'es': 'horas', 'pl': 'godziny', 'fr': 'heures', 'de': 'Stunden', 'ru': 'часов', 'nl': 'uren' },
-        'hour': { 'en': 'hour', 'it': 'ora', 'es': 'hora', 'pl': 'godzina', 'fr': 'heure', 'de': 'Stunde', 'ru': 'час', 'nl': 'uur' }
+        today: {
+            en: 'Today',
+            it: 'Oggi',
+            es: 'Hoy',
+            pl: 'Dzisiaj',
+            fr: "Aujourd'hui",
+            de: 'Heute',
+            ru: 'Сегодня',
+            nl: 'Vandaag',
+        },
+        tomorrow: {
+            en: 'Tomorrow',
+            it: 'Domani',
+            es: 'Mañana',
+            pl: 'Jutro',
+            fr: 'Demain',
+            de: 'Morgen',
+            ru: 'Завтра',
+            nl: 'Morgen',
+        },
+        dayafter: {
+            en: 'Day After Tomorrow',
+            it: 'Dopodomani',
+            es: 'Pasado mañana',
+            pl: 'Pojutrze',
+            fr: 'Après demain',
+            de: 'Übermorgen',
+            ru: 'Послезавтра',
+            nl: 'Overmorgen',
+        },
+        '3days': {
+            en: 'In 3 days',
+            it: 'In 3 giorni',
+            es: 'En 3 días',
+            pl: 'W 3 dni',
+            fr: 'Dans 3 jours',
+            de: 'In 3 Tagen',
+            ru: 'Через 2 дня',
+            nl: 'Over 3 dagen',
+        },
+        '4days': {
+            en: 'In 4 days',
+            it: 'In 4 giorni',
+            es: 'En 4 días',
+            pl: 'W 4 dni',
+            fr: 'Dans 4 jours',
+            de: 'In 4 Tagen',
+            ru: 'Через 3 дня',
+            nl: 'Over 4 dagen',
+        },
+        '5days': {
+            en: 'In 5 days',
+            it: 'In 5 giorni',
+            es: 'En 5 días',
+            pl: 'W ciągu 5 dni',
+            fr: 'Dans 5 jours',
+            de: 'In 5 Tagen',
+            ru: 'Через 4 дня',
+            nl: 'Over 5 dagen',
+        },
+        '6days': {
+            en: 'In 6 days',
+            it: 'In 6 giorni',
+            es: 'En 6 días',
+            pl: 'W ciągu 6 dni',
+            fr: 'Dans 6 jours',
+            de: 'In 6 Tagen',
+            ru: 'Через 5 дней',
+            nl: 'Over 6 dagen',
+        },
+        oneweek: {
+            en: 'In one week',
+            it: 'In una settimana',
+            es: 'En una semana',
+            pl: 'W jeden tydzień',
+            fr: 'Dans une semaine',
+            de: 'In einer Woche',
+            ru: 'Через неделю',
+            nl: 'Binnen een week',
+        },
+        '1week_left': {
+            en: 'One week left',
+            it: 'Manca una settimana',
+            es: 'Queda una semana',
+            pl: 'Został jeden tydzień',
+            fr: 'Reste une semaine',
+            de: 'Noch eine Woche',
+            ru: 'Ещё неделя',
+            nl: 'Over een week',
+        },
+        '2week_left': {
+            en: 'Two weeks left',
+            it: 'Due settimane rimaste',
+            es: 'Dos semanas restantes',
+            pl: 'Zostały dwa tygodnie',
+            fr: 'Il reste deux semaines',
+            de: 'Noch zwei Wochen',
+            ru: 'Ещё две недели',
+            nl: 'Over twee weken',
+        },
+        '3week_left': {
+            en: 'Three weeks left',
+            it: 'Tre settimane rimanenti',
+            es: 'Tres semanas quedan',
+            pl: 'Pozostały trzy tygodnie',
+            fr: 'Trois semaines restantes',
+            de: 'Noch drei Wochen',
+            ru: 'Ещё три недели',
+            nl: 'Over drie weken',
+        },
+        '4week_left': {
+            en: 'Four weeks left',
+            it: 'Quattro settimane rimaste',
+            es: 'Cuatro semanas quedan',
+            pl: 'Pozostały cztery tygodnie',
+            fr: 'Quatre semaines à gauche',
+            de: 'Noch vier Wochen',
+            ru: 'Ещё три недели',
+            nl: 'Over vier weken',
+        },
+        '5week_left': {
+            en: 'Five weeks left',
+            it: 'Cinque settimane rimaste',
+            es: 'Quedan cinco semanas',
+            pl: 'Pozostało pięć tygodni',
+            fr: 'Cinq semaines à gauche',
+            de: 'Noch fünf Wochen',
+            ru: 'Ещё пять недель',
+            nl: 'Over vijf weken',
+        },
+        '6week_left': {
+            en: 'Six weeks left',
+            it: 'Sei settimane a sinistra',
+            es: 'Seis semanas restantes',
+            pl: 'Pozostało sześć tygodni',
+            fr: 'Six semaines à gauche',
+            de: 'Noch sechs Wochen',
+            ru: 'Ещё шесть недель',
+            nl: 'Over zes weken',
+        },
+        left: {
+            en: 'left',
+            it: 'sinistra',
+            es: 'izquierda',
+            pl: 'lewo',
+            fr: 'la gauche',
+            de: ' ',
+            ru: 'осталось',
+            nl: 'over',
+        },
+        still: { en: ' ', it: '', es: '', pl: '', fr: '', de: 'Noch', ru: ' ', nl: 'nog' },
+        days: { en: 'days', it: 'Giorni', es: 'dias', pl: 'dni', fr: 'journées', de: 'Tage', ru: 'дней', nl: 'dagen' },
+        day: { en: 'day', it: 'giorno', es: 'día', pl: 'dzień', fr: 'journée', de: 'Tag', ru: 'день', nl: 'dag' },
+        hours: {
+            en: 'hours',
+            it: 'ore',
+            es: 'horas',
+            pl: 'godziny',
+            fr: 'heures',
+            de: 'Stunden',
+            ru: 'часов',
+            nl: 'uren',
+        },
+        hour: { en: 'hour', it: 'ora', es: 'hora', pl: 'godzina', fr: 'heure', de: 'Stunde', ru: 'час', nl: 'uur' },
     };
 
     function _(text, config) {
@@ -407,8 +591,7 @@ module.exports = function (RED: Red) {
                             break;
                         }
                     }
-                    if (element)
-                        arr.push(element);
+                    if (element) arr.push(element);
                 }
             }
         }
@@ -443,15 +626,13 @@ module.exports = function (RED: Red) {
         var endmonth = _end.getMonth() + 1;
         var endyear = _end.getFullYear();
         var _time = '';
-        var alreadyStarted = (_date < new Date());
+        var alreadyStarted = _date < new Date();
 
         if (withTime) {
             var hours = _date.getHours();
             var minutes = _date.getMinutes();
 
-
             if (!alreadyStarted) {
-
                 if (hours < 10) hours = '0' + hours.toString();
                 if (minutes < 10) minutes = '0' + minutes.toString();
                 _time = ' ' + hours + ':' + minutes;
@@ -459,12 +640,10 @@ module.exports = function (RED: Red) {
             var timeDiff = _end.getTime() - _date.getTime();
             if (timeDiff === 0 && hours === 0 && minutes === 0) {
                 _time = ' ';
-            }
-            else if (timeDiff > 0) {
+            } else if (timeDiff > 0) {
                 if (!alreadyStarted) {
                     _time += '-';
-                }
-                else {
+                } else {
                     _time += ' ';
                 }
 
@@ -496,12 +675,10 @@ module.exports = function (RED: Red) {
                     if (fullTimeDiff >= 24 * 60 * 60 * 1000) {
                         _time += '+' + Math.floor(timeDiff / (24 * 60 * 60 * 1000));
                     }
-                }
-                else if (config.replacedates && _end.getHours() === 0 && _end.getMinutes() === 0) {
+                } else if (config.replacedates && _end.getHours() === 0 && _end.getMinutes() === 0) {
                     _time = ' ';
                 }
             }
-
         }
         var _class = '';
         var d = new Date();
@@ -510,75 +687,71 @@ module.exports = function (RED: Red) {
         d2.setDate(d.getDate() + 1);
 
         var todayOnly = false;
-        if (day === d.getDate() && month === (d.getMonth() + 1) && year === d.getFullYear() && endday === d2.getDate() && endmonth === (d2.getMonth() + 1) && endyear === d2.getFullYear() && fullday) {
+        if (
+            day === d.getDate() &&
+            month === d.getMonth() + 1 &&
+            year === d.getFullYear() &&
+            endday === d2.getDate() &&
+            endmonth === d2.getMonth() + 1 &&
+            endyear === d2.getFullYear() &&
+            fullday
+        ) {
             todayOnly = true;
         }
 
         if (todayOnly || !alreadyStarted) {
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_today';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_tomorrow';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_dayafter';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_3days';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_4days';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_5days';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_6days';
             }
 
             d.setDate(d.getDate() + 1);
-            if (day === d.getDate() &&
-                month === (d.getMonth() + 1) &&
-                year === d.getFullYear()) {
+            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
                 _class = 'ical_oneweek';
             }
 
             if (config.replacedates) {
-                if (_class === 'ical_today') return { text: ((alreadyStarted && !todayOnly) ? '&#8594; ' : '') + _('today', config) + _time, _class: _class };
-                if (_class === 'ical_tomorrow') return { text: (alreadyStarted ? '&#8594; ' : '') + _('tomorrow', config) + _time, _class: _class };
-                if (_class === 'ical_dayafter') return { text: (alreadyStarted ? '&#8594; ' : '') + _('dayafter', config) + _time, _class: _class };
-                if (_class === 'ical_3days') return { text: (alreadyStarted ? '&#8594; ' : '') + _('3days', config) + _time, _class: _class };
-                if (_class === 'ical_4days') return { text: (alreadyStarted ? '&#8594; ' : '') + _('4days', config) + _time, _class: _class };
-                if (_class === 'ical_5days') return { text: (alreadyStarted ? '&#8594; ' : '') + _('5days', config) + _time, _class: _class };
-                if (_class === 'ical_6days') return { text: (alreadyStarted ? '&#8594; ' : '') + _('6days', config) + _time, _class: _class };
-                if (_class === 'ical_oneweek') return { text: (alreadyStarted ? '&#8594; ' : '') + _('oneweek', config) + _time, _class: _class };
+                if (_class === 'ical_today')
+                    return {
+                        text: _('today', config) + _time,
+                        _class: _class,
+                    };
+                if (_class === 'ical_tomorrow') return { text: _('tomorrow', config) + _time, _class: _class };
+                if (_class === 'ical_dayafter') return { text:_('dayafter', config) + _time, _class: _class };
+                if (_class === 'ical_3days') return { text: _('3days', config) + _time, _class: _class };
+                if (_class === 'ical_4days') return { text: _('4days', config) + _time, _class: _class };
+                if (_class === 'ical_5days') return { text: _('5days', config) + _time, _class: _class };
+                if (_class === 'ical_6days') return { text: _('6days', config) + _time, _class: _class };
+                if (_class === 'ical_oneweek') return { text: _('oneweek', config) + _time, _class: _class };
             }
         } else {
             _class = 'ical_today';
@@ -586,7 +759,7 @@ module.exports = function (RED: Red) {
             var hoursleft = Math.round((_end.getDate() - new Date().getDate()) / (1000 * 60 * 60));
 
             if (config.replacedates) {
-                var _left = (_('left', config) !== ' ' ? ' ' + _('left', config) : '');
+                var _left = _('left', config) !== ' ' ? ' ' + _('left', config) : '';
                 var text;
                 if (daysleft === 42) {
                     text = _('6week_left', config);
@@ -612,7 +785,13 @@ module.exports = function (RED: Red) {
                             text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + daysleft + ' ' + _('days', config) + _left;
                         }
                     } else {
-                        text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + daysleft + ' ' + (daysleft === 1 ? _('day', config) : _('days', config)) + _left;
+                        text =
+                            (_('still', config) !== ' ' ? _('still', config) : '') +
+                            ' ' +
+                            daysleft +
+                            ' ' +
+                            (daysleft === 1 ? _('day', config) : _('days', config)) +
+                            _left;
                     }
                 } else {
                     if (config.language === 'ru') {
@@ -626,7 +805,13 @@ module.exports = function (RED: Red) {
                             text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + hoursleft + ' ' + _('hours', config) + _left;
                         }
                     } else {
-                        text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + hoursleft + ' ' + (hoursleft === 1 ? _('hour', config) : _('hours', config)) + _left;
+                        text =
+                            (_('still', config) !== ' ' ? _('still', config) : '') +
+                            ' ' +
+                            hoursleft +
+                            ' ' +
+                            (hoursleft === 1 ? _('hour', config) : _('hours', config)) +
+                            _left;
                     }
                 }
             } else {
@@ -637,7 +822,7 @@ module.exports = function (RED: Red) {
                 if (day < 10) day = '0' + day.toString();
                 if (month < 10) month = '0' + month.toString();
 
-                text = '&#8594; ' + day + '.' + month + '.';
+                text =  day + '.' + month + '.';
                 text += year;
 
                 if (withTime) {
@@ -660,12 +845,11 @@ module.exports = function (RED: Red) {
         if (day < 10) day = '0' + day.toString();
         if (month < 10) month = '0' + month.toString();
 
-
         return {
             text: day + '.' + month + '.' + year + _time,
-            _class: _class
+            _class: _class,
         };
     }
 
-    RED.nodes.registerType("ical-upcoming", upcomingNode);
-}
+    RED.nodes.registerType('ical-upcoming', upcomingNode);
+};

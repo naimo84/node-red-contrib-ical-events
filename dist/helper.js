@@ -50,9 +50,6 @@ function getICal(node, urlOrFile, config, callback) {
                     callback && callback(err, null);
                     return;
                 }
-                console.log('data');
-                console.log(data);
-                console.log('data');
                 callback && callback(null, data);
             });
         }
