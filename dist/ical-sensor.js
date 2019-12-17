@@ -101,7 +101,8 @@ module.exports = function (RED) {
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
                                     description: ev.description,
-                                    on: true
+                                    on: true,
+                                    countdown: helper_1.countdown(new Date(ev.start))
                                 };
                             }
                             node.send({

@@ -57,7 +57,6 @@ function _convertEvent(e) {
 }
 function loadEventsForDay(whenMoment, config, cb) {
     var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4], start = whenMoment.clone().startOf('day').subtract(config.pastview, 'days'), end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
-    console.log(start, end);
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +
         '  <D:prop>\n' +

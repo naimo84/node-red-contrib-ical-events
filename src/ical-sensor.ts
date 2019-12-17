@@ -3,7 +3,7 @@ import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
-import { getICal, CalEvent } from './helper';
+import { getICal, CalEvent, countdown } from './helper';
 
 module.exports = function (RED: Red) {
     function sensorNode(config: any) {
@@ -114,7 +114,8 @@ module.exports = function (RED: Red) {
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
                                     description: ev.description,
-                                    on: true
+                                    on: true,
+                                    countdown: countdown(new Date(ev.start))
                                 }
                             }
 

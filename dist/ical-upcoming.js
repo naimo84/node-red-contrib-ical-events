@@ -253,6 +253,7 @@ module.exports = function (RED) {
                         allDay: true,
                         rule: rule,
                         location: location,
+                        countdown: helper_1.countdown(new Date(ev.start))
                     });
                     node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }
@@ -275,6 +276,7 @@ module.exports = function (RED) {
                         allDay: false,
                         rule: rule,
                         location: location,
+                        countdown: helper_1.countdown(new Date(ev.start))
                     });
                     node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }

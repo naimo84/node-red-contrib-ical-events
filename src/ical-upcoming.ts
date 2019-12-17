@@ -2,7 +2,7 @@ import { Red, Node } from 'node-red';
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
 import * as moment from 'moment';
-import { getICal, CalEvent } from './helper';
+import { getICal, CalEvent, countdown } from './helper';
 
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
@@ -283,6 +283,7 @@ module.exports = function(RED: Red) {
                         allDay: true,
                         rule: rule,
                         location: location,
+                        countdown: countdown(new Date(ev.start))
                     });
 
                     node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
@@ -307,6 +308,7 @@ module.exports = function(RED: Red) {
                         allDay: false,
                         rule: rule,
                         location: location,
+                        countdown: countdown(new Date(ev.start))
                     });
                     node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }

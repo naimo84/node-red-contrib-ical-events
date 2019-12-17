@@ -5,7 +5,7 @@ import { CronJob } from 'cron';
 import { CronTime } from 'cron';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
-import { getICal, CalEvent } from './helper';
+import { getICal, CalEvent, countdown } from './helper';
 
 module.exports = function (RED: Red) {
     let newCronJobs = new Map();
@@ -89,7 +89,8 @@ module.exports = function (RED: Red) {
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
-                                    description: ev.description
+                                    description: ev.description,
+                                    countdown: countdown(new Date(ev.start))
                                 }
 
                                 if (config.offset) {
@@ -124,7 +125,8 @@ module.exports = function (RED: Red) {
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
-                                    description: ev.description
+                                    description: ev.description,
+                                    countdown: countdown(new Date(ev.start))
                                 }
 
                                 if (config.offset) {

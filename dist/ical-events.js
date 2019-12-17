@@ -78,7 +78,8 @@ module.exports = function (RED) {
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
-                                    description: ev.description
+                                    description: ev.description,
+                                    countdown: helper_1.countdown(new Date(ev.start))
                                 };
                                 if (config.offset) {
                                     eventStart.setMinutes(eventStart.getMinutes() + parseInt(config.offset));
@@ -112,7 +113,8 @@ module.exports = function (RED) {
                                     location: ev.location,
                                     eventStart: new Date(ev.start),
                                     eventEnd: new Date(ev.end),
-                                    description: ev.description
+                                    description: ev.description,
+                                    countdown: helper_1.countdown(new Date(ev.start))
                                 };
                                 if (config.offset) {
                                     eventStart.setMinutes(eventEnd.getMinutes() + parseInt(config.offset));
