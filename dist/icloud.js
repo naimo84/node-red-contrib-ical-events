@@ -11,11 +11,19 @@ function process(reslist, start, end, ics) {
 }
 function convertEvents(events) {
     var retEntries = [];
-    if (events && events.events) {
-        events.events.forEach(function (event) {
-            var ev = _convertEvent(event);
-            retEntries.push(ev);
-        });
+    if (events) {
+        if (events.events) {
+            events.events.forEach(function (event) {
+                var ev = _convertEvent(event);
+                retEntries.push(ev);
+            });
+        }
+        if (events.occurrences) {
+            var mappedOccurrences = events.occurrences.map(function (o) { return _convertEvent(o); });
+            if (mappedOccurrences.length > 0) {
+                retEntries.push(mappedOccurrences[0]);
+            }
+        }
     }
     return retEntries;
 }
@@ -48,7 +56,8 @@ function _convertEvent(e) {
     }
 }
 function loadEventsForDay(whenMoment, config, cb) {
-    var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4], start = whenMoment.clone().startOf('day'), end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
+    var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4], start = whenMoment.clone().startOf('day').subtract(config.pastview, 'days'), end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
+    console.log(start, end);
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +
         '  <D:prop>\n' +

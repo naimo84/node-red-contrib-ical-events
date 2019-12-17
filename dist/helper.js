@@ -13,7 +13,8 @@ function getICal(node, urlOrFile, config, callback) {
             username: config.username,
             password: config.password,
             type: "caldav",
-            endpreview: node.endpreview || 1
+            endpreview: node.endpreview || 1,
+            pastview: node.pastview || 0
         }, function (list, start, end) {
             callback && callback(null, list);
         });

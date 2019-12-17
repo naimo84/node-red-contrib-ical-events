@@ -11,18 +11,26 @@ function process(reslist, start, end, ics) {
 
     convertEvents(events).forEach(event => {
         reslist[event.uid] = event;
-    })
-
+    });
 }
 
 function convertEvents(events) {
     let retEntries = [];
-    if (events && events.events) {
-        events.events.forEach(event => {
-            let ev = _convertEvent(event);
-            retEntries.push(ev);
-        });
+    if (events) {
+        if (events.events) {
+            events.events.forEach(event => {
+                let ev = _convertEvent(event);
+                retEntries.push(ev);
+            });
+        }
+        if (events.occurrences) {
+            const mappedOccurrences = events.occurrences.map(o => _convertEvent(o));
+            if (mappedOccurrences.length > 0) {
+                retEntries.push(mappedOccurrences[0])
+            }
+        }
     }
+
     return retEntries;
 }
 
@@ -67,9 +75,8 @@ export function loadEventsForDay(whenMoment, config, cb) {
         host = urlparts[2],
         port = urlparts[3] || (protocol === "https" ? 443 : 80),
         path = urlparts[4],
-        start = whenMoment.clone().startOf('day'),
+        start = whenMoment.clone().startOf('day').subtract(config.pastview, 'days'),
         end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
-
 
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +
@@ -124,6 +131,7 @@ export function loadEventsForDay(whenMoment, config, cb) {
                         json.multistatus.response.forEach(response => process(reslist, start, end, response.propstat.prop['calendar-data']._cdata));
                     }
                 }
+
                 cb(reslist, start, end);
             } catch (e) {
                 console.error("Error parsing response", e)
