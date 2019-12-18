@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.0...v0.10.1) (2019-12-18)
+
+
+### Features
+
+* [#17](https://github.com/naimo84/node-red-contrib-ical-events/issues/17) countdown to event in days, hours, minutes ([c3fd336](https://github.com/naimo84/node-red-contrib-ical-events/commit/c3fd33635d7895f8aa1508cff17065f7e5f6b657))
+
+
+### Bug Fixes
+
+* issue [#18](https://github.com/naimo84/node-red-contrib-ical-events/issues/18), Repeating events for icloud secure ([1f8a572](https://github.com/naimo84/node-red-contrib-ical-events/commit/1f8a57272be8c5b8ac8f3d7c73f4c1b8da6b9cd2))
+
 ## [0.10.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.9.2...v0.10.0) (2019-12-05)
 
 
