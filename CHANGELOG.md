@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.1...v0.10.2) (2019-12-22)
+
+
+### Features
+
+* issue [#19](https://github.com/naimo84/node-red-contrib-ical-events/issues/19) Report calendar name in msg.payloa ([498ee9e](https://github.com/naimo84/node-red-contrib-ical-events/commit/498ee9e03631bed562e6157606415894091a3a07))
+
 ### [0.10.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.0...v0.10.1) (2019-12-18)
 
 
