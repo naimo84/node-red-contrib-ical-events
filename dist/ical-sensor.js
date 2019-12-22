@@ -102,6 +102,7 @@ module.exports = function (RED) {
                                     eventEnd: new Date(ev.end),
                                     description: ev.description,
                                     on: true,
+                                    calendarName: ev.calendarName,
                                     countdown: helper_1.countdown(new Date(ev.start))
                                 };
                             }

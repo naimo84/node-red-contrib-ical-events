@@ -39,8 +39,7 @@ function CalDav(node, config, calName) {
             node.error('CalDAV -> no calendars found.');
             return;
         }
-        for (var _i = 0, _a = account.calendars; _i < _a.length; _i++) {
-            var calendar = _a[_i];
+        var _loop_1 = function (calendar) {
             if (!calName || !calName.length || (calName && calName.length && calName === calendar.displayName)) {
                 promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
                     .then(function (calendarEntries) {
@@ -52,6 +51,7 @@ function CalDav(node, config, calName) {
                             var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
                             var events = icalExpander.between(startDate.toDate(), endDate.toDate());
                             convertEvents(events).forEach(function (event) {
+                                event.calendarName = calendar.displayName;
                                 retEntries[event.uid] = event;
                             });
                         }
@@ -83,6 +83,7 @@ function CalDav(node, config, calName) {
                                     return ical.fromURL(ics, header).then(function (data) {
                                         for (var k in data) {
                                             var ev = data[k];
+                                            ev.calendarName = calendar.displayName;
                                             retEntries[ev.uid] = ev;
                                         }
                                         return retEntries;
@@ -93,6 +94,10 @@ function CalDav(node, config, calName) {
                     }
                 }));
             }
+        };
+        for (var _i = 0, _a = account.calendars; _i < _a.length; _i++) {
+            var calendar = _a[_i];
+            _loop_1(calendar);
         }
         ;
         return Promise.all(promises);

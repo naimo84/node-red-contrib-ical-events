@@ -22,7 +22,9 @@ export interface CalEvent {
     rule?: string,
     on?: boolean,
     off?: boolean,
-    countdown?: object
+    countdown?: object,
+    calendarName?: string
+                        
 }
 
 export function countdown(date) {

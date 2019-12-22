@@ -45,6 +45,7 @@ export function CalDav(node, config, calName) {
             }
 
             for (let calendar of account.calendars) {
+              
                 if (!calName || !calName.length || (calName && calName.length && calName === calendar.displayName)) {
                     promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
                         .then((calendarEntries) => {
@@ -56,6 +57,7 @@ export function CalDav(node, config, calName) {
                                     const events = icalExpander.between(startDate.toDate(), endDate.toDate())
 
                                     convertEvents(events).forEach(event => {
+                                        event.calendarName = calendar.displayName;
                                         retEntries[event.uid] = event;
                                     });
                                 }
@@ -87,6 +89,7 @@ export function CalDav(node, config, calName) {
                                            return ical.fromURL(ics, header).then(data => {
                                                 for (var k in data) {
                                                     var ev = data[k];
+                                                    ev.calendarName = calendar.displayName;
                                                     retEntries[ev.uid] = ev;
                                                 }                                              
                                                 return retEntries;
