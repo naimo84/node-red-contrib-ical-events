@@ -2,7 +2,7 @@ import { Red, Node } from 'node-red';
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
 import * as moment from 'moment';
-import { getICal, CalEvent, countdown } from './helper';
+import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset } from './helper';
 
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
@@ -328,7 +328,7 @@ module.exports = function(RED: Red) {
             node.debug('Ical read successfully ' + urlOrFile);
 
             try {
-                if (data) {
+                if (data) {                    
                     var realnow = new Date();
                     var endpreview = new Date();
                     var pastview = new Date();
@@ -352,18 +352,7 @@ module.exports = function(RED: Red) {
         });
     }
 
-    function getTimezoneOffset(date) {
-        var offset = 0;
-        var zone = moment.tz.zone(moment.tz.guess());
-        if (zone && date) {
-            offset = zone.utcOffset(date.getTime());
-        }
-        return offset;
-    }
-
-    function addOffset(time, offset) {
-        return new Date(time.getTime() + offset * 60 * 1000);
-    }
+   
 
     function displayDates(node: any, config: Config) {
         let todayEventcounter = 0;

@@ -44,7 +44,9 @@
     "start": "gulp && node-red",
     "test": "mocha \"test/**/*_spec.js\"",
     "release": "standard-version",
-    "release-minor": "standard-version --release-as minor"
+    "release-minor": "standard-version --release-as minor",
+    "watch": "tsc -w -p ./src",
+    "debug": "nodemon --legacy-watch --watch ./dist --inspect-brk=0.0.0.0:5858 C:\\Users\\mail\\AppData\\Roaming\\npm\\node_modules\\node-red\\lib\\red.js"
   },
   "husky": {
     "hooks": {
@@ -86,7 +88,8 @@
     "node-red-node-test-helper": "^0.2.3",
     "should": "13.2.3",
     "standard-version": "^7.0.1",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "nodemon": "^1.11.0"
   },
   "commitlint": {
     "format": {

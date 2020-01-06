@@ -4,6 +4,19 @@ var moment = require("moment");
 var icloud_1 = require("./icloud");
 var caldav_1 = require("./caldav");
 var ical = require("node-ical");
+function getTimezoneOffset(date) {
+    var offset = 0;
+    var zone = moment.tz.zone(moment.tz.guess());
+    if (zone && date) {
+        offset = zone.utcOffset(date.getTime());
+    }
+    return offset;
+}
+exports.getTimezoneOffset = getTimezoneOffset;
+function addOffset(time, offset) {
+    return new Date(time.getTime() + offset * 60 * 1000);
+}
+exports.addOffset = addOffset;
 function countdown(date) {
     var seconds = (date.getTime() - new Date().getTime()) / 1000;
     seconds = Number(seconds);

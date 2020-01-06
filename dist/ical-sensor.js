@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = require("crypto-js");
 var cron_1 = require("cron");
 var helper_1 = require("./helper");
+var RRule = require('rrule').RRule;
+var ce = require('cloneextend');
 module.exports = function (RED) {
     function sensorNode(config) {
         var _this = this;
@@ -47,6 +49,73 @@ module.exports = function (RED) {
             node.status({ fill: "red", shape: "ring", text: err.message });
         }
     }
+    function processRRule(ev, node) {
+        var eventLength = ev.end.getTime() - ev.start.getTime();
+        var options = RRule.parseString(ev.rrule.toString());
+        options.dtstart = helper_1.addOffset(ev.start, -helper_1.getTimezoneOffset(ev.start));
+        if (options.until) {
+            options.until = helper_1.addOffset(options.until, -helper_1.getTimezoneOffset(options.until));
+        }
+        //node.debug('options:' + JSON.stringify(options));
+        var rule = new RRule(options);
+        var now2 = new Date();
+        now2.setHours(0, 0, 0, 0);
+        var now3 = new Date(now2.getTime() - eventLength);
+        if (now2 < now3)
+            now3 = now2;
+        var dates = [];
+        try {
+            dates = rule.between(now3, helper_1.addOffset(new Date(), 24 * 60), true);
+        }
+        catch (e) {
+            node.error('Issue detected in RRule, event ignored; ' +
+                e.stack +
+                '\n' +
+                'RRule object: ' +
+                JSON.stringify(rule) +
+                '\n' +
+                'now3: ' +
+                now3 +
+                '\n' +
+                'string: ' +
+                ev.rrule.toString() +
+                '\n' +
+                'options: ' +
+                JSON.stringify(options));
+        }
+        //node.debug('dates:' + JSON.stringify(dates));
+        if (dates.length > 0) {
+            for (var i = 0; i < dates.length; i++) {
+                var ev2 = ce.clone(ev);
+                var start = dates[i];
+                ev2.start = helper_1.addOffset(start, helper_1.getTimezoneOffset(start));
+                var end = new Date(start.getTime() + eventLength);
+                ev2.end = helper_1.addOffset(end, helper_1.getTimezoneOffset(end));
+                node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
+                var checkDate = true;
+                if (ev2.exdate) {
+                    for (var d in ev2.exdate) {
+                        if (new Date(d).getTime() === ev2.start.getTime()) {
+                            checkDate = false;
+                            node.debug('   ' + i + ': sort out');
+                            break;
+                        }
+                    }
+                }
+                if (checkDate && ev.recurrences) {
+                    for (var dOri in ev.recurrences) {
+                        if (new Date(dOri).getTime() === ev2.start.getTime()) {
+                            ev2 = ce.clone(ev.recurrences[dOri]);
+                            node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                        }
+                    }
+                }
+                if (checkDate) {
+                    return ev2;
+                }
+            }
+        }
+    }
     function cronCheckJob(node, config) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
@@ -67,7 +136,17 @@ module.exports = function (RED) {
             for (var k in data) {
                 if (data.hasOwnProperty(k)) {
                     var ev = data[k];
+                    //delete data[k];
                     if (ev.type == 'VEVENT') {
+                        var ev2 = void 0;
+                        if (ev.rrule !== undefined) {
+                            ev2 = ce.clone(processRRule(ev, node));
+                        }
+                        if (ev2) {
+                            console.log(ev2);
+                            ev = ev2;
+                            console.log(ev.summary + " \"rrule\"");
+                        }
                         var eventStart = new Date(ev.start);
                         var eventEnd = new Date(ev.end);
                         if (eventStart <= dateNow && eventEnd >= dateNow) {

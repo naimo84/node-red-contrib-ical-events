@@ -80,9 +80,9 @@ module.exports = function (RED) {
     function processRRule(ev, endpreview, today, realnow, node, config) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
         var options = RRule.parseString(ev.rrule.toString());
-        options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
+        options.dtstart = helper_1.addOffset(ev.start, -helper_1.getTimezoneOffset(ev.start));
         if (options.until) {
-            options.until = addOffset(options.until, -getTimezoneOffset(options.until));
+            options.until = helper_1.addOffset(options.until, -helper_1.getTimezoneOffset(options.until));
         }
         node.debug('options:' + JSON.stringify(options));
         var rule = new RRule(options);
@@ -133,9 +133,9 @@ module.exports = function (RED) {
             for (var i = 0; i < dates.length; i++) {
                 var ev2 = ce.clone(ev);
                 var start = dates[i];
-                ev2.start = addOffset(start, getTimezoneOffset(start));
+                ev2.start = helper_1.addOffset(start, helper_1.getTimezoneOffset(start));
                 var end = new Date(start.getTime() + eventLength);
-                ev2.end = addOffset(end, getTimezoneOffset(end));
+                ev2.end = helper_1.addOffset(end, helper_1.getTimezoneOffset(end));
                 node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
                 var checkDate = true;
                 if (ev2.exdate) {
@@ -315,17 +315,6 @@ module.exports = function (RED) {
                 callback('no Data' + e);
             }
         });
-    }
-    function getTimezoneOffset(date) {
-        var offset = 0;
-        var zone = moment.tz.zone(moment.tz.guess());
-        if (zone && date) {
-            offset = zone.utcOffset(date.getTime());
-        }
-        return offset;
-    }
-    function addOffset(time, offset) {
-        return new Date(time.getTime() + offset * 60 * 1000);
     }
     function displayDates(node, config) {
         var todayEventcounter = 0;

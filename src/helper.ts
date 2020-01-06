@@ -27,6 +27,19 @@ export interface CalEvent {
                         
 }
 
+export function getTimezoneOffset(date) {
+    var offset = 0;
+    var zone = moment.tz.zone(moment.tz.guess());
+    if (zone && date) {
+        offset = zone.utcOffset(date.getTime());
+    }
+    return offset;
+}
+
+export function addOffset(time, offset) {
+    return new Date(time.getTime() + offset * 60 * 1000);
+}
+
 export function countdown(date) {
 
     var seconds = (date.getTime() - new Date().getTime()) / 1000
