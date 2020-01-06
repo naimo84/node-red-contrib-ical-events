@@ -161,7 +161,7 @@ module.exports = function (RED) {
             }
         }
     }
-    function processData(data, realnow, today, endpreview, callback, node, config) {
+    function processData(data, realnow, pastview, endpreview, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
             var ev = data[k];
@@ -174,10 +174,10 @@ module.exports = function (RED) {
                     }
                 }
                 if (ev.rrule === undefined) {
-                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
+                    checkDates(ev, endpreview, pastview, realnow, ' ', node, config);
                 }
                 else {
-                    processRRule(ev, endpreview, today, realnow, node, config);
+                    processRRule(ev, endpreview, pastview, realnow, node, config);
                 }
             }
             if (++processedEntries > 100) {
@@ -188,10 +188,10 @@ module.exports = function (RED) {
             return;
         }
         else {
-            processData(data, realnow, today, endpreview, callback, node, config);
+            processData(data, realnow, pastview, endpreview, callback, node, config);
         }
     }
-    function checkDates(ev, endpreview, today, realnow, rule, node, config) {
+    function checkDates(ev, endpreview, pastview, realnow, rule, node, config) {
         var fullday = false;
         var reason;
         var date;
@@ -237,9 +237,9 @@ module.exports = function (RED) {
         }
         if (output) {
             if (fullday) {
-                if ((ev.start < endpreview && ev.start >= today) ||
-                    (ev.end > today && ev.end <= endpreview) ||
-                    (ev.start < today && ev.end > today)) {
+                if ((ev.start < endpreview && ev.start >= pastview) ||
+                    (ev.end > pastview && ev.end <= endpreview) ||
+                    (ev.start < pastview && ev.end > pastview)) {
                     date = formatDate(ev.start, ev.end, true, true, config);
                     insertSorted(node.datesArray, {
                         date: date.text,
@@ -260,8 +260,8 @@ module.exports = function (RED) {
                 }
             }
             else {
-                // Event with time
-                if ((ev.start >= today && ev.start < endpreview && ev.end >= realnow) ||
+                // Event with time              
+                if ((ev.start >= pastview && ev.start < endpreview) ||
                     (ev.end >= realnow && ev.end <= endpreview) ||
                     (ev.start < realnow && ev.end > realnow)) {
                     date = formatDate(ev.start, ev.end, true, false, config);

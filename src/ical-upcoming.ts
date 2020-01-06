@@ -187,7 +187,7 @@ module.exports = function(RED: Red) {
         }
     }
 
-    function processData(data, realnow, today, endpreview, callback, node, config) {
+    function processData(data, realnow, pastview, endpreview, callback, node, config) {
         var processedEntries = 0;
         for (var k in data) {
             var ev = data[k];
@@ -202,9 +202,9 @@ module.exports = function(RED: Red) {
                 }
 
                 if (ev.rrule === undefined) {
-                    checkDates(ev, endpreview, today, realnow, ' ', node, config);
+                    checkDates(ev, endpreview, pastview, realnow, ' ', node, config);
                 } else {
-                    processRRule(ev, endpreview, today, realnow, node, config);
+                    processRRule(ev, endpreview, pastview, realnow, node, config);
                 }
             }
 
@@ -215,11 +215,11 @@ module.exports = function(RED: Red) {
         if (!Object.keys(data).length) {
             return;
         } else {
-            processData(data, realnow, today, endpreview, callback, node, config);
+            processData(data, realnow, pastview, endpreview, callback, node, config);
         }
     }
 
-    function checkDates(ev, endpreview, today, realnow, rule, node, config: Config) {
+    function checkDates(ev, endpreview, pastview, realnow, rule, node, config: Config) {
         var fullday = false;
         var reason;
         var date;
@@ -265,9 +265,9 @@ module.exports = function(RED: Red) {
         if (output) {
             if (fullday) {
                 if (
-                    (ev.start < endpreview && ev.start >= today) ||
-                    (ev.end > today && ev.end <= endpreview) ||
-                    (ev.start < today && ev.end > today)
+                    (ev.start < endpreview && ev.start >= pastview) ||
+                    (ev.end > pastview && ev.end <= endpreview) ||
+                    (ev.start < pastview && ev.end > pastview)
                 ) {
                     date = formatDate(ev.start, ev.end, true, true, config);
 
@@ -290,9 +290,9 @@ module.exports = function(RED: Red) {
                     node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
                 }
             } else {
-                // Event with time
+                // Event with time              
                 if (
-                    (ev.start >= today && ev.start < endpreview && ev.end >= realnow) ||
+                    (ev.start >= pastview && ev.start < endpreview) ||
                     (ev.end >= realnow && ev.end <= endpreview) ||
                     (ev.start < realnow && ev.end > realnow)
                 ) {
