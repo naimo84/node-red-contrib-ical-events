@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.2...v0.10.3) (2020-01-06)
+
+
+### Bug Fixes
+
+* issue [#21](https://github.com/naimo84/node-red-contrib-ical-events/issues/21), sensor node RRules not working ([a334bd3](https://github.com/naimo84/node-red-contrib-ical-events/commit/a334bd3a7c7d4bba5161d8cbba22f71ee91d46d7))
+* issue [#22](https://github.com/naimo84/node-red-contrib-ical-events/issues/22), Upcoming events - no past view ([148f0ae](https://github.com/naimo84/node-red-contrib-ical-events/commit/148f0ae8b76443093608b96fdcc2efd1e2640bdc))
+
 ### [0.10.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.1...v0.10.2) (2019-12-22)
 
 
