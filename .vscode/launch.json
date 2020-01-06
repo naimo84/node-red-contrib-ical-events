@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [  
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Node-red",
+        "program": "C:\\Users\\mail\\AppData\\Roaming\\npm\\node_modules\\node-red\\lib\\red.js",
+        "runtimeArgs": ["--preserve-symlinks", "--experimental-modules"],
+        "env": {
+          "NO_UPDATE_NOTIFIER": "1"
+        }
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug Current File",
+        "program": "${file}"
+      },
+      { "type": "node", "request": "attach", "name": "Attach to Process", "processId": "${command:PickProcess}" } 
+      
+    ]
+  }
