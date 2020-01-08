@@ -49,7 +49,7 @@ module.exports = function (RED) {
             node.status({ fill: "red", shape: "ring", text: err.message });
         }
     }
-    function processRRule(ev, node) {
+    function processRRule(ev, node, dateNow) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
         var options = RRule.parseString(ev.rrule.toString());
         options.dtstart = helper_1.addOffset(ev.start, -helper_1.getTimezoneOffset(ev.start));
@@ -83,7 +83,7 @@ module.exports = function (RED) {
                 'options: ' +
                 JSON.stringify(options));
         }
-        //node.debug('dates:' + JSON.stringify(dates));
+        node.debug('dates:' + JSON.stringify(dates));
         if (dates.length > 0) {
             for (var i = 0; i < dates.length; i++) {
                 var ev2 = ce.clone(ev);
@@ -110,7 +110,7 @@ module.exports = function (RED) {
                         }
                     }
                 }
-                if (checkDate) {
+                if (checkDate && ev2.start <= dateNow && ev2.end >= dateNow) {
                     return ev2;
                 }
             }
@@ -140,12 +140,13 @@ module.exports = function (RED) {
                     if (ev.type == 'VEVENT') {
                         var ev2 = void 0;
                         if (ev.rrule !== undefined) {
-                            ev2 = ce.clone(processRRule(ev, node));
+                            // console.log(`${ev.summary} "rrule"`)
+                            ev2 = ce.clone(processRRule(ev, node, dateNow));
                         }
                         if (ev2) {
-                            console.log(ev2);
+                            //console.log(ev2)
                             ev = ev2;
-                            console.log(ev.summary + " \"rrule\"");
+                            // console.log(`${ev.summary} "rrule"`)
                         }
                         var eventStart = new Date(ev.start);
                         var eventEnd = new Date(ev.end);

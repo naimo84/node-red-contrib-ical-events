@@ -56,7 +56,7 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function processRRule(ev, node) {
+    function processRRule(ev, node,dateNow) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
 
         var options = RRule.parseString(ev.rrule.toString());
@@ -94,7 +94,7 @@ module.exports = function (RED: Red) {
             );
         }
 
-        //node.debug('dates:' + JSON.stringify(dates));
+        node.debug('dates:' + JSON.stringify(dates));
 
         if (dates.length > 0) {
             for (var i = 0; i < dates.length; i++) {
@@ -126,7 +126,7 @@ module.exports = function (RED: Red) {
                     }
                 }
 
-                if (checkDate) {
+                if (checkDate && ev2.start <= dateNow && ev2.end >= dateNow) {
                     return ev2;
                 }
             }
@@ -161,12 +161,13 @@ module.exports = function (RED: Red) {
                     if (ev.type == 'VEVENT') {
                         let ev2;
                         if (ev.rrule !== undefined) {
-                            ev2 = ce.clone(processRRule(ev, node));
+                           // console.log(`${ev.summary} "rrule"`)
+                            ev2 = ce.clone(processRRule(ev, node,dateNow));
                         }
                         if (ev2) {
-                            console.log(ev2)
+                            //console.log(ev2)
                             ev = ev2
-                            console.log(`${ev.summary} "rrule"`)
+                           // console.log(`${ev.summary} "rrule"`)
                         }
 
                         const eventStart = new Date(ev.start);
