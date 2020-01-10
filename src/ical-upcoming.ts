@@ -325,7 +325,6 @@ module.exports = function(RED: Red) {
                 callback(err);
                 return;
             }
-
             node.debug('Ical read successfully ' + urlOrFile);
 
             try {
@@ -372,7 +371,7 @@ module.exports = function(RED: Red) {
                 tomorrowEventcounter++;
             }
         }
-        console.log(node.datesArray.length)
+     
         node.send({
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,

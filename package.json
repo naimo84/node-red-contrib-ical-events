@@ -87,6 +87,8 @@
     "node-red": "1.0.2",
     "node-red-node-test-helper": "^0.2.3",
     "chai": "4.2.0",
+    "chai-like": "1.1.1",
+    "chai-things": "0.2.0",
     "sinon": "8.0.4",
     "standard-version": "^7.0.1",
     "typescript": "^3.7.2",
