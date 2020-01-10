@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var moment = require("moment");
 var icloud_1 = require("./icloud");
 var caldav_1 = require("./caldav");
-var ical = require("node-ical");
+var nodeIcal = require("node-ical");
 function getTimezoneOffset(date) {
     var offset = 0;
     var zone = moment.tz.zone(moment.tz.guess());
@@ -74,7 +74,7 @@ function getICal(node, urlOrFile, config, callback) {
                     }
                 };
             }
-            ical.fromURL(node.config.url, header, function (err, data) {
+            nodeIcal.fromURL(node.config.url, header, function (err, data) {
                 if (err) {
                     callback && callback(err, null);
                     return;
@@ -83,7 +83,7 @@ function getICal(node, urlOrFile, config, callback) {
             });
         }
         else {
-            ical.parseFile(node.config.url, function (err, data) {
+            nodeIcal.parseFile(node.config.url, function (err, data) {
                 if (err) {
                     callback && callback(err, null);
                     return;

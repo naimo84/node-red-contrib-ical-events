@@ -332,6 +332,7 @@ module.exports = function (RED) {
                 tomorrowEventcounter++;
             }
         }
+        console.log(node.datesArray.length);
         node.send({
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,

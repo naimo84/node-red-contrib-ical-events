@@ -1,8 +1,7 @@
 import moment = require("moment");
 import { loadEventsForDay } from "./icloud";
 import { CalDav } from "./caldav";
-import * as  ical from 'node-ical';
-
+const nodeIcal = require("node-ical");
 export interface Job {
     id: string,
     cronjob: any
@@ -24,7 +23,7 @@ export interface CalEvent {
     off?: boolean,
     countdown?: object,
     calendarName?: string
-                        
+
 }
 
 export function getTimezoneOffset(date) {
@@ -52,8 +51,8 @@ export function countdown(date) {
 
     return {
         days: d,
-        hours: h, 
-        minutes: m, 
+        hours: h,
+        minutes: m,
         seconds: s
     }
 }
@@ -86,7 +85,7 @@ export function getICal(node, urlOrFile, config, callback) {
             }
             callback(null, retEntries);
         });
-    } else {
+    } else {        
         if (urlOrFile.match(/^https?:\/\//)) {
             let header = {};
             let username = node.config.username;
@@ -101,7 +100,7 @@ export function getICal(node, urlOrFile, config, callback) {
                 }
             }
 
-            ical.fromURL(node.config.url, header, (err, data) => {
+            nodeIcal.fromURL(node.config.url, header, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;
@@ -109,7 +108,7 @@ export function getICal(node, urlOrFile, config, callback) {
                 callback && callback(null, data);
             });
         } else {
-            ical.parseFile(node.config.url, (err, data) => {
+            nodeIcal.parseFile(node.config.url, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;

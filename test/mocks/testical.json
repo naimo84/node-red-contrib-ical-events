@@ -1,0 +1,21 @@
+{
+    "7D57AB947149F80473A2B45A8AAAF765": {
+      "type": "VEVENT",
+      "params": [],     
+      "transparency": "OPAQUE",
+      "class": "PUBLIC",
+      "comment": "Tobit Software//David-WebBox/12.00a (1212)//EN",
+      "start": "2019-12-04T17:00:00.000Z" ,
+      "datetype": "date-time",
+      "end": "2019-12-04T17:00:00.000Z" ,
+      "location": "Englische Planke 1",
+      "summary": "Erinnerung: Abfuhr schwarze Restmülltonne morgen ab 6 Uhr",
+      "uid": "7D57AB947149F80473A2B45A8AAAF765",
+      "priority": "5",
+      "description": "Für die Adresse Englische Planke 1 wird am 05.12.2019 die schwarze Restmülltonne abgeholt. ",
+      "dtstamp": "2019-12-03T20:44:41.000Z",
+      "created":"2019-12-03T20:44:41.000Z",
+      "lastmodified": "2019-12-03T20:44:41.000Z",
+      "calendarName": "David.fx - Mr. Tester"
+    }
+  }

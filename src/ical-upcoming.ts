@@ -22,7 +22,7 @@ module.exports = function(RED: Red) {
         this.pastview = config.pastview || 0;
         this.pastviewUnits = config.pastviewUnits || 'd';
 
-        this.on('input', () => {
+        this.on('input', () => {           
             cronCheckJob(this);
         });
         try {
@@ -84,6 +84,7 @@ module.exports = function(RED: Red) {
                     node.status({ fill: 'red', shape: 'ring', text: err.message });
                     return;
                 }
+              
                 displayDates(node, node.config);
             },
             node,
@@ -188,7 +189,7 @@ module.exports = function(RED: Red) {
     }
 
     function processData(data, realnow, pastview, endpreview, callback, node, config) {
-        var processedEntries = 0;
+        var processedEntries = 0;        
         for (var k in data) {
             var ev = data[k];
             delete data[k];
@@ -318,7 +319,7 @@ module.exports = function(RED: Red) {
         }
     }
 
-    function checkICal(urlOrFile, callback, node, config: Config) {
+    function checkICal(urlOrFile, callback, node, config: Config) {   
         getICal(node, urlOrFile, config, (err, data) => {
             if (err || !data) {
                 callback(err);
@@ -371,7 +372,7 @@ module.exports = function(RED: Red) {
                 tomorrowEventcounter++;
             }
         }
-
+        console.log(node.datesArray.length)
         node.send({
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,

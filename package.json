@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-ical-events",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "NodeRed iCal Adapter",
   "author": {
     "name": "naimo84",
@@ -86,7 +86,8 @@
     "mocha": "6.2.2",
     "node-red": "1.0.2",
     "node-red-node-test-helper": "^0.2.3",
-    "should": "13.2.3",
+    "chai": "4.2.0",
+    "sinon": "8.0.4",
     "standard-version": "^7.0.1",
     "typescript": "^3.7.2",
     "nodemon": "^1.11.0"
