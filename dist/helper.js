@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var moment = require("moment");
 var icloud_1 = require("./icloud");
 var caldav_1 = require("./caldav");
-var nodeIcal = require("node-ical");
+var nodeIcal = require('node-ical');
 function getTimezoneOffset(date) {
     var offset = 0;
     var zone = moment.tz.zone(moment.tz.guess());
@@ -28,7 +28,7 @@ function countdown(date) {
         days: d,
         hours: h,
         minutes: m,
-        seconds: s
+        seconds: s,
     };
 }
 exports.countdown = countdown;
@@ -40,16 +40,16 @@ function getICal(node, urlOrFile, config, callback) {
             url: urlOrFile,
             username: config.username,
             password: config.password,
-            type: "caldav",
+            type: 'caldav',
             endpreview: node.endpreview || 1,
-            pastview: node.pastview || 0
+            pastview: node.pastview || 0,
         }, function (list, start, end) {
             callback && callback(null, list);
         });
     }
     else if (config.caldav && JSON.parse(config.caldav) === true) {
-        node.debug("caldav");
-        caldav_1.CalDav(node, config, null).then(function (data) {
+        node.debug('caldav');
+        caldav_1.CalDav(node, config).then(function (data) {
             var retEntries = {};
             for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
                 var events = data_1[_i];
@@ -70,8 +70,8 @@ function getICal(node, urlOrFile, config, callback) {
                 var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
                 header = {
                     headers: {
-                        'Authorization': auth
-                    }
+                        'Authorization': auth,
+                    },
                 };
             }
             nodeIcal.fromURL(node.config.url, header, function (err, data) {
