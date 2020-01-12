@@ -10,6 +10,9 @@ module.exports = function (RED) {
         this.name = config.name;
         this.language = config.language;
         this.replacedates = config.replacedates;
+        this.calendar = config.calendar;
+        this.pastWeeks = Number(config.pastWeeks || 0);
+        this.futureWeeks = Number(config.futureWeeks || 4);
     }
-    RED.nodes.registerType("ical-config", icalConfig);
+    RED.nodes.registerType('ical-config', icalConfig);
 };

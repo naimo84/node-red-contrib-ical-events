@@ -5,63 +5,85 @@
             category: 'config',
             defaults: {
                 url: {
-                    value: ""
+                    value: '',
                 },
                 username: {
-                    value: ""
+                    value: '',
                 },
                 password: {
-                    value: ""
+                    value: '',
                 },
                 caldav: {
-                    value: ""
+                    value: '',
                 },
                 name: {
-                    value: ""
+                    value: '',
                 },
                 language: {
-                    value: ""
+                    value: '',
                 },
                 replacedates: {
-                    value: false
-                }
+                    value: false,
+                },
+                calendar: {},
+                pastWeeks: {
+                    value: '0',
+                    validate: RED.validators.number(),
+                },
+                futureWeeks: {
+                    value: '4',
+                    validate: RED.validators.number(),
+                },
             },
-            label: function () {
+            label: function() {
                 if (this.name) {
                     return this.name;
                 }
-                return "iCal Config";
+                return 'iCal Config';
             },
-            oneditprepare: function () {
+            oneditprepare: function() {
                 var node = this;
 
                 if (this.caldav == undefined) {
-                    $("#node-config-input-caldav option").filter(function () {
+                    $('#node-config-input-caldav option').filter(function() {
                         return $(this).val() == 'false';
                     }).attr('selected', true);
                 }
 
-                $('#node-config-input-caldav').change(function () {
-                    var value = $('#node-config-input-caldav').val();              
-                    if(value === "false"){
+                $('#node-config-input-caldav').change(function() {
+                    var value = $('#node-config-input-caldav').val();
+                    if (!value || value === 'false') {
                         $('#node-config-input-username').parent().hide();
                         $('#node-config-input-password').parent().hide();
-                    }else{
+                        $('#node-config-input-calendar').parent().hide();
+                        $('#node-config-input-pastWeeks').parent().hide();
+                        $('#node-config-input-futureWeeks').parent().hide();
+                        return;
+                    }
+                    if (value === 'true') {
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
+                        $('#node-config-input-calendar').parent().show();
+                        $('#node-config-input-pastWeeks').parent().show();
+                        $('#node-config-input-futureWeeks').parent().show();
+                    } else {
+                        $('#node-config-input-username').parent().show();
+                        $('#node-config-input-password').parent().show();
+                        $('#node-config-input-calendar').parent().hide();
+                        $('#node-config-input-pastWeeks').parent().hide();
+                        $('#node-config-input-futureWeeks').parent().hide();
                     }
                 });
 
-                $('#node-config-input-replacedates').change(function () {
-                    var value = $('#node-config-input-replacedates').is(':checked');                    
+                $('#node-config-input-replacedates').change(function() {
+                    var value = $('#node-config-input-replacedates').is(':checked');
                     if (value) {
                         $('#node-config-input-language').parent().show();
-                    }
-                    else {
+                    } else {
                         $('#node-config-input-language').parent().hide();
                     }
                 });
-            }
+            },
         });
 </script>
 
@@ -74,7 +96,7 @@
     </div>
     <div class="form-row">
         <label for="node-config-input-caldav" style="width:160px !important">
-            <i class="far fa-calendar"></i>
+            <i class="fa fa-calendar"></i>
             <span>Type:</span></label>
             <select id="node-config-input-caldav">
                 <option value="false">iCal</option>
@@ -121,7 +143,27 @@
             <option value="es">Espanol</option>
         </select>
     </div>
-   
+   <div class="form-row">
+        <label for="node-config-input-calendar" style="width:160px !important">
+            <i class="fa fa-calendar"></i>
+            <span>Calendar:</span>
+        </label>
+        <input type="text" id="node-config-input-calendar" placeholder="" style="width:280px !important">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-pastWeeks" style="width:160px !important">
+            <i class="fa fa-calendar"></i>
+            <span>Past Weeks:</span>
+        </label>
+        <input type="text" id="node-config-input-pastWeeks" placeholder="" style="width:280px !important">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-futureWeeks" style="width:160px !important">
+            <i class="fa fa-calendar"></i>
+            <span>Future Weeks:</span>
+        </label>
+        <input type="text" id="node-config-input-futureWeeks" placeholder="" style="width:280px !important">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="ical-config">
@@ -134,6 +176,9 @@
         <li><b>Username</b> HTTP Basic authentication user
         <li><b>Password</b> HTTP Basic authentication user
         <li><b>Type</b> Type can be ical, caldav or iCloud secure (for iCloud, see <a href="https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6">https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6</a> to find the url, username and password to access an iCloud calendar)
+        <li><b>Calendar</b> <i>Type "caldav" only</i> Calendar name
+        <li><b>Past Weeks</b> <i>Type "caldav" only</i> Number of weeks ago to load events
+        <li><b>Future Weeks</b> <i>Type "caldav" only</i> Number of weeks in the future to load events
     </ul>
-    
+
 </script>

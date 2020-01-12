@@ -1,7 +1,9 @@
-import moment = require("moment");
-import { loadEventsForDay } from "./icloud";
-import { CalDav } from "./caldav";
-const nodeIcal = require("node-ical");
+import moment = require('moment');
+import { loadEventsForDay } from './icloud';
+import { CalDav } from './caldav';
+
+const nodeIcal = require('node-ical');
+
 export interface Job {
     id: string,
     cronjob: any
@@ -41,7 +43,7 @@ export function addOffset(time, offset) {
 
 export function countdown(date) {
 
-    var seconds = (date.getTime() - new Date().getTime()) / 1000
+    var seconds = (date.getTime() - new Date().getTime()) / 1000;
     seconds = Number(seconds);
 
     var d = Math.floor(seconds / (3600 * 24));
@@ -53,8 +55,8 @@ export function countdown(date) {
         days: d,
         hours: h,
         minutes: m,
-        seconds: s
-    }
+        seconds: s,
+    };
 }
 
 export function getICal(node, urlOrFile, config, callback) {
@@ -66,16 +68,16 @@ export function getICal(node, urlOrFile, config, callback) {
             url: urlOrFile,
             username: config.username,
             password: config.password,
-            type: "caldav",
+            type: 'caldav',
             endpreview: node.endpreview || 1,
-            pastview: node.pastview || 0
+            pastview: node.pastview || 0,
         }, (list, start, end) => {
 
             callback && callback(null, list);
         });
     } else if (config.caldav && JSON.parse(config.caldav) === true) {
-        node.debug("caldav")
-        CalDav(node, config, null).then((data) => {
+        node.debug('caldav');
+        CalDav(node, config).then((data) => {
             let retEntries = {};
             for (let events of data) {
                 for (let event in events) {
@@ -85,7 +87,7 @@ export function getICal(node, urlOrFile, config, callback) {
             }
             callback(null, retEntries);
         });
-    } else {        
+    } else {
         if (urlOrFile.match(/^https?:\/\//)) {
             let header = {};
             let username = node.config.username;
@@ -95,9 +97,9 @@ export function getICal(node, urlOrFile, config, callback) {
                 var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
                 header = {
                     headers: {
-                        'Authorization': auth
-                    }
-                }
+                        'Authorization': auth,
+                    },
+                };
             }
 
             nodeIcal.fromURL(node.config.url, header, (err, data) => {

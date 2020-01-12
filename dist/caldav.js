@@ -4,9 +4,8 @@ var dav = require('dav');
 var moment = require('moment');
 var IcalExpander = require('ical-expander');
 var ical = require("node-ical");
-function CalDav(node, config, calName) {
-    this.server = config.server;
-    this.calendar = config.calendar;
+function CalDav(node, config) {
+    var calName = config.calendar;
     this.pastWeeks = config.pastWeeks || 0;
     this.futureWeeks = config.futureWeeks || 4;
     var startDate = moment().startOf('day').subtract(this.pastWeeks, 'weeks');
@@ -21,14 +20,14 @@ function CalDav(node, config, calName) {
                             type: 'time-range',
                             attrs: {
                                 start: startDate.format('YYYYMMDD[T]HHmmss[Z]'),
-                                end: endDate.format('YYYYMMDD[T]HHmmss[Z]')
-                            }
-                        }]
-                }]
+                                end: endDate.format('YYYYMMDD[T]HHmmss[Z]'),
+                            },
+                        }],
+                }],
         }];
     var xhr = new dav.transport.Basic(new dav.Credentials({
         username: config.username,
-        password: config.password
+        password: config.password,
     }));
     var calDavUri = config.url;
     var url = new URL(calDavUri);
@@ -56,7 +55,6 @@ function CalDav(node, config, calName) {
                             });
                         }
                     }
-                    ;
                     return retEntries;
                 }));
                 promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
@@ -76,8 +74,8 @@ function CalDav(node, config, calName) {
                                         var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
                                         header = {
                                             headers: {
-                                                'Authorization': auth
-                                            }
+                                                'Authorization': auth,
+                                            },
                                         };
                                     }
                                     return ical.fromURL(ics, header).then(function (data) {
@@ -99,7 +97,6 @@ function CalDav(node, config, calName) {
             var calendar = _a[_i];
             _loop_1(calendar);
         }
-        ;
         return Promise.all(promises);
     }, function () {
         node.error('CalDAV -> get calendars went wrong.');
@@ -138,7 +135,7 @@ function _convertEvent(e) {
             isRecurring: false,
             datetype: 'date',
             type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0)
+            allDay: ((e.duration.toSeconds() % 86400) === 0),
         };
     }
 }
