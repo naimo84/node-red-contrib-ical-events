@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.5](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.3...v0.10.5) (2020-01-14)
+
+
+### Bug Fixes
+
+* [#23](https://github.com/naimo84/node-red-contrib-ical-events/issues/23) added caldav config options ([188ed72](https://github.com/naimo84/node-red-contrib-ical-events/commit/188ed72252340e94e7b85aa04e90c5088ae5a7a5))
+* [#23](https://github.com/naimo84/node-red-contrib-ical-events/issues/23), RED.validators.number() reuwires a number, undefined is not allowed ([1cf58f7](https://github.com/naimo84/node-red-contrib-ical-events/commit/1cf58f7f77416c4fcb284c9363b79fe2b7728ffc))
+* issue [#21](https://github.com/naimo84/node-red-contrib-ical-events/issues/21), recurrent event in the past ([80e12ae](https://github.com/naimo84/node-red-contrib-ical-events/commit/80e12aedff17ed5440cccf18da47cb84c5990b1c))
+* issue [#22](https://github.com/naimo84/node-red-contrib-ical-events/issues/22), correct pastpreview ([7c3bdc3](https://github.com/naimo84/node-red-contrib-ical-events/commit/7c3bdc3fe4fb6fc27cf52b682123dc76ec8b97e0))
+* issue [#22](https://github.com/naimo84/node-red-contrib-ical-events/issues/22), correct pastpreview ([8ebddc7](https://github.com/naimo84/node-red-contrib-ical-events/commit/8ebddc7783aa1b2e3039475f3aeabaa5691e9bfc))
+
 ### [0.10.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.3...v0.10.4) (2020-01-08)
 
 
