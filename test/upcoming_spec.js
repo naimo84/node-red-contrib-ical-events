@@ -60,6 +60,48 @@ describe('upcoming Node', function () {
         });
     });
 
+    it('ical - 1 day pastview - 1 day pastview - today 6 - total 6', function (done) {
+        var flow_ical = [
+            { id: "c1", type: "ical-config", url: "https://domain.com/calendar.ics" },
+            {
+                id: "n1", type: "ical-upcoming", confignode: "c1", wires: [["n2"]],
+                pastview: "1",
+                endpreview: "1"
+            },
+            { id: "n2", type: "helper" }
+        ];
+        var events = test_helper.getEvents();
+
+        events["1"].start = moment().subtract(1, 'h').toDate();
+        events["1"].end = moment().subtract(1, 'h').toDate();
+        events["2"].start = moment().subtract(2, 'h').toDate();
+        events["2"].end = moment().subtract(2, 'h').toDate();
+        events["3"].start = moment().subtract(2, 'h').toDate();
+        events["3"].end = moment().subtract(2, 'h').toDate();
+
+        events["4"].start = moment().add(2, 'h').toDate();
+        events["4"].end = moment().add(2, 'h').toDate();
+        events["5"].start = moment().add(2, 'h').toDate();
+        events["5"].end = moment().add(2, 'h').toDate();
+        events["6"].start = moment().add(2, 'h').toDate();
+        events["6"].end = moment().add(2, 'h').toDate();
+
+        nodeIcal.fromURL.restore();
+        sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
+
+        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+            var n1 = helper.getNode("n1");
+            var n2 = helper.getNode("n2");
+            n2.on("input", function (msg) {
+                expect(msg).to.have.property('today', 6);
+                expect(msg).to.have.property('tomorrow', 0);
+                expect(msg).to.have.property('total', 6);
+                done();
+            });
+            n1.receive({ payload: 1 });
+        });
+    });
+
     it('ical - 1 day pastview - today 1 - total 2', function (done) {
         var flow_ical = [
             { id: "c1", type: "ical-config", url: "https://domain.com/calendar.ics" },
