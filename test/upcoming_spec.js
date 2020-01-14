@@ -25,7 +25,7 @@ describe('upcoming Node', function () {
         });
     });
 
-    it('ical - 1 day preview - today 2 - tomorrow 1 - total 3', function (done) {
+    it('ical - 1 day preview - today 2 - tomorrow 0 - total 2', function (done) {
         var flow_ical = [
             { id: "c1", type: "ical-config", url: "https://domain.com/calendar.ics" },
             {
@@ -51,8 +51,8 @@ describe('upcoming Node', function () {
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
                 expect(msg).to.have.property('today', 2);
-                expect(msg).to.have.property('tomorrow', 1);
-                expect(msg).to.have.property('total', 3);
+                expect(msg).to.have.property('tomorrow',0);
+                expect(msg).to.have.property('total', 2);
                 expect(msg.payload).to.be.an('array').that.contains.something.like({ id: "3" });
                 done();
             });
@@ -102,12 +102,12 @@ describe('upcoming Node', function () {
         });
     });
 
-    it('ical - 1 day pastview - today 1 - total 2', function (done) {
+    it('ical - 2 day pastview - today 1 - total 2', function (done) {
         var flow_ical = [
             { id: "c1", type: "ical-config", url: "https://domain.com/calendar.ics" },
             {
                 id: "n1", type: "ical-upcoming", confignode: "c1", wires: [["n2"]],
-                pastview: "1",
+                pastview: "2",
                 pastviewUnits: "days",
                 endpreview: "0"
             },
@@ -128,7 +128,7 @@ describe('upcoming Node', function () {
         helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n2.on("input", function (msg) {
+            n2.on("input", function (msg) {               
                 expect(msg).to.have.property('today', 1);
                 expect(msg).to.have.property('tomorrow', 0);
                 expect(msg).to.have.property('total', 2);
