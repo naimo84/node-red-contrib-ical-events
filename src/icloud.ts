@@ -82,6 +82,8 @@ export function loadEventsForDay(whenMoment, config, cb) {
 
     if (config.pastviewUnits === 'days') {
         start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+    }
+    if (config.endpreviewUnits === 'days') {
         end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
     }
 

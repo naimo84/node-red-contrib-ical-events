@@ -57,10 +57,12 @@ function _convertEvent(e) {
 }
 function loadEventsForDay(whenMoment, config, cb) {
     var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4];
-    var start = whenMoment.clone().startOf('day').subtract(config.pastview, 'days');
-    var end = whenMoment.clone().endOf('day').add(config.endpreview, 'days');
+    var start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
+    var end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
     if (config.pastviewUnits === 'days') {
         start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+    }
+    if (config.endpreviewUnits === 'days') {
         end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
     }
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +

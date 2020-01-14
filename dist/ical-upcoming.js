@@ -297,12 +297,22 @@ module.exports = function (RED) {
                     var realnow = new Date();
                     var endpreview = new Date();
                     var pastview = new Date();
-                    endpreview = moment(endpreview)
-                        .add(node.endpreview, node.endpreviewUnits.charAt(0))
-                        .toDate();
-                    pastview = moment(pastview)
-                        .subtract(node.pastview, node.pastviewUnits.charAt(0))
-                        .toDate();
+                    if (node.endpreviewUnits === 'days') {
+                        endpreview = moment(endpreview).endOf('day').add(node.endpreview - 1, 'days').toDate();
+                    }
+                    else {
+                        endpreview = moment(endpreview)
+                            .add(node.endpreview, node.endpreviewUnits.charAt(0))
+                            .toDate();
+                    }
+                    if (node.pastviewUnits === 'days') {
+                        pastview = moment(pastview).startOf('day').subtract(node.pastview - 1, 'days').toDate();
+                    }
+                    else {
+                        pastview = moment(pastview)
+                            .subtract(node.pastview, node.pastviewUnits.charAt(0))
+                            .toDate();
+                    }
                     processData(data, realnow, pastview, endpreview, callback, node, config);
                     callback(data);
                 }

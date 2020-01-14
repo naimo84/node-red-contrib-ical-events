@@ -9,7 +9,7 @@ var RRule = require('rrule').RRule;
 
 var ce = require('cloneextend');
 
-module.exports = function(RED: Red) {
+module.exports = function (RED: Red) {
     function upcomingNode(config: any) {
         RED.nodes.createNode(this, config);
 
@@ -22,7 +22,7 @@ module.exports = function(RED: Red) {
         this.pastview = config.pastview || 0;
         this.pastviewUnits = config.pastviewUnits || 'd';
 
-        this.on('input', () => {           
+        this.on('input', () => {
             cronCheckJob(this);
         });
         try {
@@ -84,7 +84,7 @@ module.exports = function(RED: Red) {
                     node.status({ fill: 'red', shape: 'ring', text: err.message });
                     return;
                 }
-              
+
                 displayDates(node, node.config);
             },
             node,
@@ -109,19 +109,19 @@ module.exports = function(RED: Red) {
         if (now2 < now3) now3 = now2;
         node.debug(
             'RRule event:' +
-                ev.summary +
-                '; start:' +
-                ev.start.toString() +
-                '; endpreview:' +
-                endpreview.toString() +
-                '; today:' +
-                today +
-                '; now2:' +
-                now2 +
-                '; now3:' +
-                now3 +
-                '; rule:' +
-                JSON.stringify(rule)
+            ev.summary +
+            '; start:' +
+            ev.start.toString() +
+            '; endpreview:' +
+            endpreview.toString() +
+            '; today:' +
+            today +
+            '; now2:' +
+            now2 +
+            '; now3:' +
+            now3 +
+            '; rule:' +
+            JSON.stringify(rule)
         );
 
         var dates = [];
@@ -130,22 +130,22 @@ module.exports = function(RED: Red) {
         } catch (e) {
             node.error(
                 'Issue detected in RRule, event ignored; ' +
-                    e.stack +
-                    '\n' +
-                    'RRule object: ' +
-                    JSON.stringify(rule) +
-                    '\n' +
-                    'now3: ' +
-                    now3 +
-                    '\n' +
-                    'endpreview: ' +
-                    endpreview +
-                    '\n' +
-                    'string: ' +
-                    ev.rrule.toString() +
-                    '\n' +
-                    'options: ' +
-                    JSON.stringify(options)
+                e.stack +
+                '\n' +
+                'RRule object: ' +
+                JSON.stringify(rule) +
+                '\n' +
+                'now3: ' +
+                now3 +
+                '\n' +
+                'endpreview: ' +
+                endpreview +
+                '\n' +
+                'string: ' +
+                ev.rrule.toString() +
+                '\n' +
+                'options: ' +
+                JSON.stringify(options)
             );
         }
 
@@ -189,7 +189,7 @@ module.exports = function(RED: Red) {
     }
 
     function processData(data, realnow, pastview, endpreview, callback, node, config) {
-        var processedEntries = 0;        
+        var processedEntries = 0;
         for (var k in data) {
             var ev = data[k];
             delete data[k];
@@ -276,7 +276,7 @@ module.exports = function(RED: Red) {
                         date: date.text,
                         summary: ev.summary,
                         topic: ev.summary,
-                        calendarName: ev.calendarName,                        
+                        calendarName: ev.calendarName,
                         event: reason,
                         eventStart: new Date(ev.start.getTime()),
                         eventEnd: new Date(ev.end.getTime()),
@@ -319,7 +319,7 @@ module.exports = function(RED: Red) {
         }
     }
 
-    function checkICal(urlOrFile, callback, node, config: Config) {   
+    function checkICal(urlOrFile, callback, node, config: Config) {
         getICal(node, urlOrFile, config, (err, data) => {
             if (err || !data) {
                 callback(err);
@@ -328,17 +328,26 @@ module.exports = function(RED: Red) {
             node.debug('Ical read successfully ' + urlOrFile);
 
             try {
-                if (data) {                    
+                if (data) {
                     var realnow = new Date();
                     var endpreview = new Date();
                     var pastview = new Date();
 
-                    endpreview = moment(endpreview)
-                        .add(node.endpreview, node.endpreviewUnits.charAt(0))
-                        .toDate();
-                    pastview = moment(pastview)
-                        .subtract(node.pastview, node.pastviewUnits.charAt(0))
-                        .toDate();
+                    if (node.endpreviewUnits === 'days') {
+                        endpreview = moment(endpreview).endOf('day').add(node.endpreview - 1, 'days').toDate();
+                    } else {
+                        endpreview = moment(endpreview)
+                            .add(node.endpreview, node.endpreviewUnits.charAt(0))
+                            .toDate();
+                    }
+                    
+                    if (node.pastviewUnits === 'days') {
+                        pastview = moment(pastview).startOf('day').subtract(node.pastview - 1, 'days').toDate();
+                    } else {
+                        pastview = moment(pastview)
+                            .subtract(node.pastview, node.pastviewUnits.charAt(0))
+                            .toDate();
+                    }
 
                     processData(data, realnow, pastview, endpreview, callback, node, config);
                     callback(data);
@@ -352,7 +361,7 @@ module.exports = function(RED: Red) {
         });
     }
 
-   
+
 
     function displayDates(node: any, config: Config) {
         let todayEventcounter = 0;
@@ -371,7 +380,7 @@ module.exports = function(RED: Red) {
                 tomorrowEventcounter++;
             }
         }
-     
+
         node.send({
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,
@@ -739,7 +748,7 @@ module.exports = function(RED: Red) {
                         _class: _class,
                     };
                 if (_class === 'ical_tomorrow') return { text: _('tomorrow', config) + _time, _class: _class };
-                if (_class === 'ical_dayafter') return { text:_('dayafter', config) + _time, _class: _class };
+                if (_class === 'ical_dayafter') return { text: _('dayafter', config) + _time, _class: _class };
                 if (_class === 'ical_3days') return { text: _('3days', config) + _time, _class: _class };
                 if (_class === 'ical_4days') return { text: _('4days', config) + _time, _class: _class };
                 if (_class === 'ical_5days') return { text: _('5days', config) + _time, _class: _class };
@@ -815,7 +824,7 @@ module.exports = function(RED: Red) {
                 if (day < 10) day = '0' + day.toString();
                 if (month < 10) month = '0' + month.toString();
 
-                text =  day + '.' + month + '.';
+                text = day + '.' + month + '.';
                 text += year;
 
                 if (withTime) {
