@@ -74,9 +74,16 @@ export function loadEventsForDay(whenMoment, config, cb) {
         protocol = urlparts[1],
         host = urlparts[2],
         port = urlparts[3] || (protocol === "https" ? 443 : 80),
-        path = urlparts[4],
-        start = whenMoment.clone().startOf('day').subtract(config.pastview, 'days'),
-        end = Moment(whenMoment.clone().startOf('day')).add(config.endpreview, 'days');
+        path = urlparts[4];
+
+
+    let start = whenMoment.clone().startOf('day').subtract(config.pastview,config.pastviewUnits);
+    let end = whenMoment.clone().endOf('day').add(config.endpreview,config.endpreviewUnits);
+
+    if (config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+        end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
+    }
 
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +

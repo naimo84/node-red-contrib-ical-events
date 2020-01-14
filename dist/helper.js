@@ -43,6 +43,8 @@ function getICal(node, urlOrFile, config, callback) {
             type: 'caldav',
             endpreview: node.endpreview || 1,
             pastview: node.pastview || 0,
+            endpreviewUnits: node.endpreviewUnits || 'days',
+            pastviewUnits: node.pastviewUnits || 'days',
         }, function (list, start, end) {
             callback && callback(null, list);
         });
