@@ -28,29 +28,35 @@
                 calendar: {},
                 pastWeeks: {
                     value: '0',
-                    validate: RED.validators.number(),
+                    validate: function (v) {
+                        if (v && isNaN(v)) return false;
+                        return true;
+                    }
                 },
                 futureWeeks: {
                     value: '4',
-                    validate: RED.validators.number(),
+                    validate: function (v) {
+                        if (v && isNaN(v)) return false;
+                        return true;
+                    }
                 },
             },
-            label: function() {
+            label: function () {
                 if (this.name) {
                     return this.name;
                 }
                 return 'iCal Config';
             },
-            oneditprepare: function() {
+            oneditprepare: function () {
                 var node = this;
 
                 if (this.caldav == undefined) {
-                    $('#node-config-input-caldav option').filter(function() {
+                    $('#node-config-input-caldav option').filter(function () {
                         return $(this).val() == 'false';
                     }).attr('selected', true);
                 }
 
-                $('#node-config-input-caldav').change(function() {
+                $('#node-config-input-caldav').change(function () {
                     var value = $('#node-config-input-caldav').val();
                     if (!value || value === 'false') {
                         $('#node-config-input-username').parent().hide();
@@ -75,7 +81,7 @@
                     }
                 });
 
-                $('#node-config-input-replacedates').change(function() {
+                $('#node-config-input-replacedates').change(function () {
                     var value = $('#node-config-input-replacedates').is(':checked');
                     if (value) {
                         $('#node-config-input-language').parent().show();
