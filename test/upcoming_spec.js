@@ -1,6 +1,6 @@
 var helper = require("node-red-node-test-helper");
 var chai = require("chai");
-var icalContainersNode = require("../dist/ical-upcoming.js");
+var icalUpcomingNode = require("../dist/ical-upcoming.js");
 var icalConfigNode = require("../dist/ical-config.js");
 const nodeIcal = require("node-ical");
 const moment = require("moment");
@@ -11,7 +11,7 @@ chai.use(require('chai-like'));
 chai.use(require('chai-things')); // Don't swap these two
 helper.init(require.resolve('node-red'));
 
-describe('upcoming Node', function () {
+describe('Upcoming Node', function () {
 
 
     beforeEach(function (done) {
@@ -43,10 +43,10 @@ describe('upcoming Node', function () {
         events["2"].end = moment().add(2, 'h').toDate();
         events["3"].start = moment().startOf('day').toDate();
         events["3"].end = moment().endOf('day').toDate();
-
+        nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
-        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
@@ -89,7 +89,7 @@ describe('upcoming Node', function () {
         nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
-        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
@@ -125,7 +125,7 @@ describe('upcoming Node', function () {
         nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
-        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {               
@@ -148,7 +148,7 @@ describe('upcoming Node', function () {
         nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
-        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
@@ -174,7 +174,7 @@ describe('upcoming Node', function () {
         nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
-        helper.load([icalConfigNode, icalContainersNode], flow_ical, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
@@ -193,7 +193,7 @@ describe('upcoming Node', function () {
             { id: "n1", type: "ical-upcoming", config: "c1" }
         ];
 
-        helper.load([icalConfigNode, icalContainersNode], flow, function () {
+        helper.load([icalConfigNode, icalUpcomingNode], flow, function () {
             var n1 = helper.getNode("n1");
             n1.should.have.property('type', 'ical-upcoming');
             done();

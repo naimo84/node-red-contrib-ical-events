@@ -1,9 +1,11 @@
 var should = require("should");
 var helper = require("node-red-node-test-helper");
-
+var icalEventNode = require("../dist/ical-events.js");
+var icalConfigNode = require("../dist/ical-config.js");
+const test_helper = require('./test_helper');
 helper.init(require.resolve('node-red'));
 
-describe('Container Actions Node', function () {
+describe('Events Node', function () {
 
     beforeEach(function (done) {
         helper.startServer(done);
@@ -20,12 +22,11 @@ describe('Container Actions Node', function () {
             { id: "c1", type: "ical-config" },
             { id: "n1", type: "ical-events", config: "c1" }
         ];
-        var icalContainersNode = require("../dist/ical-events.js");
-        var icalConfigNode = require("../dist/ical-config.js");
+     
 
 
 
-        helper.load([icalConfigNode, icalContainersNode], flow, function () {
+        helper.load([icalConfigNode, icalEventNode], flow, function () {
             var n1 = helper.getNode("n1");
             n1.should.have.property('type', 'ical-events');
             done();
