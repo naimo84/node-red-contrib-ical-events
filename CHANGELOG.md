@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.5...v0.10.6) (2020-01-18)
+
+
+### Bug Fixes
+
+* issue [#22](https://github.com/naimo84/node-red-contrib-ical-events/issues/22), pastview icloud ([f59f7f4](https://github.com/naimo84/node-red-contrib-ical-events/commit/f59f7f450e5510e25df431070bf27d87cebe6fe7))
+
 ### [0.10.5](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.3...v0.10.5) (2020-01-14)
 
 
