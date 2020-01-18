@@ -217,3 +217,5 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("ical-sensor", sensorNode);
 };
+
+//# sourceMappingURL=ical-sensor.js.map

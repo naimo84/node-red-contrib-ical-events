@@ -96,3 +96,5 @@ function getICal(node, urlOrFile, config, callback) {
     }
 }
 exports.getICal = getICal;
+
+//# sourceMappingURL=helper.js.map

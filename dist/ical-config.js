@@ -16,3 +16,5 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType('ical-config', icalConfig);
 };
+
+//# sourceMappingURL=ical-config.js.map

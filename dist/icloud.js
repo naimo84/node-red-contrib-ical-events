@@ -127,3 +127,5 @@ function loadEventsForDay(whenMoment, config, cb) {
     });
 }
 exports.loadEventsForDay = loadEventsForDay;
+
+//# sourceMappingURL=icloud.js.map

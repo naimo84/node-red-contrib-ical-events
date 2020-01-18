@@ -1,6 +1,7 @@
 var gulp = require("gulp");
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
+var sourcemaps = require('gulp-sourcemaps');
 
 var paths = {
     pages: ['src/*.html'],
@@ -20,8 +21,11 @@ gulp.task("copy-assets", function () {
 
 function bundle() {
     return tsProject.src()
+        .pipe(sourcemaps.init())
         .pipe(tsProject())
-        .js.pipe(gulp.dest("dist"));
+        .js
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest("dist"));
 }
 
-gulp.task("default", gulp.series(gulp.parallel('copy-html'),gulp.parallel('copy-assets'), bundle));
+gulp.task("default", gulp.series(gulp.parallel('copy-html'), gulp.parallel('copy-assets'), bundle));

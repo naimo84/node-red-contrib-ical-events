@@ -184,3 +184,5 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("ical-events", eventsNode);
 };
+
+//# sourceMappingURL=ical-events.js.map

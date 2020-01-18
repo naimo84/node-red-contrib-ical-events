@@ -819,3 +819,5 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType('ical-upcoming', upcomingNode);
 };
+
+//# sourceMappingURL=ical-upcoming.js.map

@@ -139,3 +139,5 @@ function _convertEvent(e) {
         };
     }
 }
+
+//# sourceMappingURL=caldav.js.map
