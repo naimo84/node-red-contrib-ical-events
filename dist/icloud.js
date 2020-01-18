@@ -59,10 +59,10 @@ function loadEventsForDay(whenMoment, config, cb) {
     var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4];
     var start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
     var end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
-    if (config.pastviewUnits === 'days') {
+    if (config.pastviewUnits === 'days' && config.pastview >= 1) {
         start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
     }
-    if (config.endpreviewUnits === 'days') {
+    if (config.endpreviewUnits === 'days' && config.endpreview >= 1) {
         end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
     }
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +

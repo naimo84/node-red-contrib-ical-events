@@ -333,7 +333,7 @@ module.exports = function (RED: Red) {
                     var endpreview = new Date();
                     var pastview = new Date();
 
-                    if (node.endpreviewUnits === 'days') {
+                    if (node.endpreviewUnits === 'days' && node.endpreview>=1) {
                         endpreview = moment(endpreview).endOf('day').add(node.endpreview - 1, 'days').toDate();
                     } else {
                         endpreview = moment(endpreview)
@@ -341,7 +341,7 @@ module.exports = function (RED: Red) {
                             .toDate();
                     }
                     
-                    if (node.pastviewUnits === 'days') {
+                    if (node.pastviewUnits === 'days' && node.pastview>=1) {
                         pastview = moment(pastview).startOf('day').subtract(node.pastview - 1, 'days').toDate();
                     } else {
                         pastview = moment(pastview)

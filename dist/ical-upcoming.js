@@ -297,7 +297,7 @@ module.exports = function (RED) {
                     var realnow = new Date();
                     var endpreview = new Date();
                     var pastview = new Date();
-                    if (node.endpreviewUnits === 'days') {
+                    if (node.endpreviewUnits === 'days' && node.endpreview >= 1) {
                         endpreview = moment(endpreview).endOf('day').add(node.endpreview - 1, 'days').toDate();
                     }
                     else {
@@ -305,7 +305,7 @@ module.exports = function (RED) {
                             .add(node.endpreview, node.endpreviewUnits.charAt(0))
                             .toDate();
                     }
-                    if (node.pastviewUnits === 'days') {
+                    if (node.pastviewUnits === 'days' && node.pastview >= 1) {
                         pastview = moment(pastview).startOf('day').subtract(node.pastview - 1, 'days').toDate();
                     }
                     else {
