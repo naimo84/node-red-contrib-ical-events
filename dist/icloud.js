@@ -55,16 +55,8 @@ function _convertEvent(e) {
         };
     }
 }
-function loadEventsForDay(whenMoment, config, cb) {
+function requestIcloudSecure(config, start, end, cb) {
     var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4];
-    var start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
-    var end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
-    if (config.pastviewUnits === 'days' && config.pastview >= 1) {
-        start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
-    }
-    if (config.endpreviewUnits === 'days' && config.endpreview >= 1) {
-        end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
-    }
     var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
         '<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">\n' +
         '  <D:prop>\n' +
@@ -102,19 +94,9 @@ function loadEventsForDay(whenMoment, config, cb) {
             s += chunk;
         });
         req.on('close', function () {
-            var reslist = {};
             try {
                 var json = JSON.parse(xmlParser.xml2json(s, { compact: true, spaces: 0 }));
-                if (json && json.multistatus && json.multistatus.response) {
-                    var ics;
-                    if (json.multistatus.response.propstat) {
-                        process(reslist, start, end, json.multistatus.response.propstat.prop['calendar-data']._cdata);
-                    }
-                    else {
-                        json.multistatus.response.forEach(function (response) { return process(reslist, start, end, response.propstat.prop['calendar-data']._cdata); });
-                    }
-                }
-                cb(reslist, start, end);
+                cb(json);
             }
             catch (e) {
                 console.error("Error parsing response", e);
@@ -125,6 +107,29 @@ function loadEventsForDay(whenMoment, config, cb) {
     req.on('error', function (e) {
         console.error('problem with request: ' + e.message);
     });
+}
+function loadEventsForDay(whenMoment, config, cb) {
+    var start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
+    var end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
+    if (config.pastviewUnits === 'days' && config.pastview >= 1) {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+    }
+    if (config.endpreviewUnits === 'days' && config.endpreview >= 1) {
+        end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
+    }
+    requestIcloudSecure(config, start, end, (function (json) {
+        var reslist = {};
+        if (json && json.multistatus && json.multistatus.response) {
+            var ics;
+            if (json.multistatus.response.propstat) {
+                process(reslist, start, end, json.multistatus.response.propstat.prop['calendar-data']._cdata);
+            }
+            else {
+                json.multistatus.response.forEach(function (response) { return process(reslist, start, end, response.propstat.prop['calendar-data']._cdata); });
+            }
+        }
+        cb(reslist, start, end);
+    }));
 }
 exports.loadEventsForDay = loadEventsForDay;
 

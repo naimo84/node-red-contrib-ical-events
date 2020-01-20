@@ -6,6 +6,7 @@ const nodeIcal = require("node-ical");
 const moment = require("moment");
 var sinon = require('sinon');
 const test_helper = require('./test_helper');
+const icloud = require('../dist/icloud');
 var expect = chai.expect;
 chai.use(require('chai-like'));
 chai.use(require('chai-things')); // Don't swap these two
@@ -24,6 +25,48 @@ describe('Upcoming Node', function () {
             helper.stopServer(done);
         });
     });
+
+    it('icloud', function (done) {
+        var flow_icloud = [
+            {
+                id: "c1", type: "ical-config",
+                type: "icloud",
+                url: "https://p51-caldav.icloud.com/123456789/calendars/home/"
+            },
+            {
+                id: "n1", type: "ical-upcoming", confignode: "c1", wires: [["n2"]],
+                endpreview: "1",
+                endpreviewUnits: "days",
+                pastview: "0",
+                pastviewUnits: "days"
+            },
+            { id: "n2", type: "helper" }
+        ];
+        var events = test_helper.getEvents();
+
+        events["1"].start = moment().add(1, 'd').toDate();
+        events["1"].end = moment().add(1, 'd').endOf('day').toDate();
+        events["2"].start = moment().add(1, 'h').toDate();
+        events["2"].end = moment().add(2, 'h').toDate();
+        events["3"].start = moment().startOf('day').toDate();
+        events["3"].end = moment().endOf('day').toDate();
+        events["4"].start = moment().subtract(1, 'hour').toDate();
+        events["4"].end = moment().add(1, 'hour').toDate();
+       
+        sinon.stub(icloud, "requestIcloudSecure");
+
+        helper.load([icalConfigNode, icalUpcomingNode], flow_icloud, function () {
+            var n1 = helper.getNode("n1");
+            var n2 = helper.getNode("n2");
+            n2.on("input", function (msg) {
+              console.log(msg)
+                done();
+            });
+            n1.receive({ payload: 1 });
+        });
+
+
+    })
 
     it('ical - 1 day preview - today 3 - tomorrow 0 - total 3', function (done) {
         var flow_ical = [
@@ -45,8 +88,8 @@ describe('Upcoming Node', function () {
         events["2"].end = moment().add(2, 'h').toDate();
         events["3"].start = moment().startOf('day').toDate();
         events["3"].end = moment().endOf('day').toDate();
-        events["4"].start = moment().subtract(1,'hour').toDate();
-        events["4"].end = moment().add(1,'hour').toDate();
+        events["4"].start = moment().subtract(1, 'hour').toDate();
+        events["4"].end = moment().add(1, 'hour').toDate();
         nodeIcal.fromURL.restore();
         sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
 
@@ -55,7 +98,7 @@ describe('Upcoming Node', function () {
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
                 expect(msg).to.have.property('today', 3);
-                expect(msg).to.have.property('tomorrow',0);
+                expect(msg).to.have.property('tomorrow', 0);
                 expect(msg).to.have.property('total', 3);
                 expect(msg.payload).to.be.an('array').that.contains.something.like({ id: "3" });
                 expect(msg.payload).to.be.an('array').that.contains.something.like({ id: "4" });
@@ -133,7 +176,7 @@ describe('Upcoming Node', function () {
         helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n2.on("input", function (msg) {               
+            n2.on("input", function (msg) {
                 expect(msg).to.have.property('today', 1);
                 expect(msg).to.have.property('tomorrow', 0);
                 expect(msg).to.have.property('total', 2);
