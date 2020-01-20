@@ -100,7 +100,7 @@ module.exports = function (RED: Red) {
                                     eventStart.setMinutes(eventStart.getMinutes() - 1);
                                 }
 
-                                const job2 = new CronJob(eventStart, cronJobStart.bind(null, event, node));
+                                const job2 = new CronJob(eventStart, cronJobStart.bind(null, event, node.send));
                                 let startedCronJobs = node.context().get('startedCronJobs') || {};
                                 if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
                                     newCronJobs.set(uid, job2);
@@ -137,7 +137,7 @@ module.exports = function (RED: Red) {
                                     eventStart.setMinutes(eventEnd.getMinutes() - 1);
                                 }
 
-                                const job2 = new CronJob(eventEnd, cronJobEnd.bind(null, event, node));
+                                const job2 = new CronJob(eventEnd, cronJobEnd.bind(null, event, node.send));
                                 let startedCronJobs = node.context().get('startedCronJobs') || {};
                                 if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
                                     newCronJobs.set(uid, job2);
@@ -188,14 +188,14 @@ module.exports = function (RED: Red) {
         });
     }
 
-    function cronJobStart(event: any, node: Node) {
-        node.send([{
+    function cronJobStart(event: any, send) {
+        send([{
             payload: event
         }, null]);
     }
 
-    function cronJobEnd(event: any, node: Node) {
-        node.send([null, {
+    function cronJobEnd(event: any,send) {
+        send([null, {
             payload: event
         }]);
     }
