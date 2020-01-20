@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.7](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.6...v0.10.7) (2020-01-20)
+
+
+### Bug Fixes
+
+* [#25](https://github.com/naimo84/node-red-contrib-ical-events/issues/25), circular error when saving context ([1f540bb](https://github.com/naimo84/node-red-contrib-ical-events/commit/1f540bb2804b8596b7ca61456148de9a5191cffb))
+
 ### [0.10.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.5...v0.10.6) (2020-01-18)
 
 
