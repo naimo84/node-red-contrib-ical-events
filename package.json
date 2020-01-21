@@ -41,12 +41,21 @@
     "url": "https://github.com/naimo84/node-red-contrib-ical-events"
   },
   "scripts": {
-    "start": "gulp && node-red",
+    "start": "node-red",
     "test": "mocha \"test/**/*_spec.js\"",
     "release": "standard-version",
     "release-minor": "standard-version --release-as minor",
-    "watch": "tsc -w -p ./src",
-    "debug": "nodemon --legacy-watch --watch ./dist --inspect-brk=0.0.0.0:5858 C:\\Users\\mail\\AppData\\Roaming\\npm\\node_modules\\node-red\\lib\\red.js"
+    "watch": "tsc -w -p ./tsconfig.json",
+    "dev": "gulp develop"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*"
+    ],
+    "delay": "2500ms",
+    "verbose": true,
+    "ext": "js,html"
   },
   "husky": {
     "hooks": {
@@ -69,7 +78,8 @@
     "moment": "^2.24.0",
     "moment-range": "^4.0.2",
     "node-ical": "^0.10.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@types/cron": "^1.7.1",
@@ -84,13 +94,15 @@
     "chai-things": "0.2.0",
     "commitlint": "^8.3.5",
     "gulp": "^4.0.2",
+    "gulp-nodemon": "^2.4.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "gulp-watch": "^5.0.1",
     "husky": "4.0.10",
     "mocha": "7.0.0",
     "node-red": "1.0.3",
     "node-red-node-test-helper": "^0.2.3",
-    "nodemon": "^2.0.2",
+    "nodemon": "^1.19.4",
     "sinon": "8.1.0",
     "standard-version": "^7.0.1",
     "typescript": "^3.7.5"
