@@ -115,7 +115,7 @@ function loadEventsForDay(whenMoment, config, cb) {
         start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
     }
     if (config.endpreviewUnits === 'days') {
-        end = whenMoment.clone().endOf('day').add(config.endpreview + 1, 'days');
+        end = whenMoment.clone().endOf('day').add(config.endpreview, 'days');
     }
     requestIcloudSecure(config, start, end, (function (json) {
         var reslist = {};
