@@ -14,9 +14,9 @@ module.exports = function (RED) {
         this.config = configNode;
         this.filter = config.filter;
         this.trigger = config.trigger || 'always';
-        this.endpreview = config.endpreview || 10;
+        this.endpreview = parseInt(config.endpreview) || 10;
         this.endpreviewUnits = config.endpreviewUnits || 'd';
-        this.pastview = config.pastview || 0;
+        this.pastview = parseInt(config.pastview) || 0;
         this.pastviewUnits = config.pastviewUnits || 'd';
         this.on('input', function () {
             cronCheckJob(_this);
@@ -236,6 +236,7 @@ module.exports = function (RED) {
             output = true;
         }
         if (output) {
+            node.debug('Event: ' + JSON.stringify(ev));
             if (fullday) {
                 if ((ev.start < endpreview && ev.start >= pastview) ||
                     (ev.end > pastview && ev.end <= endpreview) ||

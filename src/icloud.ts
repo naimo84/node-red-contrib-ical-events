@@ -141,11 +141,11 @@ export function loadEventsForDay(whenMoment, config, cb) {
     let start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
     let end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
 
-    if (config.pastviewUnits === 'days' && config.pastview >= 1) {
-        start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+    if (config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
     }
-    if (config.endpreviewUnits === 'days' && config.endpreview >= 1) {
-        end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
+    if (config.endpreviewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(config.endpreview, 'days');
     }
 
     requestIcloudSecure(config, start, end, (json => {

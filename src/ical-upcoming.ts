@@ -17,9 +17,9 @@ module.exports = function (RED: Red) {
         this.config = configNode;
         this.filter = config.filter;
         this.trigger = config.trigger || 'always';
-        this.endpreview = config.endpreview || 10;
+        this.endpreview =parseInt(config.endpreview) || 10;
         this.endpreviewUnits = config.endpreviewUnits || 'd';
-        this.pastview = config.pastview || 0;
+        this.pastview = parseInt(config.pastview) || 0;
         this.pastviewUnits = config.pastviewUnits || 'd';
 
         this.on('input', () => {
@@ -41,6 +41,7 @@ module.exports = function (RED: Red) {
                         break;
                     case 'days':
                         cron = `0 0 0 */${config.timeout} * *`;
+                        
                         break;
                     default:
                         break;
@@ -264,6 +265,7 @@ module.exports = function (RED: Red) {
             output = true;
         }
         if (output) {
+            node.debug('Event: '+JSON.stringify(ev))
             if (fullday) {
                 if (
                     (ev.start < endpreview && ev.start >= pastview) ||

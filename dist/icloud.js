@@ -111,11 +111,11 @@ function requestIcloudSecure(config, start, end, cb) {
 function loadEventsForDay(whenMoment, config, cb) {
     var start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
     var end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
-    if (config.pastviewUnits === 'days' && config.pastview >= 1) {
-        start = whenMoment.clone().startOf('day').subtract(config.pastview - 1, 'days');
+    if (config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
     }
-    if (config.endpreviewUnits === 'days' && config.endpreview >= 1) {
-        end = whenMoment.clone().endOf('day').add(config.endpreview - 1, 'days');
+    if (config.endpreviewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(config.endpreview + 1, 'days');
     }
     requestIcloudSecure(config, start, end, (function (json) {
         var reslist = {};
