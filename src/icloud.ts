@@ -4,6 +4,7 @@ const MomentRange = require('moment-range'),
     https = require('https'),
     icalExpander = require('ical-expander'),
     xmlParser = require('xml-js');
+import { convertEvents } from './helper';
 
 function process(reslist, start, end, ics) {
     const cal = new icalExpander({ ics, maxIterations: 1000 });
@@ -12,57 +13,6 @@ function process(reslist, start, end, ics) {
     convertEvents(events).forEach(event => {
         reslist[event.uid] = event;
     });
-}
-
-function convertEvents(events) {
-    let retEntries = [];
-    if (events) {
-        if (events.events) {
-            events.events.forEach(event => {
-                let ev = _convertEvent(event);
-                retEntries.push(ev);
-            });
-        }
-        if (events.occurrences) {
-            const mappedOccurrences = events.occurrences.map(o => _convertEvent(o));
-            if (mappedOccurrences.length > 0) {
-                retEntries.push(mappedOccurrences[0])
-            }
-        }
-    }
-
-    return retEntries;
-}
-
-function _convertEvent(e) {
-    if (e) {
-        let startDate = e.startDate.toJSDate()
-        let endDate = e.endDate.toJSDate()
-
-        if (e.item) {
-            e = e.item
-        }
-        if (e.duration.wrappedJSObject) {
-            delete e.duration.wrappedJSObject
-        }
-
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.summary || '',
-            description: e.description || '',
-            attendees: e.attendees,
-            duration: e.duration.toICALString(),
-            durationSeconds: e.duration.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: e.uid || '',
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0)
-        }
-    }
 }
 
 function requestIcloudSecure(config, start, end, cb): any {

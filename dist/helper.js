@@ -4,6 +4,53 @@ var moment = require("moment");
 var icloud_1 = require("./icloud");
 var caldav_1 = require("./caldav");
 var nodeIcal = require('node-ical');
+function convertEvents(events) {
+    var retEntries = [];
+    if (events) {
+        if (events.events) {
+            events.events.forEach(function (event) {
+                var ev = _convertEvent(event);
+                retEntries.push(ev);
+            });
+        }
+        if (events.occurrences) {
+            var mappedOccurrences = events.occurrences.map(function (o) { return _convertEvent(o); });
+            if (mappedOccurrences.length > 0) {
+                retEntries.push(mappedOccurrences[0]);
+            }
+        }
+    }
+    return retEntries;
+}
+exports.convertEvents = convertEvents;
+function _convertEvent(e) {
+    if (e) {
+        var startDate = e.startDate.toJSDate();
+        var endDate = e.endDate.toJSDate();
+        if (e.item) {
+            e = e.item;
+        }
+        if (e.duration.wrappedJSObject) {
+            delete e.duration.wrappedJSObject;
+        }
+        return {
+            start: startDate,
+            end: endDate,
+            summary: e.summary || '',
+            description: e.description || '',
+            attendees: e.attendees,
+            duration: e.duration.toICALString(),
+            durationSeconds: e.duration.toSeconds(),
+            location: e.location || '',
+            organizer: e.organizer || '',
+            uid: e.uid || '',
+            isRecurring: false,
+            datetype: 'date',
+            type: 'VEVENT',
+            allDay: ((e.duration.toSeconds() % 86400) === 0)
+        };
+    }
+}
 function getTimezoneOffset(date) {
     var offset = 0;
     var zone = moment.tz.zone(moment.tz.guess());

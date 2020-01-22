@@ -4,6 +4,7 @@ var dav = require('dav');
 var moment = require('moment');
 var IcalExpander = require('ical-expander');
 var ical = require("node-ical");
+var helper_1 = require("./helper");
 function CalDav(node, config) {
     var calName = config.calendar;
     this.pastWeeks = config.pastWeeks || 0;
@@ -49,7 +50,7 @@ function CalDav(node, config) {
                         if (ics) {
                             var icalExpander = new IcalExpander({ ics: ics, maxIterations: 100 });
                             var events = icalExpander.between(startDate.toDate(), endDate.toDate());
-                            convertEvents(events).forEach(function (event) {
+                            helper_1.convertEvents(events).forEach(function (event) {
                                 event.calendarName = calendar.displayName;
                                 retEntries[event.uid] = event;
                             });
@@ -103,41 +104,5 @@ function CalDav(node, config) {
     });
 }
 exports.CalDav = CalDav;
-function convertEvents(events) {
-    var retEntries = [];
-    events.events.forEach(function (event) {
-        var ev = _convertEvent(event);
-        retEntries.push(ev);
-    });
-    return retEntries;
-}
-function _convertEvent(e) {
-    if (e) {
-        var startDate = e.startDate;
-        var endDate = e.endDate;
-        if (e.item) {
-            e = e.item;
-        }
-        if (e.duration.wrappedJSObject) {
-            delete e.duration.wrappedJSObject;
-        }
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.summary || '',
-            description: e.description || '',
-            attendees: e.attendees,
-            duration: e.duration.toICALString(),
-            durationSeconds: e.duration.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: e.uid || '',
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0),
-        };
-    }
-}
 
 //# sourceMappingURL=caldav.js.map

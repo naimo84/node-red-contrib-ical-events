@@ -2,58 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Moment = require('moment');
 var MomentRange = require('moment-range'), moment = MomentRange.extendMoment(Moment), https = require('https'), icalExpander = require('ical-expander'), xmlParser = require('xml-js');
+var helper_1 = require("./helper");
 function process(reslist, start, end, ics) {
     var cal = new icalExpander({ ics: ics, maxIterations: 1000 });
     var events = cal.between(start.toDate(), end.toDate());
-    convertEvents(events).forEach(function (event) {
+    helper_1.convertEvents(events).forEach(function (event) {
         reslist[event.uid] = event;
     });
-}
-function convertEvents(events) {
-    var retEntries = [];
-    if (events) {
-        if (events.events) {
-            events.events.forEach(function (event) {
-                var ev = _convertEvent(event);
-                retEntries.push(ev);
-            });
-        }
-        if (events.occurrences) {
-            var mappedOccurrences = events.occurrences.map(function (o) { return _convertEvent(o); });
-            if (mappedOccurrences.length > 0) {
-                retEntries.push(mappedOccurrences[0]);
-            }
-        }
-    }
-    return retEntries;
-}
-function _convertEvent(e) {
-    if (e) {
-        var startDate = e.startDate.toJSDate();
-        var endDate = e.endDate.toJSDate();
-        if (e.item) {
-            e = e.item;
-        }
-        if (e.duration.wrappedJSObject) {
-            delete e.duration.wrappedJSObject;
-        }
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.summary || '',
-            description: e.description || '',
-            attendees: e.attendees,
-            duration: e.duration.toICALString(),
-            durationSeconds: e.duration.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: e.uid || '',
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0)
-        };
-    }
 }
 function requestIcloudSecure(config, start, end, cb) {
     var DavTimeFormat = 'YYYYMMDDTHHmms\\Z', url = config.url, user = config.username, pass = config.password, urlparts = /(https?)\:\/\/(.*?):?(\d*)?(\/.*\/?)/gi.exec(url), protocol = urlparts[1], host = urlparts[2], port = urlparts[3] || (protocol === "https" ? 443 : 80), path = urlparts[4];

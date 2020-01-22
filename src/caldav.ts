@@ -4,6 +4,7 @@ const dav = require('dav');
 const moment = require('moment');
 const IcalExpander = require('ical-expander');
 import * as  ical from 'node-ical';
+import { convertEvents } from './helper';
 
 export function CalDav(node, config: Config) {
     const calName = config.calendar;
@@ -108,44 +109,4 @@ export function CalDav(node, config: Config) {
             node.error('CalDAV -> get calendars went wrong.');
         });
 
-}
-
-function convertEvents(events) {
-    let retEntries = [];
-    events.events.forEach(event => {
-        let ev = _convertEvent(event);
-        retEntries.push(ev);
-    });
-    return retEntries;
-}
-
-function _convertEvent(e) {
-    if (e) {
-        let startDate = e.startDate;
-        let endDate = e.endDate;
-
-        if (e.item) {
-            e = e.item;
-        }
-        if (e.duration.wrappedJSObject) {
-            delete e.duration.wrappedJSObject;
-        }
-
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.summary || '',
-            description: e.description || '',
-            attendees: e.attendees,
-            duration: e.duration.toICALString(),
-            durationSeconds: e.duration.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: e.uid || '',
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0),
-        };
-    }
 }
