@@ -26,6 +26,35 @@ describe('Upcoming Node', function () {
         });
     });
 
+    it('ical - no summary', function (done) {
+        var flow_ical = [
+            { id: "c1", type: "ical-config", url: "https://domain.com/calendar.ics" },
+            {
+                id: "n1", type: "ical-upcoming", confignode: "c1", wires: [["n2"]],
+                endpreview: "1"
+            },
+            { id: "n2", type: "helper" }
+        ];
+        var events = test_helper.getEvents();
+        events["1"].start = moment().subtract(1, 'hour').toDate();
+        events["1"].end = moment().add(1, 'hour').toDate();
+        delete events["1"].summary;
+        nodeIcal.fromURL.restore();
+        sinon.stub(nodeIcal, "fromURL").callsArgWith(2, null, events);
+
+        helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
+            var n1 = helper.getNode("n1");
+            var n2 = helper.getNode("n2");
+            n2.on("input", function (msg) {               
+                expect(msg).to.have.property('today', 1);
+                expect(msg).to.have.property('tomorrow', 0);
+                expect(msg).to.have.property('total', 1);
+                expect(msg.payload).to.be.an('array').that.contains.something.like({ id: "1" });
+                done();
+            });
+            n1.receive({ payload: 1 });
+        });
+    });
 
     it('ical - 1 day preview - today 3 - tomorrow 0 - total 3', function (done) {
         var flow_ical = [
@@ -135,7 +164,7 @@ describe('Upcoming Node', function () {
         helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n2.on("input", function (msg) {               
+            n2.on("input", function (msg) {
                 expect(msg).to.have.property('today', 1);
                 expect(msg).to.have.property('tomorrow', 0);
                 expect(msg).to.have.property('total', 1);
@@ -160,7 +189,7 @@ describe('Upcoming Node', function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
             n2.on("input", function (msg) {
-               
+
                 expect(msg).to.have.property('total', 0);
                 done();
             });
@@ -189,7 +218,7 @@ describe('Upcoming Node', function () {
         helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n2.on("input", function (msg) {                
+            n2.on("input", function (msg) {
                 expect(msg).to.have.property('today', 1);
                 expect(msg).to.have.property('tomorrow', 1);
                 done();

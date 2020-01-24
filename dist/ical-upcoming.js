@@ -166,7 +166,7 @@ module.exports = function (RED) {
         for (var k in data) {
             var ev = data[k];
             delete data[k];
-            if (ev.summary !== undefined && ev.type === 'VEVENT') {
+            if (ev.type === 'VEVENT') {
                 if (!ev.end) {
                     ev.end = ce.clone(ev.start);
                     if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()) {
@@ -195,7 +195,7 @@ module.exports = function (RED) {
         var fullday = false;
         var reason;
         var date;
-        if (ev.summary.hasOwnProperty('val')) {
+        if (ev.summary && ev.summary.hasOwnProperty('val')) {
             reason = ev.summary.val;
         }
         else {

@@ -196,7 +196,7 @@ module.exports = function (RED: Red) {
             var ev = data[k];
             delete data[k];
 
-            if (ev.summary !== undefined && ev.type === 'VEVENT') {
+            if (ev.type === 'VEVENT') {
                 if (!ev.end) {
                     ev.end = ce.clone(ev.start);
                     if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()) {
@@ -227,7 +227,7 @@ module.exports = function (RED: Red) {
         var reason;
         var date;
 
-        if (ev.summary.hasOwnProperty('val')) {
+        if (ev.summary && ev.summary.hasOwnProperty('val')) {
             reason = ev.summary.val;
         } else {
             reason = ev.summary;
