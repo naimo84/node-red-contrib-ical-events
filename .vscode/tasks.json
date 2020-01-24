@@ -1,0 +1,23 @@
+{ 
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "release",
+      "command": "npm run release",
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "gulp",
+      "command": "npm run build",
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "test",
+      "command": "npm run test",
+      "problemMatcher": []
+    }
+  ]
+}

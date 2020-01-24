@@ -14,16 +14,17 @@ module.exports = function (RED: Red) {
         RED.nodes.createNode(this, config);
 
         let configNode = (RED.nodes.getNode(config.confignode) as unknown) as Config;
-        this.config = configNode;
-        this.filter = config.filter;
-        this.trigger = config.trigger || 'always';
-        this.endpreview =parseInt(config.endpreview) || 10;
-        this.endpreviewUnits = config.endpreviewUnits || 'd';
-        this.pastview = parseInt(config.pastview) || 0;
-        this.pastviewUnits = config.pastviewUnits || 'd';
+        let node = this;
+        node.config = configNode;
+        node.filter = config.filter;
+        node.trigger = config.trigger || 'always';
+        node.endpreview = parseInt(config.endpreview !== undefined ? config.endpreview : 10) ;
+        node.endpreviewUnits = config.endpreviewUnits || 'd';
+        node.pastview = parseInt(config.pastview !== undefined ? config.endpreview : 0);
+        node.pastviewUnits = config.pastviewUnits || 'd';
 
-        this.on('input', () => {
-            cronCheckJob(this);
+        node.on('input', () => {
+            cronCheckJob(node);
         });
         try {
             let cron = '';
@@ -41,7 +42,7 @@ module.exports = function (RED: Red) {
                         break;
                     case 'days':
                         cron = `0 0 0 */${config.timeout} * *`;
-                        
+
                         break;
                     default:
                         break;
@@ -53,18 +54,18 @@ module.exports = function (RED: Red) {
             }
 
             if (cron !== '') {
-                this.job = new CronJob(cron, cronCheckJob.bind(null, this, configNode));
+                node.job = new CronJob(cron, cronCheckJob.bind(null, node, configNode));
 
-                this.on('close', () => {
-                    this.job.stop();
-                    this.debug('cron stopped');
+                node.on('close', () => {
+                    node.job.stop();
+                    node.debug('cron stopped');
                 });
 
-                this.job.start();
+                node.job.start();
             }
         } catch (err) {
-            this.error('Error: ' + err.message);
-            this.status({ fill: 'red', shape: 'ring', text: err.message });
+            node.error('Error: ' + err.message);
+            node.status({ fill: 'red', shape: 'ring', text: err.message });
         }
     }
 
@@ -265,7 +266,7 @@ module.exports = function (RED: Red) {
             output = true;
         }
         if (output) {
-            node.debug('Event: '+JSON.stringify(ev))
+            node.debug('Event: ' + JSON.stringify(ev))
             if (fullday) {
                 if (
                     (ev.start < endpreview && ev.start >= pastview) ||
@@ -335,15 +336,15 @@ module.exports = function (RED: Red) {
                     var endpreview = new Date();
                     var pastview = new Date();
 
-                    if (node.endpreviewUnits === 'days' && node.endpreview>=1) {
+                    if (node.endpreviewUnits === 'days' && node.endpreview >= 1) {
                         endpreview = moment(endpreview).endOf('day').add(node.endpreview - 1, 'days').toDate();
                     } else {
                         endpreview = moment(endpreview)
                             .add(node.endpreview, node.endpreviewUnits.charAt(0))
                             .toDate();
                     }
-                    
-                    if (node.pastviewUnits === 'days' && node.pastview>=1) {
+
+                    if (node.pastviewUnits === 'days' && node.pastview >= 1) {
                         pastview = moment(pastview).startOf('day').subtract(node.pastview - 1, 'days').toDate();
                     } else {
                         pastview = moment(pastview)

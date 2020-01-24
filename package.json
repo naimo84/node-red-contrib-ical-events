@@ -46,7 +46,8 @@
     "release": "standard-version",
     "release-minor": "standard-version --release-as minor",
     "watch": "tsc -w -p ./tsconfig.json",
-    "dev": "gulp develop"
+    "dev": "gulp develop",
+    "build": "gulp"
   },
   "nodemonConfig": {
     "ignore": [

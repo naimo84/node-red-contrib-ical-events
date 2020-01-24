@@ -8,18 +8,18 @@ var RRule = require('rrule').RRule;
 var ce = require('cloneextend');
 module.exports = function (RED) {
     function upcomingNode(config) {
-        var _this = this;
         RED.nodes.createNode(this, config);
         var configNode = RED.nodes.getNode(config.confignode);
-        this.config = configNode;
-        this.filter = config.filter;
-        this.trigger = config.trigger || 'always';
-        this.endpreview = parseInt(config.endpreview) || 10;
-        this.endpreviewUnits = config.endpreviewUnits || 'd';
-        this.pastview = parseInt(config.pastview) || 0;
-        this.pastviewUnits = config.pastviewUnits || 'd';
-        this.on('input', function () {
-            cronCheckJob(_this);
+        var node = this;
+        node.config = configNode;
+        node.filter = config.filter;
+        node.trigger = config.trigger || 'always';
+        node.endpreview = parseInt(config.endpreview !== undefined ? config.endpreview : 10);
+        node.endpreviewUnits = config.endpreviewUnits || 'd';
+        node.pastview = parseInt(config.pastview !== undefined ? config.endpreview : 0);
+        node.pastviewUnits = config.pastviewUnits || 'd';
+        node.on('input', function () {
+            cronCheckJob(node);
         });
         try {
             var cron = '';
@@ -46,17 +46,17 @@ module.exports = function (RED) {
                 cron = config.cron;
             }
             if (cron !== '') {
-                this.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, this, configNode));
-                this.on('close', function () {
-                    _this.job.stop();
-                    _this.debug('cron stopped');
+                node.job = new cron_1.CronJob(cron, cronCheckJob.bind(null, node, configNode));
+                node.on('close', function () {
+                    node.job.stop();
+                    node.debug('cron stopped');
                 });
-                this.job.start();
+                node.job.start();
             }
         }
         catch (err) {
-            this.error('Error: ' + err.message);
-            this.status({ fill: 'red', shape: 'ring', text: err.message });
+            node.error('Error: ' + err.message);
+            node.status({ fill: 'red', shape: 'ring', text: err.message });
         }
     }
     function cronCheckJob(node) {
