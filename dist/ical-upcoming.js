@@ -140,7 +140,7 @@ module.exports = function (RED) {
                 var checkDate = true;
                 if (ev2.exdate) {
                     for (var d in ev2.exdate) {
-                        if (new Date(d).getTime() === ev2.start.getTime()) {
+                        if (ev2.exdate[d].getTime() === ev2.start.getTime()) {
                             checkDate = false;
                             node.debug('   ' + i + ': sort out');
                             break;
