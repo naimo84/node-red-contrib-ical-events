@@ -135,10 +135,11 @@ describe('Upcoming Node', function () {
         helper.load([icalConfigNode, icalUpcomingNode], flow_ical, function () {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n2.on("input", function (msg) {
+            n2.on("input", function (msg) {               
                 expect(msg).to.have.property('today', 1);
                 expect(msg).to.have.property('tomorrow', 0);
-                expect(msg).to.have.property('total', 2);
+                expect(msg).to.have.property('total', 1);
+                expect(msg.payload).to.be.an('array').that.contains.something.like({ id: "3" });
                 done();
             });
             n1.receive({ payload: 1 });
