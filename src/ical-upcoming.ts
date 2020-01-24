@@ -232,7 +232,6 @@ module.exports = function (RED: Red) {
         } else {
             reason = ev.summary;
         }
-
         var location = ev.location || '';
 
         if (!ev.start) return;
