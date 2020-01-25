@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.0...v0.11.1) (2020-01-25)
+
+
+### Bug Fixes
+
+* **package.json:** standard-version not bumping version ([92fdb7b](https://github.com/naimo84/node-red-contrib-ical-events/commit/92fdb7b05944a30c3826c968f8c94eae4f7d0222))
+* corrected test ([024d741](https://github.com/naimo84/node-red-contrib-ical-events/commit/024d741aca948a4e26223a0601001d9e36aa4a9a))
+* default values for end- and pastview ([9b3d6ea](https://github.com/naimo84/node-red-contrib-ical-events/commit/9b3d6eae42e90524b95f810ece5397bb83f7c9f4))
+* issue [#27](https://github.com/naimo84/node-red-contrib-ical-events/issues/27), deleted recurring events still in output msg ([273c942](https://github.com/naimo84/node-red-contrib-ical-events/commit/273c942a3ba71604211e3d75ad2d36366a67f9f2))
+* issue [#28](https://github.com/naimo84/node-red-contrib-ical-events/issues/28), Empty Summary ([f279d61](https://github.com/naimo84/node-red-contrib-ical-events/commit/f279d610f7c1d7e5ec4c6818b66936f40f62e2a1))
+* issue 28, Empty Summary ([866384b](https://github.com/naimo84/node-red-contrib-ical-events/commit/866384b747fe8331904ca0020915a7ee7d9f1ede))
+* upcoming tests reactivated ([074a86b](https://github.com/naimo84/node-red-contrib-ical-events/commit/074a86bd83b732586cd2878786ee2bbb3c80d6be))
+
 ## [0.11.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.10.7...v0.11.0) (2020-01-22)
 
 
