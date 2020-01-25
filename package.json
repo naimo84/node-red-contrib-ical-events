@@ -105,7 +105,7 @@
     "node-red-node-test-helper": "^0.2.3",
     "nodemon": "^1.19.4",
     "sinon": "8.1.0",
-    "standard-version": "^7.0.1",
+    "standard-version": "^7.1.0",
     "typescript": "^3.7.5"
   },
   "commitlint": {
