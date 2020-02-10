@@ -820,6 +820,10 @@ module.exports = function (RED: Red) {
                 }
             } else {
                 day = _end.getDate();
+                if(fullday){
+                    day -= 1;
+                    withTime=false;
+                }
                 month = _end.getMonth() + 1;
                 year = _end.getFullYear();
 
