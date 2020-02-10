@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.2...v0.11.3) (2020-02-10)
+
+
+### Bug Fixes
+
+* correcting pastview from config ([536aa81](https://github.com/naimo84/node-red-contrib-ical-events/commit/536aa818dea24297ace2d8b401d2ac7e50ae3934))
+* remove node_modules ([4b1d2af](https://github.com/naimo84/node-red-contrib-ical-events/commit/4b1d2af82e7e174ac480be78c630a5f6eb42ca92))
+* remove node_modules ([65b7eb7](https://github.com/naimo84/node-red-contrib-ical-events/commit/65b7eb7c0d9034fb804879ca6a5da955d9ac91a1))
+
 ### [0.11.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.0...v0.11.2) (2020-01-25)
 
 
