@@ -16,7 +16,7 @@ module.exports = function (RED) {
         node.trigger = config.trigger || 'always';
         node.endpreview = parseInt(config.endpreview !== undefined ? config.endpreview : 10);
         node.endpreviewUnits = config.endpreviewUnits || 'd';
-        node.pastview = parseInt(config.pastview !== undefined ? config.endpreview : 0);
+        node.pastview = parseInt(config.pastview !== undefined ? config.pastview : 0);
         node.pastviewUnits = config.pastviewUnits || 'd';
         node.on('input', function () {
             cronCheckJob(node);
