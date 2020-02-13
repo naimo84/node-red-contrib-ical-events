@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.3...v0.11.4) (2020-02-13)
+
+
+### Bug Fixes
+
+* issue [#29](https://github.com/naimo84/node-red-contrib-ical-events/issues/29), Fullday events from past have wrong date ([a4d56aa](https://github.com/naimo84/node-red-contrib-ical-events/commit/a4d56aa443c315c40825c4f48432a8ec6679d563))
+
 ### [0.11.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.2...v0.11.3) (2020-02-10)
 
 
