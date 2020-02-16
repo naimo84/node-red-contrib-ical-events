@@ -48,7 +48,7 @@ export function CalDav(node, config: Config) {
 
             for (let calendar of account.calendars) {
 
-                if (!calName || !calName.length || (calName && calName.length && calName === calendar.displayName)) {
+                if (!calName || !calName.length || (calName && calName.length && calName.toLowerCase() === calendar.displayName.toLowerCase())) {
                     promises.push(dav.listCalendarObjects(calendar, { xhr: xhr, filters: filters })
                         .then((calendarEntries) => {
                             let retEntries = {};
