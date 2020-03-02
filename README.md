@@ -98,6 +98,8 @@ The message additionaly contains the following values of the calendar entry
 
 As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
 
+---
+
 ##### Configuration
 
 -   "Check every": how often the calendar is checked for new events
@@ -111,6 +113,28 @@ As of the events node, its checked on input or cronjob. The msg.payload contains
 -   "Name": Displayname
 -   "Preview": Only Events within now and this **future** value are checked.
 -   "Past view": Only Events within now and this **past** value are checked.
+
+### INPUT
+
+msg.url
+msg.language
+msg.replacedates
+msg.caldav
+msg.username
+msg.password
+msg.calendar
+msg.pastWeeks
+msg.futureWeeks
+msg.filter
+msg.trigger
+msg.preview
+msg.previewUnits
+msg.pastview
+msg.pastviewUnits
+msg.offset
+msg.offsetUnits
+
+### OUTPUT
 
 Additional msg properties are:
 
