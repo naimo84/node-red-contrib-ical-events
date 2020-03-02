@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.12.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.4...v0.12.0) (2020-03-02)
+
+
+### Features
+
+* [#31](https://github.com/naimo84/node-red-contrib-ical-events/issues/31) final configuralbe payload ([0bcc332](https://github.com/naimo84/node-red-contrib-ical-events/commit/0bcc33203405ad00b5edd3b9cf2d3a6e5ffb4ded))
+
+
+### Bug Fixes
+
+* toLowerCase calendar.displayName ([f1a2575](https://github.com/naimo84/node-red-contrib-ical-events/commit/f1a2575eb0f241378b5c1ca777201c2b337cfbf0))
+
 ### [0.11.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.11.3...v0.11.4) (2020-02-13)
 
 
