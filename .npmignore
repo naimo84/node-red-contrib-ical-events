@@ -1,0 +1,6 @@
+.github
+.vscode
+test/*
+*.js.map
+src/*
+gulpfile.js

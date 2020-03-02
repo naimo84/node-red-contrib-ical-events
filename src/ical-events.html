@@ -8,19 +8,43 @@
                     value: "",
                     type: "ical-config"
                 },
+                timeout: {
+                    value: ""
+                },
+                timeoutUnits: {
+                    value: ""
+                },
                 cron: {
-                    value: ""                   
+                    value: ""
+                },
+                trigger: {
+                    value: '',
+                },
+                filter: {
+                    value: '',
+                    required: false,
+                    validate: function (v) {
+                        try {
+                            new RegExp(v);
+                            return true;
+                        } catch (e) {
+                            return false;
+                        }
+                    },
                 },
                 name: {
-                    value: ""                   
+                    value: ""
                 },
                 offset: {
-                    value: ""                   
+                    value: ""
+                },
+                offsetUnits: {
+                    value: ""
                 }
             },
             inputs: 1,
             outputs: 2,
-            outputLabels: ["Start Message","End Message"],
+            outputLabels: ["Start Message", "End Message"],
             color: "#E7AE24",
             label: function () {
                 if (this.name) {
@@ -32,7 +56,34 @@
                 return "event trigger";
             },
             icon: "calendar.png",
-            paletteLabel: "Trigger"
+            paletteLabel: "Trigger",
+            oneditprepare: function () {
+                var node = this;
+                $("#node-input-timeout").spinner({ min: 0 });
+                
+
+                $('.ui-spinner-button').on("click", function () {
+                    $(this).siblings('input').trigger("change");
+                });
+
+                if (!this.timeoutUnits) {
+                    $("#node-input-timeoutUnits option").filter(function () {
+                        return $(this).val() == 'seconds';
+                    }).attr('selected', true);
+                }
+
+                if (!this.offsettUnits) {
+                    $("#node-input-offsetUnits option").filter(function () {
+                        return $(this).val() == 'minutes';
+                    }).attr('selected', true);
+                }
+             
+                if (!this.trigger) {
+                    $("#node-input-trigger option").filter(function () {
+                        return $(this).val() == 'always';
+                    }).attr('selected', true);
+                }
+            }
         });
 </script>
 
@@ -41,18 +92,52 @@
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
     </div>
-    <div class="form-row">
-        <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
-        <input type="text" id="node-input-cron">
+    <div class="form-row" id="delay-details-for">
+        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
+        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
+        <select id="node-input-timeoutUnits" style="width:200px !important">          
+          <option value="seconds">Seconds</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
+        </select>
     </div>
     <div class="form-row">
-        <label for="node-input-offset"<i class="fa fa-clock-o"></i> <span>Offset (in minutes)</span></label>
-        <input type="text" id="node-input-offset">
+        <label for="node-input-trigger"><i class="fa fa-clock-o"></i> <span>Trigger</span></label>        
+        <select id="node-input-trigger" style="width:250px !important">          
+          <option value="always">Always</option>
+          <option value="match">Match</option>
+          <option value="nomatch">No match</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-filter"><i class="icon-filter"></i> Filter</label>
+        <input type="text" id="node-input-filter"  style="width:250px !important">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-offset"><i class="fa fa-clock-o"></i> <span>Offset</span></label>
+        <input type="text" id="node-input-offset" style="text-align:end; width:50px !important">
+        <select id="node-input-offsetUnits" style="width:200px !important">          
+            <option value="seconds">Seconds</option>
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+          </select>
     </div>
     <div class="form-row">        
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name">
     </div>
+    <div class="form-row">
+        <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
+        <input type="text" id="node-input-cron">
+    </div>
+    <div class="form-tips">     
+        <i class="fas fa-exclamation"></i>
+            <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
+    </div>
+    
 </script>
 
 <!-- Simple Help Text -->
@@ -62,10 +147,17 @@
     <p>The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.</p>
     <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
     <h3>Configuration</h3>
-    <br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *')
+     
     <br/> • "Name": Displayname
-    <br/> • "Offset": positive or negative value in minutes, when msg.payload is triggered before/after the ical-startdate
-    
+    <br/> • "Offset": positive or negative value, when output is triggered before/after the event-startdate
+    <span><br/> • <b>"Trigger"</b>: possible values:
+        <br/>&emsp;     Always (Filter expression is ignored)
+        <br/> &emsp;      Match (only events that match the Filter expression are processed)
+        <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
+    </span>
+    <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+    <br/><br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') <b>DEPRECATED:</b> Cron Setting will be remove in future releases. 
+
     <p>The msg.payload contains the following values of the calendar entry</p>
     <br/> • summary
     <br/> • id

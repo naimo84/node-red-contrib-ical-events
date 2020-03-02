@@ -105,8 +105,8 @@ export function CalDav(node, config: Config) {
                 }
             }
             return Promise.all(promises);
-        }, function() {
-            node.error('CalDAV -> get calendars went wrong.');
+        }, function(err) {
+            node.error('CalDAV -> get calendars went wrong. ' + err);
         });
 
 }

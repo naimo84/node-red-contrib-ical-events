@@ -3,22 +3,20 @@ import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
-import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset } from './helper';
+import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode } from './helper';
 var RRule = require('rrule').RRule;
 var ce = require('cloneextend');
 
 module.exports = function (RED: Red) {
     function sensorNode(config: any) {
-        RED.nodes.createNode(this, config);
-        let configNode = RED.nodes.getNode(config.confignode) as unknown as Config;
-        let node = this;
-        node.trigger = config.trigger;
-        node.filter = config.filter;
-        this.config = configNode;
+        RED.nodes.createNode(this, config);       
+        let node:IcalNode = this;  
 
         try {
-            node.on('input', () => {
-                cronCheckJob(this, config);
+            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
+            node.on('input', (msg) => {
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg); 
+                cronCheckJob(node);
             });
 
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
@@ -40,7 +38,7 @@ module.exports = function (RED: Red) {
                     default:
                         break;
                 }
-                node.job = new CronJob(cron, cronCheckJob.bind(null, node, config));
+                node.job = new CronJob(cron, cronCheckJob.bind(null, node));
                 node.job.start();
 
                 node.on('close', () => {
@@ -48,7 +46,7 @@ module.exports = function (RED: Red) {
                 });
             }
 
-            cronCheckJob(this, config);
+            cronCheckJob(node);
         }
         catch (err) {
             node.error('Error: ' + err.message);
@@ -56,7 +54,7 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function processRRule(ev, node,dateNow) {
+    function processRRule(ev, node:IcalNode,dateNow) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
 
         var options = RRule.parseString(ev.rrule.toString());
@@ -134,7 +132,7 @@ module.exports = function (RED: Red) {
     }
 
 
-    function cronCheckJob(node: any, config: any) {
+    function cronCheckJob(node: IcalNode) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
         }
@@ -148,7 +146,7 @@ module.exports = function (RED: Red) {
                 return;
             }
 
-            node.debug('Ical read successfully ' + config.url);
+            node.debug('Ical read successfully ' + node.config.url);
             if (!data) return;
 
             let current = false;
@@ -176,11 +174,11 @@ module.exports = function (RED: Red) {
                         if (eventStart <= dateNow && eventEnd >= dateNow) {
 
                             let output = false;
-                            if (node.trigger == 'match') {
-                                let regex = new RegExp(node.filter)
+                            if (node.config.trigger == 'match') {
+                                let regex = new RegExp(node.config.filter)
                                 if (regex.test(ev.summary)) output = true;
-                            } else if (node.trigger == 'nomatch') {
-                                let regex = new RegExp(node.filter)
+                            } else if (node.config.trigger == 'nomatch') {
+                                let regex = new RegExp(node.config.filter)
                                 if (!regex.test(ev.summary)) output = true;
                             } else {
                                 output = true;

@@ -1,6 +1,9 @@
 import moment = require('moment');
 import { loadEventsForDay } from './icloud';
 import { CalDav } from './caldav';
+import { Config } from './ical-config';
+import { CronJob } from 'cron';
+import {  Node } from 'node-red';
 
 const nodeIcal = require('node-ical');
 
@@ -9,7 +12,12 @@ export interface Job {
     cronjob: any
 }
 
-
+export interface IcalNode extends Node {
+    datesArray_old: any;
+    datesArray: any;
+    job: CronJob;
+    config: Config;
+}
 
 export interface CalEvent {
     summary?: string,
@@ -28,6 +36,28 @@ export interface CalEvent {
     countdown?: object,
     calendarName?: string
 
+}
+
+export function getConfig(config: Config, node: any, msg: any): Config {
+    return {
+        url: msg?.url || config.url,
+        language: msg?.language || config.language,
+        replacedates: msg?.replacedates || config.replacedates,
+        caldav: msg?.caldav || config.caldav,
+        username: msg?.username || config.username,
+        password: msg?.password || config.password,
+        calendar: msg?.calendar || config.calendar,
+        pastWeeks: msg?.pastWeeks || config.pastWeeks,
+        futureWeeks: msg?.futureWeeks || config.futureWeeks,
+        filter: msg?.filter || node.filter,
+        trigger: msg?.trigger || node.trigger || 'always',
+        preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
+        previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
+        pastview: parseInt(msg?.pastview || node?.pastview || 0),
+        pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
+        offset: parseInt(msg?.offset || node?.offset || 0),
+        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm'
+    } as Config;
 }
 
 

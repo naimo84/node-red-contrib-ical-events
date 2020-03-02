@@ -27,6 +27,12 @@
             endpreviewUnits: {
                 value: '',
             },
+            preview: {
+                value: '',
+            },
+            previewUnits: {
+                value: '',
+            },
             pastview: {
                 value: '',
             },
@@ -39,7 +45,7 @@
             filter: {
                 value: '',
                 required: false,
-                validate: function(v) {
+                validate: function (v) {
                     try {
                         new RegExp(v);
                         return true;
@@ -52,7 +58,7 @@
         inputs: 1,
         outputs: 1,
         color: '#E7AE24',
-        label: function() {
+        label: function () {
             if (this.name) {
                 return this.name;
             } else if (this.confignode.name) {
@@ -63,45 +69,53 @@
         },
         icon: 'calendar.png',
         paletteLabel: 'Upcoming',
-        oneditprepare: function() {
+        oneditprepare: function () {
             var node = this;
             $('#node-input-timeout').spinner({ min: 0 });
-            $('#node-input-endpreview').spinner({ min: 0 });
+            $('#node-input-preview').spinner({ min: 0 });
             $('#node-input-pastview').spinner({ min: 0 });
 
-            $('.ui-spinner-button').on('click', function() {
+            $('.ui-spinner-button').on('click', function () {
                 $(this)
                     .siblings('input')
                     .trigger('change');
             });
 
-            if (!this.timeoutUnits) {
+            if (!node.timeoutUnits) {
                 $('#node-input-timeoutUnits option')
-                    .filter(function() {
+                    .filter(function () {
                         return $(this).val() == 'seconds';
                     })
                     .attr('selected', true);
             }
 
-            if (!this.endpreviewUnits) {
-                $('#node-input-endpreviewUnits option')
-                    .filter(function() {
-                        return $(this).val() == 'days';
+            if (!node.previewUnits) {
+                $('#node-input-previewUnits option')
+                    .filter(function () {                        
+                        if (node.endpreviewUnits) {
+                            return $(this).val() == node.endpreviewUnits;
+                        } else {
+                            return $(this).val() == 'days';
+                        }
                     })
                     .attr('selected', true);
             }
 
-            if (!this.pastviewUnits) {
+            if (!node.preview && node.endpreview) {
+                $('#node-input-preview').val(node.endpreview);
+            }
+
+            if (!node.pastviewUnits) {
                 $('#node-input-pastviewUnits option')
-                    .filter(function() {
+                    .filter(function () {
                         return $(this).val() == 'days';
                     })
                     .attr('selected', true);
             }
 
-            if (!this.trigger) {
+            if (!node.trigger) {
                 $('#node-input-trigger option')
-                    .filter(function() {
+                    .filter(function () {
                         return $(this).val() == 'always';
                     })
                     .attr('selected', true);
@@ -125,10 +139,7 @@
           <option value="days">Days</option>
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
-        <input type="text" id="node-input-cron">
-    </div>
+   
     <div class="form-row">
         <label for="node-input-trigger"><i class="fa fa-clock-o"></i> <span>Trigger</span></label>
         <select id="node-input-trigger" style="width:250px !important">
@@ -142,9 +153,9 @@
         <input type="text" id="node-input-filter"  style="width:250px !important">
     </div>
     <div class="form-row" id="delay-details-for">
-        <label for="node-input-endpreview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
-        <input type="text" id="node-input-endpreview" style="text-align:end; width:50px !important">
-        <select id="node-input-endpreviewUnits" style="width:200px !important">
+        <label for="node-input-preview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
+        <input type="text" id="node-input-preview" style="text-align:end; width:50px !important">
+        <select id="node-input-previewUnits" style="width:200px !important">
           <option value="seconds">Seconds</option>
           <option value="minutes">Minutes</option>
           <option value="hours">Hours</option>
@@ -165,6 +176,14 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name">
     </div>
+    <div class="form-row">
+        <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
+        <input type="text" id="node-input-cron">
+    </div> 
+    <div class="form-tips">     
+        <i class="fas fa-exclamation"></i>
+            <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
+    </div>
 </script>
 
 <!-- Simple Help Text -->
@@ -176,7 +195,7 @@
         <h3>Configuration</h3>
         <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>
         <br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
-        <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
+        <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i> <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
         <span><br/> • <b>"Trigger"</b>: possible values:
             <br/>&emsp;     Always (Filter expression is ignored)
             <br/> &emsp;      Match (only events that match the Filter expression are processed)
@@ -194,6 +213,8 @@
         <br/> • eventStart
         <br/> • eventEnd
         <br/> • description
+        <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
+        <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i> <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
     </p>
      <br/>
         <p><b>additional msg. values:</b>

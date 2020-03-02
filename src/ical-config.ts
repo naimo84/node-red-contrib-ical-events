@@ -1,18 +1,28 @@
 import { NodeProperties } from 'node-red';
 
-export interface Config extends NodeProperties {
-    url: string,
-    language: string,
-    replacedates: boolean,
-    caldav: string,
-    username: string,
-    password: string,
-    calendar: string,
-    pastWeeks: number,
-    futureWeeks: number
+export interface Config extends NodeProperties {    
+    url?: string,
+    language?: string,
+    replacedates?: boolean,
+    caldav?: string,
+    username?: string,
+    password?: string,
+    calendar?: string,
+    pastWeeks?: number,
+    futureWeeks?: number,
+    filter?: string,
+    trigger?: string,
+    endpreview?: number,
+    endpreviewUnits?: string,
+    preview?: number,
+    previewUnits?: string,
+    pastview?: number,
+    pastviewUnits?: string,
+    offsetUnits?:string,
+    offset?: number
 }
 
-module.exports = function(RED: any) {
+module.exports = function (RED: any) {
     function icalConfig(config: Config) {
         RED.nodes.createNode(this, config);
 
