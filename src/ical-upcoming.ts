@@ -270,7 +270,7 @@ module.exports = function (RED: Red) {
                     date = formatDate(ev.start, ev.end, true, true, config);
 
                     insertSorted(node.datesArray, {
-                        date: date.text,
+                        date: date.text.trim(),
                         summary: ev.summary,
                         topic: ev.summary,
                         calendarName: ev.calendarName,
@@ -296,7 +296,7 @@ module.exports = function (RED: Red) {
                 ) {
                     date = formatDate(ev.start, ev.end, true, false, config);
                     insertSorted(node.datesArray, {
-                        date: date.text,
+                        date: date.text.trim(),
                         event: reason,
                         summary: ev.summary,
                         topic: ev.summary,
@@ -611,7 +611,8 @@ module.exports = function (RED: Red) {
             var date = formatDate(datesArray[i].eventStart, datesArray[i].eventEnd, true, datesArray[i].allDay, config);
 
             if (text) text += '<br/>\n';
-            text += date.text + ' ' + datesArray[i].event + '</span>';
+            text += (date.text.trim()  + ' ' + datesArray[i].event).trim() 
+            text += '</span>';
         }
 
         return text;
@@ -849,7 +850,7 @@ module.exports = function (RED: Red) {
         if (month < 10) month = '0' + month.toString();
 
         return {
-            text: day + '.' + month + '.' + year + _time,
+            text: (day + '.' + month + '.' + year + _time).trim(),
             _class: _class,
         };
     }
