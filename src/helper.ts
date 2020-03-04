@@ -70,11 +70,8 @@ export function convertEvents(events) {
                 retEntries.push(ev);
             });
         }
-        if (events.occurrences) {
-            const mappedOccurrences = events.occurrences.map(o => _convertEvent(o));
-            if (mappedOccurrences.length > 0) {
-                retEntries.push(mappedOccurrences[0])
-            }
+        if (events.occurrences&&events.occurrences.length>0) {
+            events.occurrences.map(o => retEntries.push(_convertEvent(o)));            
         }
     }
 
@@ -143,22 +140,12 @@ export function countdown(date) {
     };
 }
 
-export function getICal(node, urlOrFile, config, callback) {
+export function getICal(node:IcalNode,  config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
         const now = moment();
         const when = now.toDate();
 
-        loadEventsForDay(moment(when), {
-            url: urlOrFile,
-            username: config.username,
-            password: config.password,
-            type: 'caldav',
-            endpreview: node.endpreview || 1,
-            pastview: node.pastview || 0,
-            endpreviewUnits: node.endpreviewUnits || 'days',
-            pastviewUnits: node.pastviewUnits || 'days',
-        }, (list, start, end) => {
-
+        loadEventsForDay(moment(when), node, (list, start, end) => {
             callback && callback(null, list);
         });
     } else if (config.caldav && JSON.parse(config.caldav) === true) {
@@ -174,7 +161,7 @@ export function getICal(node, urlOrFile, config, callback) {
             callback(null, retEntries);
         });
     } else {
-        if (urlOrFile.match(/^https?:\/\//)) {
+        if (node.config.url.match(/^https?:\/\//)) {
             let header = {};
             let username = node.config.username;
             let password = node.config.password;

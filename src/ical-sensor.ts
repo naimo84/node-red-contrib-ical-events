@@ -141,7 +141,7 @@ module.exports = function (RED: Red) {
         }
 
         var dateNow = new Date();
-        getICal(node, node.config.url, node.config, (err, data) => {
+        getICal(node, node.config, (err, data) => {
             if (err || !data) {
                 return;
             }

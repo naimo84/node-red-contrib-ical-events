@@ -4,18 +4,19 @@ const MomentRange = require('moment-range'),
     https = require('https'),
     icalExpander = require('ical-expander'),
     xmlParser = require('xml-js');
-import { convertEvents } from './helper';
+import { convertEvents, IcalNode } from './helper';
+import { Config } from './ical-config';
 
 function process(reslist, start, end, ics) {
     const cal = new icalExpander({ ics, maxIterations: 1000 });
     const events = cal.between(start.toDate(), end.toDate());
 
-    convertEvents(events).forEach(event => {
-        reslist[event.uid] = event;
-    });
+    for(let event of convertEvents(events)){
+        reslist[event.uid+event.start] = event;  
+    }
 }
 
-function requestIcloudSecure(config, start, end, cb): any {
+function requestIcloudSecure(config: Config, start, end, cb): any {
     const DavTimeFormat = 'YYYYMMDDTHHmms\\Z',
         url = config.url,
         user = config.username,
@@ -85,20 +86,20 @@ function requestIcloudSecure(config, start, end, cb): any {
     });
 }
 
-export function loadEventsForDay(whenMoment, config, cb) {
+export function loadEventsForDay(whenMoment, node: IcalNode, cb) {
 
 
-    let start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
-    let end = whenMoment.clone().endOf('day').add(config.endpreview, config.endpreviewUnits);
+    let start = whenMoment.clone().startOf('day').subtract(node.config.pastview, node.config.pastviewUnits);
+    let end = whenMoment.clone().endOf('day').add(node.config.preview, node.config.previewUnits);
 
-    if (config.pastviewUnits === 'days') {
-        start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
+    if (node.config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(node.config.pastview + 1, 'days');
     }
-    if (config.endpreviewUnits === 'days') {
-        end = whenMoment.clone().endOf('day').add(config.endpreview, 'days');
+    if (node.config.previewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(node.config.preview, 'days');
     }
 
-    requestIcloudSecure(config, start, end, (json => {
+    requestIcloudSecure(node.config, start, end, (json => {
         var reslist = {};
         if (json && json.multistatus && json.multistatus.response) {
             var ics;

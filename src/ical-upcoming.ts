@@ -317,7 +317,7 @@ module.exports = function (RED: Red) {
     }
 
     function checkICal(callback, node) {
-        getICal(node, node.config.url, node.config, (err, data) => {
+        getICal(node,node.config, (err, data) => {
             if (err || !data) {
                 callback(err);
                 return;
