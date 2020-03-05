@@ -3,7 +3,7 @@ import { loadEventsForDay } from './icloud';
 import { CalDav } from './caldav';
 import { Config } from './ical-config';
 import { CronJob } from 'cron';
-import {  Node } from 'node-red';
+import { Node } from 'node-red';
 
 const nodeIcal = require('node-ical');
 
@@ -40,15 +40,15 @@ export interface CalEvent {
 
 export function getConfig(config: Config, node: any, msg: any): Config {
     return {
-        url: msg?.url || config.url,
-        language: msg?.language || config.language,
-        replacedates: msg?.replacedates || config.replacedates,
-        caldav: msg?.caldav || config.caldav,
-        username: msg?.username || config.username,
-        password: msg?.password || config.password,
-        calendar: msg?.calendar || config.calendar,
-        pastWeeks: msg?.pastWeeks || config.pastWeeks,
-        futureWeeks: msg?.futureWeeks || config.futureWeeks,
+        url: msg?.url || config?.url,
+        language: msg?.language || config?.language,
+        replacedates: msg?.replacedates || config?.replacedates,
+        caldav: msg?.caldav || config?.caldav,
+        username: msg?.username || config?.username,
+        password: msg?.password || config?.password,
+        calendar: msg?.calendar || config?.calendar,
+        pastWeeks: msg?.pastWeeks || config?.pastWeeks,
+        futureWeeks: msg?.futureWeeks || config?.futureWeeks,
         filter: msg?.filter || node.filter,
         trigger: msg?.trigger || node.trigger || 'always',
         preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
@@ -70,8 +70,8 @@ export function convertEvents(events) {
                 retEntries.push(ev);
             });
         }
-        if (events.occurrences&&events.occurrences.length>0) {
-            events.occurrences.map(o => retEntries.push(_convertEvent(o)));            
+        if (events.occurrences && events.occurrences.length > 0) {
+            events.occurrences.map(o => retEntries.push(_convertEvent(o)));
         }
     }
 
@@ -140,7 +140,7 @@ export function countdown(date) {
     };
 }
 
-export function getICal(node:IcalNode,  config, callback) {
+export function getICal(node: IcalNode, config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
         const now = moment();
         const when = now.toDate();
@@ -161,7 +161,7 @@ export function getICal(node:IcalNode,  config, callback) {
             callback(null, retEntries);
         });
     } else {
-        if (node.config.url.match(/^https?:\/\//)) {
+        if (node.config?.url?.match(/^https?:\/\//)) {
             let header = {};
             let username = node.config.username;
             let password = node.config.password;
@@ -183,6 +183,11 @@ export function getICal(node:IcalNode,  config, callback) {
                 callback && callback(null, data);
             });
         } else {
+            if (!node.config.url) {
+                node.error("URL/File is not defined");
+                node.status({ fill: 'red', shape: 'ring', text: "URL/File is not defined" });
+                callback && callback(null, {});
+            }
             nodeIcal.parseFile(node.config.url, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
