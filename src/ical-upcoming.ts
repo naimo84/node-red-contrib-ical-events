@@ -10,16 +10,16 @@ var RRule = require('rrule').RRule;
 var ce = require('cloneextend');
 
 module.exports = function (RED: Red) {
-    
+
 
     function upcomingNode(config: any) {
         RED.nodes.createNode(this, config);
-        let node:IcalNode = this;
+        let node: IcalNode = this;
 
 
         node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
         node.on('input', (msg) => {
-            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);        
+            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
             cronCheckJob(node);
         });
         try {
@@ -65,13 +65,13 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function cronCheckJob(node:IcalNode) {
+    function cronCheckJob(node: IcalNode) {
         if (node.job && node.job.running) {
             node.status({ fill: 'green', shape: 'dot', text: node.job.nextDate().toISOString() });
         } else {
             node.status({});
         }
-       
+
         node.datesArray_old = ce.clone(node.datesArray);
         node.datesArray = [];
         checkICal(
@@ -89,7 +89,7 @@ module.exports = function (RED: Red) {
         );
     }
 
-    function processRRule(ev, preview, today, realnow, node:IcalNode, config) {
+    function processRRule(ev, preview, today, realnow, node: IcalNode, config) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
 
         var options = RRule.parseString(ev.rrule.toString());
@@ -317,7 +317,7 @@ module.exports = function (RED: Red) {
     }
 
     function checkICal(callback, node) {
-        getICal(node,node.config, (err, data) => {
+        getICal(node, node.config, (err, data) => {
             if (err || !data) {
                 callback(err);
                 return;
@@ -330,16 +330,24 @@ module.exports = function (RED: Red) {
                     var preview = new Date();
                     var pastview = new Date();
 
-                    if (node.config.previewUnits === 'days' && node.config.preview >= 1) {
-                        preview = moment(preview).endOf('day').add(node.config.preview - 1, 'days').toDate();
+                    if (node.config.previewUnits === 'days') {
+                        if (node.config.preview == 1) {
+                            preview = moment(preview).endOf('day').add(node.config.preview - 1, 'days').toDate();
+                        } else {
+                            preview = moment(preview).endOf('day').add(node.config.preview, 'days').toDate();
+                        }
                     } else {
                         preview = moment(preview)
                             .add(node.config.preview, node.config.previewUnits.charAt(0))
                             .toDate();
                     }
 
-                    if (node.config.pastviewUnits === 'days' && node.config.pastview >= 1) {
-                        pastview = moment(pastview).startOf('day').subtract(node.config.pastview - 1, 'days').toDate();
+                    if (node.config.pastviewUnits === 'days') {
+                        if (node.config.pastview == 1) {
+                            pastview = moment(pastview).startOf('day').subtract(node.config.pastview - 1, 'days').toDate();
+                        } else {
+                            pastview = moment(pastview).startOf('day').subtract(node.config.pastview, 'days').toDate();
+                        }
                     } else {
                         pastview = moment(pastview)
                             .subtract(node.config.pastview, node.config.pastviewUnits.charAt(0))
@@ -611,7 +619,7 @@ module.exports = function (RED: Red) {
             var date = formatDate(datesArray[i].eventStart, datesArray[i].eventEnd, true, datesArray[i].allDay, config);
 
             if (text) text += '<br/>\n';
-            text += (date.text.trim()  + ' ' + datesArray[i].event).trim() 
+            text += (date.text.trim() + ' ' + datesArray[i].event).trim()
             text += '</span>';
         }
 
