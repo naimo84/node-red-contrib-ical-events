@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.12.1...v0.12.2) (2020-03-13)
+
+
+### Features
+
+* [#31](https://github.com/naimo84/node-red-contrib-ical-events/issues/31), no default config is needed ([beb2676](https://github.com/naimo84/node-red-contrib-ical-events/commit/beb26767535d4728baa9368f9a6bff427ef5deec))
+
+
+### Bug Fixes
+
+* issue [#37](https://github.com/naimo84/node-red-contrib-ical-events/issues/37), wrong day calculation ([abcfc7f](https://github.com/naimo84/node-red-contrib-ical-events/commit/abcfc7f5ebd4882d2d551cbc220148de6eb3f020))
+* issue [#38](https://github.com/naimo84/node-red-contrib-ical-events/issues/38), error-circular ([ee44153](https://github.com/naimo84/node-red-contrib-ical-events/commit/ee441536b591a91d1e2180f0f2167b744eb31cf0))
+
 ### [0.12.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.12.0...v0.12.1) (2020-03-05)
 
 
