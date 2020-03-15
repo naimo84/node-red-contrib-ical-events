@@ -3,7 +3,7 @@ import { CronJob } from 'cron';
 import { Config } from './ical-config';
 import * as moment from 'moment';
 import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode } from './helper';
-
+import * as NodeCache from 'node-cache';
 var parser = require('cron-parser');
 var RRule = require('rrule').RRule;
 
@@ -15,7 +15,7 @@ module.exports = function (RED: Red) {
     function upcomingNode(config: any) {
         RED.nodes.createNode(this, config);
         let node: IcalNode = this;
-
+        let cache = new NodeCache();
 
         node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
         node.on('input', (msg) => {
