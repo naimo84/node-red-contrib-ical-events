@@ -4,6 +4,7 @@ import { CalDav } from './caldav';
 import { Config } from './ical-config';
 import { CronJob } from 'cron';
 import { Node } from 'node-red';
+import * as NodeCache from 'node-cache';
 
 const nodeIcal = require('node-ical');
 
@@ -17,6 +18,7 @@ export interface IcalNode extends Node {
     datesArray: any;
     job: CronJob;
     config: Config;
+    cache: NodeCache;
 }
 
 export interface CalEvent {
@@ -36,6 +38,23 @@ export interface CalEvent {
     countdown?: object,
     calendarName?: string
 
+}
+
+export function getICal(node: IcalNode, config, callback) {
+    getEvents(node, config, (err, data) => {
+        if (node.cache) {
+            if (data) {
+                node.cache.set("events", data);
+                callback && callback(null, data);
+            }
+            if(err){
+                data = node.cache.get("events");
+                callback && callback(null, data);
+            }
+        } else {
+            callback && callback(err, data);
+        }
+    });
 }
 
 export function getConfig(config: Config, node: any, msg: any): Config {
@@ -140,7 +159,7 @@ export function countdown(date) {
     };
 }
 
-export function getICal(node: IcalNode, config, callback) {
+function getEvents(node: IcalNode, config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
         const now = moment();
         const when = now.toDate();
@@ -197,5 +216,6 @@ export function getICal(node: IcalNode, config, callback) {
             });
         }
     }
-
 }
+
+
