@@ -4,15 +4,22 @@ const dav = require('dav');
 const moment = require('moment');
 const IcalExpander = require('ical-expander');
 import * as  ical from 'node-ical';
-import { convertEvents } from './helper';
+import { convertEvents, convertEvent } from './helper';
 
 export function CalDav(node, config: Config) {
     const calName = config.calendar;
-    this.pastWeeks = config.pastWeeks || 0;
-    this.futureWeeks = config.futureWeeks || 4;
+    const now = moment();
+    const whenMoment = moment(now.toDate());
 
-    let startDate = moment().startOf('day').subtract(this.pastWeeks, 'weeks');
-    let endDate = moment().endOf('day').add(this.futureWeeks, 'weeks');
+    let start = whenMoment.clone().startOf('day').subtract(node.config.pastview, node.config.pastviewUnits);
+    let end = whenMoment.clone().endOf('day').add(node.config.preview, node.config.previewUnits);
+
+    if (node.config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(node.config.pastview + 1, 'days');
+    }
+    if (node.config.previewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(node.config.preview, 'days');
+    }
     const filters = [{
         type: 'comp-filter',
         attrs: { name: 'VCALENDAR' },
@@ -22,8 +29,8 @@ export function CalDav(node, config: Config) {
             children: [{
                 type: 'time-range',
                 attrs: {
-                    start: startDate.format('YYYYMMDD[T]HHmmss[Z]'),
-                    end: endDate.format('YYYYMMDD[T]HHmmss[Z]'),
+                    start: start.format('YYYYMMDD[T]HHmmss[Z]'),
+                    end: end.format('YYYYMMDD[T]HHmmss[Z]'),
                 },
             }],
         }],
@@ -56,7 +63,7 @@ export function CalDav(node, config: Config) {
                                 const ics = calendarEntry.calendarData;
                                 if (ics) {
                                     const icalExpander = new IcalExpander({ ics, maxIterations: 100 });
-                                    const events = icalExpander.between(startDate.toDate(), endDate.toDate());
+                                    const events = icalExpander.between(start.toDate(), end.toDate());
 
                                     convertEvents(events).forEach(event => {
                                         event.calendarName = calendar.displayName;
@@ -90,7 +97,7 @@ export function CalDav(node, config: Config) {
 
                                             return ical.fromURL(ics, header).then(data => {
                                                 for (var k in data) {
-                                                    var ev = data[k];
+                                                    var ev = convertEvent(data[k]);
                                                     ev.calendarName = calendar.displayName;
                                                     retEntries[ev.uid] = ev;
                                                 }
@@ -105,7 +112,7 @@ export function CalDav(node, config: Config) {
                 }
             }
             return Promise.all(promises);
-        }, function(err) {
+        }, function (err) {
             node.error('CalDAV -> get calendars went wrong. ' + err);
         });
 

@@ -7,9 +7,7 @@ export interface Config extends NodeProperties {
     caldav?: string,
     username?: string,
     password?: string,
-    calendar?: string,
-    pastWeeks?: number,
-    futureWeeks?: number,
+    calendar?: string,  
     filter?: string,
     trigger?: string,
     endpreview?: number,
@@ -34,9 +32,7 @@ module.exports = function (RED: any) {
         this.name = config.name;
         this.language = config.language;
         this.replacedates = config.replacedates;
-        this.calendar = config.calendar;
-        this.pastWeeks = Number(config.pastWeeks || 0);
-        this.futureWeeks = Number(config.futureWeeks || 4);
+        this.calendar = config.calendar;       
     }
 
     RED.nodes.registerType('ical-config', icalConfig);
