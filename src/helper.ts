@@ -77,34 +77,62 @@ export function getConfig(config: Config, node: any, msg: any): Config {
     } as Config;
 }
 
-
 export function convertEvents(events) {
     let retEntries = [];
     if (events) {
         if (events.events) {
             events.events.forEach(event => {
-                let ev = _convertEvent(event);
+                let ev = convertEvent(event);
                 retEntries.push(ev);
             });
         }
         if (events.occurrences && events.occurrences.length > 0) {
-            events.occurrences.map(o => retEntries.push(_convertEvent(o)));
+            events.occurrences.forEach(event => {
+                let ev = convertEvent(event);
+                retEntries.push(ev);
+            });
         }
     }
 
     return retEntries;
 }
 
-function _convertEvent(e) {
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+export function convertEvent(e) {
     if (e) {
-        let startDate = e.startDate.toJSDate()
-        let endDate = e.endDate.toJSDate()
+        let startDate = e.startDate?.toJSDate() || e.start;
+        let endDate = e.endDate?.toJSDate() || e.end;
+
+        const recurrence = e.recurrenceId;
 
         if (e.item) {
             e = e.item
         }
-        if (e.duration.wrappedJSObject) {
+        if (e.duration?.wrappedJSObject) {
             delete e.duration.wrappedJSObject
+        }
+
+        let uid = e.uid || uuidv4();
+        if (recurrence) {
+            uid += new Date(recurrence.year, recurrence.month, recurrence.day, recurrence.hour, recurrence.minute, recurrence.second).getTime().toString();
+        } else {
+            uid += startDate.getTime().toString();
+        }
+
+        let duration = e.duration;
+        let allday = false;
+        if (!duration) {
+            var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+            seconds = Number(seconds);
+            allday = ((seconds % 86400) === 0)
+        } else {
+            allday = ((duration.toSeconds() % 86400) === 0)
         }
 
         return {
@@ -113,15 +141,16 @@ function _convertEvent(e) {
             summary: e.summary || '',
             description: e.description || '',
             attendees: e.attendees,
-            duration: e.duration.toICALString(),
-            durationSeconds: e.duration.toSeconds(),
+            duration: e.duration?.toICALString(),
+            durationSeconds: e.duration?.toSeconds(),
             location: e.location || '',
             organizer: e.organizer || '',
-            uid: e.uid || '',
+            uid: uid,
             isRecurring: false,
             datetype: 'date',
             type: 'VEVENT',
-            allDay: ((e.duration.toSeconds() % 86400) === 0)
+            allDay: allday,
+            calendarName: null
         }
     }
 }
