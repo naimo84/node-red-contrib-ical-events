@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.14.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.13.0...v0.14.0) (2020-03-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* pastweek and futureweeks are now available as preview and pastview setting
+* pastweek and futureweeks are now available as preview and pastview setting
+
+### Bug Fixes
+
+* issue [#43](https://github.com/naimo84/node-red-contrib-ical-events/issues/43), rrule only shows last event ([f7ef763](https://github.com/naimo84/node-red-contrib-ical-events/commit/f7ef763b92d587bc3005aac0d9652506d8a0f446))
+
+
+* move caldav pastweek and futureweeks ([492860c](https://github.com/naimo84/node-red-contrib-ical-events/commit/492860c32e7f7e7cc1239f5435129e7514a08c53))
+* move caldav pastweek and futureweeks ([34733d9](https://github.com/naimo84/node-red-contrib-ical-events/commit/34733d9f62c598841464aad3815216986cf747a5))
+
 ## [0.13.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.12.2...v0.13.0) (2020-03-19)
 
 
