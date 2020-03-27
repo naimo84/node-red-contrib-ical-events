@@ -47,7 +47,7 @@ export function getICal(node: IcalNode, config, callback) {
                 node.cache.set("events", data);
                 callback && callback(null, data);
             }
-            if(err){
+            if (err) {
                 data = node.cache.get("events");
                 callback && callback(null, data);
             }
@@ -65,7 +65,7 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         caldav: msg?.caldav || config?.caldav,
         username: msg?.username || config?.username,
         password: msg?.password || config?.password,
-        calendar: msg?.calendar || config?.calendar,        
+        calendar: msg?.calendar || config?.calendar,
         filter: msg?.filter || node.filter,
         trigger: msg?.trigger || node.trigger || 'always',
         preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
@@ -113,6 +113,9 @@ export function convertEvent(e) {
 
         if (e.item) {
             e = e.item
+        }
+        if (e.type && e.type !== "VEVENT") {
+            return;
         }
         if (e.duration?.wrappedJSObject) {
             delete e.duration.wrappedJSObject

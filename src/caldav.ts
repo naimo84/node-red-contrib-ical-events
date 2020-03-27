@@ -66,8 +66,10 @@ export function CalDav(node, config: Config) {
                                     const events = icalExpander.between(start.toDate(), end.toDate());
 
                                     convertEvents(events).forEach(event => {
-                                        event.calendarName = calendar.displayName;
-                                        retEntries[event.uid] = event;
+                                        if (event) {
+                                            event.calendarName = calendar.displayName;
+                                            retEntries[event.uid] = event;
+                                        }
                                     });
                                 }
                             }
@@ -98,8 +100,10 @@ export function CalDav(node, config: Config) {
                                             return ical.fromURL(ics, header).then(data => {
                                                 for (var k in data) {
                                                     var ev = convertEvent(data[k]);
-                                                    ev.calendarName = calendar.displayName;
-                                                    retEntries[ev.uid] = ev;
+                                                    if (ev) {
+                                                        ev.calendarName = calendar.displayName;
+                                                        retEntries[ev.uid] = ev;
+                                                    }
                                                 }
                                                 return retEntries;
                                             });
