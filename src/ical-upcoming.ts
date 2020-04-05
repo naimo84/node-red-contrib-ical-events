@@ -171,12 +171,16 @@ module.exports = function (RED: Red) {
                 }
                 if (checkDate && ev.recurrences) {
                     for (var dOri in ev.recurrences) {
-                        if (new Date(dOri).getTime() === ev2.start.getTime()) {
-                            ev2 = ce.clone(ev.recurrences[dOri]);
-                            node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                        let recurrenceid = ev.recurrences[dOri].recurrenceid
+                        if (recurrenceid) {
+                            if (recurrenceid.getTime() === ev2.start.getTime()) {
+                                ev2 = ce.clone(ev.recurrences[dOri]);
+                                node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                            }
                         }
                     }
                 }
+
 
                 if (checkDate) {
                     checkDates(ev2, preview, today, realnow, ' rrule ', node, config);
@@ -184,6 +188,7 @@ module.exports = function (RED: Red) {
             }
         }
     }
+
 
     function processData(data, realnow, pastview, preview, callback, node, config) {
         var processedEntries = 0;
