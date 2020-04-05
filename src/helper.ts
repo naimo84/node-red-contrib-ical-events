@@ -1,6 +1,6 @@
 import moment = require('moment');
 import { loadEventsForDay } from './icloud';
-import { CalDav } from './caldav';
+import { CalDav, Fallback } from './caldav';
 import { Config } from './ical-config';
 import { CronJob } from 'cron';
 import { Node } from 'node-red';
@@ -80,17 +80,25 @@ export function getConfig(config: Config, node: any, msg: any): Config {
 export function convertEvents(events) {
     let retEntries = [];
     if (events) {
-        if (events.events) {
-            events.events.forEach(event => {
-                let ev = convertEvent(event);
+        if (Array.isArray(events)) {
+            events.forEach(event => {
+                let ev = convertScrapegoat(event.data);
                 retEntries.push(ev);
             });
         }
-        if (events.occurrences && events.occurrences.length > 0) {
-            events.occurrences.forEach(event => {
-                let ev = convertEvent(event);
-                retEntries.push(ev);
-            });
+        else {
+            if (events.events) {
+                events.events.forEach(event => {
+                    let ev = convertEvent(event);
+                    retEntries.push(ev);
+                });
+            }
+            if (events.occurrences && events.occurrences.length > 0) {
+                events.occurrences.forEach(event => {
+                    let ev = convertEvent(event);
+                    retEntries.push(ev);
+                });
+            }
         }
     }
 
@@ -158,6 +166,50 @@ export function convertEvent(e) {
     }
 }
 
+function convertScrapegoat(e) {
+    if (e) {
+        let startDate = moment(e.start).toDate();
+        let endDate = moment(e.end).toDate();
+
+        const recurrence = e.recurrenceId;
+
+        if (e.duration?.wrappedJSObject) {
+            delete e.duration.wrappedJSObject
+        }
+
+        let uid = e.uid || uuidv4();
+        uid += startDate.getTime().toString();
+
+        let duration = e.duration;
+        let allday = false;
+        if (!duration) {
+            var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+            seconds = Number(seconds);
+            allday = ((seconds % 86400) === 0)
+        } else {
+            allday = ((duration.toSeconds() % 86400) === 0)
+        }
+
+        return {
+            start: startDate,
+            end: endDate,
+            summary: e.title || '',
+            description: e.title || '',
+            attendees: e.attendees,
+            duration: e.duration?.toICALString(),
+            durationSeconds: e.duration?.toSeconds(),
+            location: e.location || '',
+            organizer: e.organizer || '',
+            uid: uid,
+            isRecurring: false,
+            datetype: 'date',
+            type: 'VEVENT',
+            allDay: allday,
+            calendarName: null
+        }
+    }
+}
+
 export function getTimezoneOffset(date) {
     var offset = 0;
     var zone = moment.tz.zone(moment.tz.guess());
@@ -201,13 +253,19 @@ function getEvents(node: IcalNode, config, callback) {
         node.debug('caldav');
         CalDav(node, config).then((data) => {
             let retEntries = {};
-            for (let events of data) {
-                for (let event in events) {
-                    var ev = events[event];
-                    retEntries[ev.uid] = ev;
+            if (data) {
+                for (let events of data) {
+                    for (let event in events) {
+                        var ev = events[event];
+                        retEntries[ev.uid] = ev;
+                    }
                 }
             }
             callback(null, retEntries);
+        }).catch((err) => {
+            Fallback(node).then((data) => {
+                callback(null, data)
+            })
         });
     } else {
         if (node.config?.url?.match(/^https?:\/\//)) {

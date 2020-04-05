@@ -1,8 +1,9 @@
 import { Config } from './ical-config';
 
-const dav = require('dav');
-const moment = require('moment');
-const IcalExpander = require('ical-expander');
+import dav = require('dav');
+import Scrapegoat = require("scrapegoat");
+import moment = require('moment');
+import IcalExpander = require('ical-expander');
 import * as  ical from 'node-ical';
 import { convertEvents, convertEvent } from './helper';
 
@@ -117,7 +118,22 @@ export function CalDav(node, config: Config) {
             }
             return Promise.all(promises);
         }, function (err) {
-            node.error('CalDAV -> get calendars went wrong. ' + err);
+            node.debug('CalDAV -> get calendars went wrong. ' + err);
+            throw err;
         });
+}
 
+export async function Fallback(node) {
+    let config = {
+        auth: {
+            user: node.config.username,
+            pass: node.config.password
+        },
+        uri: node.config.url
+    };
+    let scrapegoat = new Scrapegoat(config);
+
+    let data = await scrapegoat.getAllEvents();
+
+    return convertEvents(data);
 }
