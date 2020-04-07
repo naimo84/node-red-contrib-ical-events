@@ -73,7 +73,8 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         pastview: parseInt(msg?.pastview || node?.pastview || 0),
         pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
         offset: parseInt(msg?.offset || node?.offset || 0),
-        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm'
+        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
+        rejectUnauthorized:msg?.rejectUnauthorized || node?.rejectUnauthorized || false
     } as Config;
 }
 
@@ -241,17 +242,18 @@ export function countdown(date) {
     };
 }
 
-function getEvents(node: IcalNode, config, callback) {
+function getEvents(node: IcalNode, config:Config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
+        node.debug('icloud');
         const now = moment();
         const when = now.toDate();
 
-        loadEventsForDay(moment(when), node, (list, start, end) => {
+        loadEventsForDay(moment(when), config, (list, start, end) => {
             callback && callback(null, list);
         });
     } else if (config.caldav && JSON.parse(config.caldav) === true) {
         node.debug('caldav');
-        CalDav(node, config).then((data) => {
+        CalDav(config).then((data) => {
             let retEntries = {};
             if (data) {
                 for (let events of data) {
@@ -263,15 +265,20 @@ function getEvents(node: IcalNode, config, callback) {
             }
             callback(null, retEntries);
         }).catch((err) => {
-            Fallback(node).then((data) => {
+            node.debug(`caldav - get calendar went wrong. Error Message: ${err}`)
+            node.debug(`caldav - using fallback`)
+            Fallback(config).then((data) => {
                 callback(null, data)
+            }).catch(err_fallback=>{
+                node.error(`caldav - get calendar went wrong. Error Message: ${err_fallback}`)
             })
         });
     } else {
-        if (node.config?.url?.match(/^https?:\/\//)) {
+        node.debug('ical');
+        if (config?.url?.match(/^https?:\/\//)) {
             let header = {};
-            let username = node.config.username;
-            let password = node.config.password;
+            let username = config.username;
+            let password = config.password;
 
             if (username && password) {
                 var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
@@ -282,7 +289,7 @@ function getEvents(node: IcalNode, config, callback) {
                 };
             }
 
-            nodeIcal.fromURL(node.config.url, header, (err, data) => {
+            nodeIcal.fromURL(config.url, header, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;
@@ -290,12 +297,12 @@ function getEvents(node: IcalNode, config, callback) {
                 callback && callback(null, data);
             });
         } else {
-            if (!node.config.url) {
+            if (!config.url) {
                 node.error("URL/File is not defined");
                 node.status({ fill: 'red', shape: 'ring', text: "URL/File is not defined" });
                 callback && callback(null, {});
             }
-            nodeIcal.parseFile(node.config.url, (err, data) => {
+            nodeIcal.parseFile(config.url, (err, data) => {
                 if (err) {
                     callback && callback(err, null);
                     return;

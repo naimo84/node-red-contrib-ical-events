@@ -7,19 +7,21 @@ import IcalExpander = require('ical-expander');
 import * as  ical from 'node-ical';
 import { convertEvents, convertEvent } from './helper';
 
-export function CalDav(node, config: Config) {
+export function CalDav(config: Config) {
     const calName = config.calendar;
     const now = moment();
     const whenMoment = moment(now.toDate());
 
-    let start = whenMoment.clone().startOf('day').subtract(node.config.pastview, node.config.pastviewUnits);
-    let end = whenMoment.clone().endOf('day').add(node.config.preview, node.config.previewUnits);
+    // @ts-ignore
+    let start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
+    // @ts-ignore
+    let end = whenMoment.clone().endOf('day').add(config.preview, config.previewUnits);
 
-    if (node.config.pastviewUnits === 'days') {
-        start = whenMoment.clone().startOf('day').subtract(node.config.pastview + 1, 'days');
+    if (config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
     }
-    if (node.config.previewUnits === 'days') {
-        end = whenMoment.clone().endOf('day').add(node.config.preview, 'days');
+    if (config.previewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(config.preview, 'days');
     }
     const filters = [{
         type: 'comp-filter',
@@ -50,8 +52,7 @@ export function CalDav(node, config: Config) {
         .then((account) => {
             let promises = [];
             if (!account.calendars) {
-                node.error('CalDAV -> no calendars found.');
-                return;
+                throw 'CalDAV -> no calendars found.';
             }
 
             for (let calendar of account.calendars) {
@@ -87,8 +88,8 @@ export function CalDav(node, config: Config) {
                                         if (calendarObject.data && calendarObject.data.href) {
                                             let ics = url.origin + calendarObject.data.href;
                                             let header = {};
-                                            let username = node.config.username;
-                                            let password = node.config.password;
+                                            let username = config.username;
+                                            let password = config.password;
                                             if (username && password) {
                                                 var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
                                                 header = {
@@ -117,21 +118,20 @@ export function CalDav(node, config: Config) {
                 }
             }
             return Promise.all(promises);
-        }, function (err) {
-            node.debug('CalDAV -> get calendars went wrong. ' + err);
+        }, function (err) {           
             throw err;
         });
 }
 
-export async function Fallback(node) {
-    let config = {
+export async function Fallback(config:Config) {
+    let scrapegoat = new Scrapegoat({
         auth: {
-            user: node.config.username,
-            pass: node.config.password
+            user: config.username,
+            pass: config.password
         },
-        uri: node.config.url
-    };
-    let scrapegoat = new Scrapegoat(config);
+        uri: config.url,
+        rejectUnauthorized: config.rejectUnauthorized
+    });
 
     let data = await scrapegoat.getAllEvents();
 

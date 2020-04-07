@@ -1,6 +1,7 @@
 import { NodeProperties } from 'node-red';
 
-export interface Config extends NodeProperties {    
+export interface Config extends NodeProperties {
+    rejectUnauthorized?: boolean;    
     url?: string,
     language?: string,
     replacedates?: boolean,

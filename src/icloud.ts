@@ -4,7 +4,7 @@ const MomentRange = require('moment-range'),
     https = require('https'),
     icalExpander = require('ical-expander'),
     xmlParser = require('xml-js');
-import { convertEvents, IcalNode } from './helper';
+import { convertEvents } from './helper';
 import { Config } from './ical-config';
 
 function process(reslist, start, end, ics) {
@@ -42,7 +42,7 @@ function requestIcloudSecure(config: Config, start, end, cb): any {
         '</C:calendar-query>';
 
     var options = {
-        rejectUnauthorized: false,
+        rejectUnauthorized: config.rejectUnauthorized,
         hostname: host,
         port: port,
         path: path,
@@ -86,20 +86,20 @@ function requestIcloudSecure(config: Config, start, end, cb): any {
     });
 }
 
-export function loadEventsForDay(whenMoment, node: IcalNode, cb) {
+export function loadEventsForDay(whenMoment, config:Config, cb) {
 
 
-    let start = whenMoment.clone().startOf('day').subtract(node.config.pastview, node.config.pastviewUnits);
-    let end = whenMoment.clone().endOf('day').add(node.config.preview, node.config.previewUnits);
+    let start = whenMoment.clone().startOf('day').subtract(config.pastview, config.pastviewUnits);
+    let end = whenMoment.clone().endOf('day').add(config.preview, config.previewUnits);
 
-    if (node.config.pastviewUnits === 'days') {
-        start = whenMoment.clone().startOf('day').subtract(node.config.pastview + 1, 'days');
+    if (config.pastviewUnits === 'days') {
+        start = whenMoment.clone().startOf('day').subtract(config.pastview + 1, 'days');
     }
-    if (node.config.previewUnits === 'days') {
-        end = whenMoment.clone().endOf('day').add(node.config.preview, 'days');
+    if (config.previewUnits === 'days') {
+        end = whenMoment.clone().endOf('day').add(config.preview, 'days');
     }
 
-    requestIcloudSecure(node.config, start, end, (json => {
+    requestIcloudSecure(config, start, end, (json => {
         var reslist = {};
         if (json && json.multistatus && json.multistatus.response) {
             var ics;
