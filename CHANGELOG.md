@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.14.2...v0.14.3) (2020-04-07)
+
+
+### Bug Fixes
+
+* issue [#44](https://github.com/naimo84/node-red-contrib-ical-events/issues/44), synology caldav server, added scrapegoat as fallback ([4fa8df6](https://github.com/naimo84/node-red-contrib-ical-events/commit/4fa8df69984a8d4161f24fe9129061d9e760b07e))
+
 ### [0.14.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.14.1...v0.14.2) (2020-04-06)
 
 
