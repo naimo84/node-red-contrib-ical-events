@@ -10,14 +10,14 @@ var ce = require('cloneextend');
 
 module.exports = function (RED: Red) {
     function sensorNode(config: any) {
-        RED.nodes.createNode(this, config);       
-        let node:IcalNode = this;  
+        RED.nodes.createNode(this, config);
+        let node: IcalNode = this;
 
         try {
             node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
             node.cache = new NodeCache();
             node.on('input', (msg) => {
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg); 
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
                 cronCheckJob(node);
             });
 
@@ -56,7 +56,7 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function processRRule(ev, node:IcalNode,dateNow) {
+    function processRRule(ev, node: IcalNode, dateNow) {
         var eventLength = ev.end.getTime() - ev.start.getTime();
 
         var options = RRule.parseString(ev.rrule.toString());
@@ -95,7 +95,7 @@ module.exports = function (RED: Red) {
         }
 
         node.debug('dates:' + JSON.stringify(dates));
-
+        let reslist = [];
         if (dates.length > 0) {
             for (var i = 0; i < dates.length; i++) {
                 var ev2 = ce.clone(ev);
@@ -110,33 +110,40 @@ module.exports = function (RED: Red) {
                 var checkDate = true;
                 if (ev2.exdate) {
                     for (var d in ev2.exdate) {
-                        if (new Date(d).getTime() === ev2.start.getTime()) {
-                            checkDate = false;
-                            node.debug('   ' + i + ': sort out');
-                            break;
+                        let exdate = ev2.exdate[d]
+                        if (exdate) {
+                            if (exdate.getTime() === ev2.start.getTime()) {
+                                checkDate = false;
+                                node.debug('   ' + i + ': sort out');
+                                break;
+                            }
                         }
                     }
                 }
                 if (checkDate && ev.recurrences) {
                     for (var dOri in ev.recurrences) {
-                        if (new Date(dOri).getTime() === ev2.start.getTime()) {
-                            ev2 = ce.clone(ev.recurrences[dOri]);
-                            node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                        let recurrenceid = ev.recurrences[dOri].recurrenceid
+                        if (recurrenceid) {
+                            if (recurrenceid.getTime() === ev2.start.getTime()) {
+                                ev2 = ce.clone(ev.recurrences[dOri]);
+                                node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
+                            }
                         }
                     }
                 }
 
                 if (checkDate && ev2.start <= dateNow && ev2.end >= dateNow) {
-                    return ev2;
+                    reslist.push(ev2);
                 }
             }
         }
+        return reslist;
     }
 
 
     function cronCheckJob(node: IcalNode) {
         if (node.job && node.job.running) {
-            node.status({ fill: "green", shape: "dot", text: node.job.nextDate().toISOString() });
+            node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toISOString()}` });
         }
         else {
             node.status({});
@@ -161,66 +168,18 @@ module.exports = function (RED: Red) {
                     if (ev.type == 'VEVENT') {
                         let ev2;
                         if (ev.rrule !== undefined) {
-                           // console.log(`${ev.summary} "rrule"`)
-                            ev2 = ce.clone(processRRule(ev, node,dateNow));
+                            ev2 = ce.clone(processRRule(ev, node, dateNow));
                         }
-                        if (ev2) {
-                            //console.log(ev2)
+                        if (ev2) {                            
                             ev = ev2
-                           // console.log(`${ev.summary} "rrule"`)
                         }
 
-                        const eventStart = new Date(ev.start);
-                        const eventEnd = new Date(ev.end);
-
-                        if (eventStart <= dateNow && eventEnd >= dateNow) {
-
-                            let output = false;
-                            if (node.config.trigger == 'match') {
-                                let regex = new RegExp(node.config.filter)
-                                if (regex.test(ev.summary)) output = true;
-                            } else if (node.config.trigger == 'nomatch') {
-                                let regex = new RegExp(node.config.filter)
-                                if (!regex.test(ev.summary)) output = true;
-                            } else {
-                                output = true;
+                        if (ev instanceof Array && ev.length >= 1) {
+                            for (let e of ev) {
+                                processData(e, dateNow, node, last, current)
                             }
-
-
-                            let uid = crypto.MD5(ev.created + ev.summary).toString();
-                            if (ev.uid) {
-                                uid = ev.uid;
-                            }
-
-                            let event: CalEvent = {
-                                on: false
-                            }
-
-                            if (output) {
-                                event = {
-                                    summary: ev.summary,
-                                    topic: ev.summary,
-                                    id: uid,
-                                    location: ev.location,
-                                    eventStart: new Date(ev.start),
-                                    eventEnd: new Date(ev.end),
-                                    description: ev.description,
-                                    on: true,
-                                    calendarName: ev.calendarName,
-                                    countdown: countdown(new Date(ev.start))
-                                }
-                            }
-
-                            node.send({
-                                payload: event
-                            });
-                            current = true;
-
-                            if (last != current) {
-                                node.send([null, {
-                                    payload: event
-                                }]);
-                            }
+                        } else {
+                            processData(ev, dateNow, node, last, current)
                         }
                     }
                 }
@@ -245,6 +204,61 @@ module.exports = function (RED: Red) {
             node.context().set('on', current);
 
         });
+    }
+
+    function processData(ev, dateNow, node, last, current) {
+        const eventStart = new Date(ev.start);
+        const eventEnd = new Date(ev.end);
+
+        if (eventStart <= dateNow && eventEnd >= dateNow) {
+
+            let output = false;
+            if (node.config.trigger == 'match') {
+                let regex = new RegExp(node.config.filter)
+                if (regex.test(ev.summary)) output = true;
+            } else if (node.config.trigger == 'nomatch') {
+                let regex = new RegExp(node.config.filter)
+                if (!regex.test(ev.summary)) output = true;
+            } else {
+                output = true;
+            }
+
+
+            let uid = crypto.MD5(ev.created + ev.summary).toString();
+            if (ev.uid) {
+                uid = ev.uid;
+            }
+
+            let event: CalEvent = {
+                on: false
+            }
+
+            if (output) {
+                event = {
+                    summary: ev.summary,
+                    topic: ev.summary,
+                    id: uid,
+                    location: ev.location,
+                    eventStart: new Date(ev.start),
+                    eventEnd: new Date(ev.end),
+                    description: ev.description,
+                    on: true,
+                    calendarName: ev.calendarName,
+                    countdown: countdown(new Date(ev.start))
+                }
+            }
+
+            node.send({
+                payload: event
+            });
+            current = true;
+
+            if (last != current) {
+                node.send([null, {
+                    payload: event
+                }]);
+            }
+        }
     }
 
     RED.nodes.registerType("ical-sensor", sensorNode);

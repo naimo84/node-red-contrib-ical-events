@@ -67,7 +67,7 @@ module.exports = function (RED: Red) {
 
     function cronCheckJob(node: IcalNode) {
         if (node.job && node.job.running) {
-            node.status({ fill: 'green', shape: 'dot', text: node.job.nextDate().toISOString() });
+            node.status({ fill: 'green', shape: 'dot', text: `next check: ${node.job.nextDate().toISOString()}` });
         } else {
             node.status({});
         }
