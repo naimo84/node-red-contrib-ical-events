@@ -170,16 +170,16 @@ module.exports = function (RED: Red) {
                         if (ev.rrule !== undefined) {
                             ev2 = ce.clone(processRRule(ev, node, dateNow));
                         }
-                        if (ev2) {                            
+                        if (ev2) {
                             ev = ev2
                         }
 
                         if (ev instanceof Array && ev.length >= 1) {
                             for (let e of ev) {
-                                processData(e, dateNow, node, last, current)
+                                current = processData(e, dateNow, node, last, current)
                             }
                         } else {
-                            processData(ev, dateNow, node, last, current)
+                            current = processData(ev, dateNow, node, last, current)
                         }
                     }
                 }
@@ -259,6 +259,7 @@ module.exports = function (RED: Red) {
                 }]);
             }
         }
+        return current;
     }
 
     RED.nodes.registerType("ical-sensor", sensorNode);
