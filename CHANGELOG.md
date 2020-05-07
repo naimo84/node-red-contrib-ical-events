@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.15.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.14.5...v0.15.0) (2020-05-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* default before was true, now it's false
+
+### Features
+
+* using cache in case of an error is configurable ([f336cfe](https://github.com/naimo84/node-red-contrib-ical-events/commit/f336cfe2ee2e455ec4a18a3feb226ba4a87b63e7))
+
 ### [0.14.5](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.14.4...v0.14.5) (2020-04-18)
 
 
