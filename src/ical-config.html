@@ -25,6 +25,9 @@
                 replacedates: {
                     value: false,
                 },
+                usecache: {
+                    value: false,
+                },
                 calendar: {},
                 pastWeeks: {
                     value: '0',
@@ -95,6 +98,13 @@
 
 <script type="text/x-red" data-template-name="ical-config">
     <div class="form-row">
+        <label for="node-config-input-name" style="width:160px !important">
+            <i class="fa fa-user"></i>
+            <span>Name:</span></label>
+        <input type="text" id="node-config-input-name" placeholder="" style="width:280px !important">
+    </div>
+    <hr/>
+    <div class="form-row">
         <label for="node-config-input-url" style="width:160px !important">
             <i class="fa fa-link"></i>
             <span>iCal / ics / caldav URL or filepath to ics:</span></label>
@@ -123,10 +133,10 @@
         <input type="password" id="node-config-input-password" placeholder="" style="width:280px !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name" style="width:160px !important">
-            <i class="fa fa-user"></i>
-            <span>Name:</span></label>
-        <input type="text" id="node-config-input-name" placeholder="" style="width:280px !important">
+        <label for="node-config-input-usecache" style="width:160px !important">
+            <i class="fa fa-asterisk"></i>
+            <span>Use cache in case of an error:</span></label>
+        <input type="checkbox" id="node-config-input-usecache" placeholder="" style="width:16px !important">
     </div>
     <div class="form-row">
         <label for="node-config-input-replacedates" style="width:160px !important">

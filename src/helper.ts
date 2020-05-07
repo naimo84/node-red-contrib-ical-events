@@ -42,7 +42,7 @@ export interface CalEvent {
 
 export function getICal(node: IcalNode, config, callback) {
     getEvents(node, config, (err, data) => {
-        if (node.cache) {
+        if (node.config.usecache && node.cache) {
             if (data) {
                 node.cache.set("events", data);
                 callback && callback(null, data);
@@ -64,6 +64,7 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         replacedates: msg?.replacedates || config?.replacedates,
         caldav: msg?.caldav || config?.caldav,
         username: msg?.username || config?.username,
+        usecache: msg?.usecache || config?.usecache || false,
         password: msg?.password || config?.password,
         calendar: msg?.calendar || config?.calendar,
         filter: msg?.filter || node.filter,

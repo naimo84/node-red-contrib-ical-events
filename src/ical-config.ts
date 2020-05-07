@@ -18,7 +18,8 @@ export interface Config extends NodeProperties {
     pastview?: number,
     pastviewUnits?: string,
     offsetUnits?:string,
-    offset?: number
+    offset?: number,
+    usecache?: boolean
 }
 
 module.exports = function (RED: any) {
@@ -34,6 +35,7 @@ module.exports = function (RED: any) {
         this.language = config.language;
         this.replacedates = config.replacedates;
         this.calendar = config.calendar;       
+        this.usecache = config.usecache;       
     }
 
     RED.nodes.registerType('ical-config', icalConfig);
