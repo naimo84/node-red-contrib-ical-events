@@ -75,7 +75,7 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
         offset: parseInt(msg?.offset || node?.offset || 0),
         offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
-        rejectUnauthorized:msg?.rejectUnauthorized || node?.rejectUnauthorized || false
+        rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false
     } as Config;
 }
 
@@ -212,13 +212,10 @@ function convertScrapegoat(e) {
     }
 }
 
-export function getTimezoneOffset(date) {
-    var offset = 0;
-    var zone = moment.tz.zone(moment.tz.guess());
-    if (zone && date) {
-        offset = zone.utcOffset(date.getTime());
-    }
-    return offset;
+export function getTimezoneOffset(date: Date) {
+    const isoDate = date.toISOString();
+    var offset = moment(isoDate).utcOffset();
+    return -offset;
 }
 
 export function addOffset(time, offset) {
@@ -243,7 +240,7 @@ export function countdown(date) {
     };
 }
 
-function getEvents(node: IcalNode, config:Config, callback) {
+function getEvents(node: IcalNode, config: Config, callback) {
     if (config.caldav && config.caldav === 'icloud') {
         node.debug('icloud');
         const now = moment();
@@ -270,7 +267,7 @@ function getEvents(node: IcalNode, config:Config, callback) {
             node.debug(`caldav - using fallback`)
             Fallback(config).then((data) => {
                 callback(null, data)
-            }).catch(err_fallback=>{
+            }).catch(err_fallback => {
                 node.error(`caldav - get calendar went wrong. Error Message: ${err_fallback}`)
             })
         });
