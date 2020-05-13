@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.15.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.0...v0.15.1) (2020-05-13)
+
+
+### Bug Fixes
+
+* issue [#48](https://github.com/naimo84/node-red-contrib-ical-events/issues/48), removed deprecated timezone from moment ([96a9048](https://github.com/naimo84/node-red-contrib-ical-events/commit/96a9048ae0f3d1c79cd525dfc8a4654a0063407f))
+
 ## [0.15.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.14.5...v0.15.0) (2020-05-07)
 
 
