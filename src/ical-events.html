@@ -89,6 +89,11 @@
 </script>
 
 <script type="text/x-red" data-template-name="ical-events">
+    <div class="form-row">        
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name">
+    </div>
+    <hr/>
     <div class="form-row">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
@@ -126,10 +131,7 @@
             <option value="days">Days</option>
           </select>
     </div>
-    <div class="form-row">        
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name">
-    </div>
+    
     <div class="form-row">
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
         <input type="text" id="node-input-cron">
@@ -156,7 +158,7 @@
         <br/> &emsp;      Match (only events that match the Filter expression are processed)
         <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
     </span>
-    <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+    <br/> • <b>"Filter"</b>: summary of the events is filtered against this regular expression
     <br/><br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') <b>DEPRECATED:</b> Cron Setting will be remove in future releases. 
 
     <p>The msg.payload contains the following values of the calendar entry</p>

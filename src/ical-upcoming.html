@@ -127,6 +127,11 @@
 
 <script type="text/x-red" data-template-name="ical-upcoming">
     <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name">
+    </div>
+    <hr/>
+    <div class="form-row">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
     </div>
@@ -173,10 +178,7 @@
           <option value="days">Days</option>
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name">
-    </div>
+   
     <div class="form-row">
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
         <input type="text" id="node-input-cron">
@@ -202,7 +204,7 @@
             <br/> &emsp;      Match (only events that match the Filter expression are processed)
             <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
         </span>
-        <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+        <br/> • <b>"Filter"</b>: summary of the events is filtered against this regular expression
         <br/> • <b>"Preview"</b>: Only Events within now and this <b>future</b> value are checked.
         <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.
         <br/> • <b>"Name"</b>: Displayname

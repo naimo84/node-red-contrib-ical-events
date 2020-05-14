@@ -75,6 +75,11 @@
 </script>
 
 <script type="text/x-red" data-template-name="ical-sensor">
+    <div class="form-row">        
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name"  style="width:250px !important">
+    </div>   
+    <hr/>
     <div class="form-row">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
@@ -101,10 +106,7 @@
         <label for="node-input-filter"><i class="icon-filter"></i> Filter</label>
         <input type="text" id="node-input-filter"  style="width:250px !important">
       </div>
-    <div class="form-row">        
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name"  style="width:250px !important">
-    </div>   
+   
 </script>
 
 <!-- Simple Help Text -->
@@ -120,7 +122,7 @@
         <br/> &emsp;      Match (only events that match the Filter expression are processed)
         <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
     </span>
-    <br/> • <b>"Filter"</b>: events are filterd against this regular expression
+    <br/> • <b>"Filter"</b>: summary of the events is filtered against this regular expression
     <br/> • <b>"Name"</b>: Displayname
     
     <p>If an event is running at time of checking, <b>msg.on</b> is true, otherwise false.</p>
