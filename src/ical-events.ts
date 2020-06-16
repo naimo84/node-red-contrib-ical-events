@@ -162,7 +162,7 @@ module.exports = function (RED: Red) {
 
                         if (ev.type == 'VEVENT') {
                             let ev2;
-                            if (ev.rrule !== undefined) {                               
+                            if (ev.rrule !== undefined) {
                                 ev2 = ce.clone(processRRule(ev, node, dateNow));
                             }
                             if (ev2) {
@@ -184,7 +184,10 @@ module.exports = function (RED: Red) {
                 if (newCronJobs) {
                     newCronJobs.forEach((job, key) => {
                         try {
+                            let nextDates = job.nextDates();
+                            node.status({ text: `next trigger: ${nextDates.toString()}`, fill: "green", shape: "dot" })
                             job.start();
+
                             node.debug("starting - " + key);
                             startedCronJobs[key] = job;
                         } catch (newCronErr) {
@@ -298,7 +301,7 @@ module.exports = function (RED: Red) {
             }
             else if (startedCronJobs[uid]) {
                 cronJob.stop();
-                job2 = new CronJob(eventStart, cronJobEnd.bind(null, event, node));
+                job2 = new CronJob(eventEnd, cronJobEnd.bind(null, event, node));
                 newCronJobs.set(uid, job2);
                 node.debug("started - " + uid);
             }
