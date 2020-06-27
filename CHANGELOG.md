@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.15.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.1...v0.15.2) (2020-06-27)
+
+
+### Features
+
+* issue [#48](https://github.com/naimo84/node-red-contrib-ical-events/issues/48), describe filter property ([01553e9](https://github.com/naimo84/node-red-contrib-ical-events/commit/01553e93146b982222cce4cf7850bbf54be1c0b2))
+
+
+### Bug Fixes
+
+* issue [#50](https://github.com/naimo84/node-red-contrib-ical-events/issues/50), EndCronjob had wrong date ([46c3d76](https://github.com/naimo84/node-red-contrib-ical-events/commit/46c3d76b5af31484fc4ca2081a747d9151ff5ab5))
+
 ### [0.15.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.0...v0.15.1) (2020-05-13)
 
 
