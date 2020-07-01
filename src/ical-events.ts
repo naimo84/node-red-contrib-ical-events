@@ -37,10 +37,33 @@ module.exports = function (RED: Red) {
                 }
             });
 
-            if (config.cron && config.cron !== "") {
-                parser.parseExpression(config.cron);
+            let cron = '';
+            if (config.timeout && config.timeout !== '' && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== '') {
+                switch (config.timeoutUnits) {
+                    case 'seconds':
+                        cron = `*/${config.timeout} * * * * *`;
+                        break;
+                    case 'minutes':
+                        cron = `0 */${config.timeout} * * * *`;
+                        break;
+                    case 'hours':
+                        cron = `0 0 */${config.timeout} * * *`;
+                        break;
+                    case 'days':
+                        cron = `0 0 0 */${config.timeout} * *`;
 
-                node.job = new CronJob(config.cron || '0 0 * * * *', cronCheckJob.bind(null, node));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (config.cron && config.cron !== '') {
+                parser.parseExpression(config.cron);
+                cron = config.cron;
+            }
+
+            if (cron !== '') {
+                node.job = new CronJob(cron, cronCheckJob.bind(null, node));
                 node.job.start();
 
                 node.on('close', () => {
