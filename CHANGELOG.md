@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.15.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.2...v0.15.3) (2020-07-01)
+
+
+### Bug Fixes
+
+* [#50](https://github.com/naimo84/node-red-contrib-ical-events/issues/50), event sensor not working correct ([56956f3](https://github.com/naimo84/node-red-contrib-ical-events/commit/56956f3e44a6cfe4a560e2b22964791bebcaf03e))
+
 ### [0.15.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.1...v0.15.2) (2020-06-27)
 
 
