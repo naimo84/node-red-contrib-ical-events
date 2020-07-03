@@ -19,6 +19,7 @@ module.exports = function (RED: Red) {
         node.cache = new NodeCache();
         node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
         node.on('input', (msg) => {
+            node.msg=msg;
             node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
             cronCheckJob(node);
         });
@@ -391,13 +392,13 @@ module.exports = function (RED: Red) {
             }
         }
 
-        node.send({
+        node.send(Object.assign(node.msg,{
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,
             total: node.datesArray.length,
             htmlTable: brSeparatedList(node.datesArray, config),
             payload: node.datesArray,
-        });
+        }));
     }
 
     let dictionary = {

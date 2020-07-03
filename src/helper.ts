@@ -19,6 +19,7 @@ export interface IcalNode extends Node {
     job: CronJob;
     config: Config;
     cache: NodeCache;
+    msg: any;
 }
 
 export interface CalEvent {
