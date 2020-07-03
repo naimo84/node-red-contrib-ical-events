@@ -61,6 +61,7 @@ export function getICal(node: IcalNode, config, callback) {
 export function getConfig(config: Config, node: any, msg: any): Config {
     return {
         url: msg?.url || config?.url,
+        name: msg?.calendarName || config?.name,
         language: msg?.language || config?.language,
         replacedates: msg?.replacedates || config?.replacedates,
         caldav: msg?.caldav || config?.caldav,

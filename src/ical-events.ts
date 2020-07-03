@@ -255,7 +255,7 @@ module.exports = function (RED: Red) {
                 eventStart: new Date(ev.start),
                 eventEnd: new Date(ev.end),
                 description: ev.description,
-                calendarName: ev.calendarName,
+                calendarName: ev.calendarName||node.config.name,
                 countdown: countdown(new Date(ev.start))
             }
 
@@ -301,7 +301,7 @@ module.exports = function (RED: Red) {
                 eventStart: new Date(ev.start),
                 eventEnd: new Date(ev.end),
                 description: ev.description,
-                calendarName: ev.calendarName,
+                calendarName: ev.calendarName||node.config.name,
                 countdown: countdown(new Date(ev.start))
             }
 
