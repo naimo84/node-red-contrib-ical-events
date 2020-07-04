@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.16.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.3...v0.16.0) (2020-07-04)
+
+
+### Features
+
+* [#54](https://github.com/naimo84/node-red-contrib-ical-events/issues/54), calendarName for output message ([142a5dc](https://github.com/naimo84/node-red-contrib-ical-events/commit/142a5dc5dd6b51aa57c54ec9567c49147cacb0b5))
+
+
+### Bug Fixes
+
+* issue [#53](https://github.com/naimo84/node-red-contrib-ical-events/issues/53), forward input to output msg ([d2e4b61](https://github.com/naimo84/node-red-contrib-ical-events/commit/d2e4b6106d653b2b31a83a38a41eb040b955478b))
+
 ### [0.15.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.2...v0.15.3) (2020-07-01)
 
 
