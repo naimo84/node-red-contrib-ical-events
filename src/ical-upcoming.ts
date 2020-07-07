@@ -17,9 +17,10 @@ module.exports = function (RED: Red) {
         RED.nodes.createNode(this, config);
         let node: IcalNode = this;
         node.cache = new NodeCache();
+        node.red = RED;
         node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
         node.on('input', (msg) => {
-            node.msg=msg;
+            node.msg = RED.util.cloneMessage(msg);
             node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
             cronCheckJob(node);
         });

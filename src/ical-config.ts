@@ -5,6 +5,7 @@ export interface Config extends NodeProperties {
     url?: string,
     language?: string,
     replacedates?: boolean,
+    checkall?: boolean,
     caldav?: string,
     username?: string,
     password?: string,

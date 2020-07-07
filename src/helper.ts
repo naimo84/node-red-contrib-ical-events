@@ -3,7 +3,7 @@ import { loadEventsForDay } from './icloud';
 import { CalDav, Fallback } from './caldav';
 import { Config } from './ical-config';
 import { CronJob } from 'cron';
-import { Node } from 'node-red';
+import { Red, Node } from 'node-red';
 import * as NodeCache from 'node-cache';
 
 const nodeIcal = require('node-ical');
@@ -19,7 +19,8 @@ export interface IcalNode extends Node {
     job: CronJob;
     config: Config;
     cache: NodeCache;
-    msg: any;
+    red: Red;
+    msg:any;
 }
 
 export interface CalEvent {
@@ -42,20 +43,34 @@ export interface CalEvent {
 }
 
 export function getICal(node: IcalNode, config, callback) {
-    getEvents(node, config, (err, data) => {
-        if (node.config.usecache && node.cache) {
-            if (data) {
-                node.cache.set("events", data);
-                callback && callback(null, data);
+    let configs = [];
+    if (node.config.checkall) {
+        node.red.nodes.eachNode(n => {
+            if (n.type === 'ical-config') {
+                configs.push(n);
             }
-            if (err) {
-                data = node.cache.get("events");
-                callback && callback(null, data);
+        })
+    } else {
+        configs.push(node.config);
+    }
+
+    for (let config of configs) {
+     
+        getEvents(node, config, (err, data) => {
+            if (node.config.usecache && node.cache) {
+                if (data) {
+                    node.cache.set("events", data);
+                    callback && callback(null, data);
+                }
+                if (err) {
+                    data = node.cache.get("events");
+                    callback && callback(null, data);
+                }
+            } else {
+                callback && callback(err, data);
             }
-        } else {
-            callback && callback(err, data);
-        }
-    });
+        });
+    }
 }
 
 export function getConfig(config: Config, node: any, msg: any): Config {
@@ -63,6 +78,7 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         url: msg?.url || config?.url,
         name: msg?.calendarName || config?.name,
         language: msg?.language || config?.language,
+        checkall: msg?.checkall || node?.checkall || false,
         replacedates: msg?.replacedates || config?.replacedates,
         caldav: msg?.caldav || config?.caldav,
         username: msg?.username || config?.username,
