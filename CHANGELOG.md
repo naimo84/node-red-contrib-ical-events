@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.17.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.16.0...v0.17.0) (2020-07-17)
+
+
+### Features
+
+* [#52](https://github.com/naimo84/node-red-contrib-ical-events/issues/52), fetch all configs concurrent ([3c95e2f](https://github.com/naimo84/node-red-contrib-ical-events/commit/3c95e2fa089183f1e722f2d867407d3e9175f426))
+
+
+### Bug Fixes
+
+* issues [#57](https://github.com/naimo84/node-red-contrib-ical-events/issues/57) [#56](https://github.com/naimo84/node-red-contrib-ical-events/issues/56), object.assign ([6a77b42](https://github.com/naimo84/node-red-contrib-ical-events/commit/6a77b42e499e06f4ef2b0b6e041c76320fe586b0))
+
 ## [0.16.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.15.3...v0.16.0) (2020-07-04)
 
 
