@@ -18,6 +18,7 @@ module.exports = function (RED: Red) {
         let node: IcalNode = this;
         node.cache = new NodeCache();
         node.red = RED;
+        node.msg = {};
         node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
         node.on('input', (msg) => {
             node.msg = RED.util.cloneMessage(msg);
