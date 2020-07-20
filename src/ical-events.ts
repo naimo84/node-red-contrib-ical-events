@@ -275,8 +275,7 @@ module.exports = function (RED: Red) {
 
 
             let job2 = new CronJob(eventStart, cronJobStart.bind(null, event, node));
-            let cronJob = startedCronJobs[uid];
-            console.log(cronJob)
+            let cronJob = startedCronJobs[uid];            
             if (!newCronJobs.has(uid) && !cronJob) {
                 newCronJobs.set(uid, job2);
                 node.debug("new - " + uid);
