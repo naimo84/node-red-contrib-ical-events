@@ -5,6 +5,7 @@ import Scrapegoat = require("scrapegoat");
 import moment = require('moment');
 import IcalExpander = require('ical-expander');
 import * as  ical from 'node-ical';
+import * as URL from "url";
 import { convertEvents, convertEvent } from './helper';
 
 export function CalDav(config: Config) {
@@ -47,7 +48,8 @@ export function CalDav(config: Config) {
     );
 
     let calDavUri = config.url;
-    let url = new URL(calDavUri);
+    let url = URL.parse(calDavUri);
+    let host = url.protocol + '//' + url.host+'/';
     return dav.createAccount({ server: calDavUri, xhr: xhr, loadCollections: true, loadObjects: true })
         .then((account) => {
             let promises = [];
@@ -86,7 +88,7 @@ export function CalDav(config: Config) {
                                 if (calendarEntry.calendar.objects) {
                                     for (let calendarObject of calendarEntry.calendar.objects) {
                                         if (calendarObject.data && calendarObject.data.href) {
-                                            let ics = url.origin + calendarObject.data.href;
+                                            let ics = host + calendarObject.data.href;
                                             let header = {};
                                             let username = config.username;
                                             let password = config.password;
