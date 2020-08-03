@@ -131,8 +131,11 @@ export async function Fallback(config:Config) {
             user: config.username,
             pass: config.password
         },
-        uri: config.url,
-        rejectUnauthorized: config.rejectUnauthorized
+        uri: encodeURI(config.url).replace('@','%40'),
+        rejectUnauthorized: config.rejectUnauthorized,
+        headers:{
+            "Content-Type":"application/xml"
+        }
     });
 
     let data = await scrapegoat.getAllEvents();
