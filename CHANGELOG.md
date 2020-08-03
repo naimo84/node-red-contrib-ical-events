@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.0...v0.17.2) (2020-08-03)
+
+
+### Bug Fixes
+
+* [#58](https://github.com/naimo84/node-red-contrib-ical-events/issues/58), undefined console.log ([7e14159](https://github.com/naimo84/node-red-contrib-ical-events/commit/7e14159589ceae9a9929f44cbc8bbb95653d516c))
+* issue [#59](https://github.com/naimo84/node-red-contrib-ical-events/issues/59), url not defined exception ([52f68e8](https://github.com/naimo84/node-red-contrib-ical-events/commit/52f68e8897fb0c20fea7e1ae0cd6f0c318087599))
+* issue [#61](https://github.com/naimo84/node-red-contrib-ical-events/issues/61), fix for mailcow ([682eed1](https://github.com/naimo84/node-red-contrib-ical-events/commit/682eed14c77eee278edc18e4ce7e4f57c0927920))
+
 ### [0.17.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.0...v0.17.1) (2020-07-20)
 
 
