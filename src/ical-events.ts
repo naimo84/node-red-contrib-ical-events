@@ -207,10 +207,13 @@ module.exports = function (RED: Red) {
                 }
 
                 if (newCronJobs) {
+                    let triggerDate = [];
+
                     newCronJobs.forEach((job, key) => {
                         try {
                             let nextDates = job.nextDates();
-                            node.status({ text: `next trigger: ${nextDates.toString()}`, fill: "green", shape: "dot" })
+                            triggerDate.push(nextDates.toString());
+
                             job.start();
 
                             node.debug("starting - " + key);
@@ -218,8 +221,14 @@ module.exports = function (RED: Red) {
                         } catch (newCronErr) {
                             node.error(newCronErr);
                         }
-
                     });
+
+                    triggerDate.sort((a, b) => {
+                        return new Date(a).valueOf() - new Date(b).valueOf();
+                    });
+
+                    if (triggerDate.length > 0)
+                        node.status({ text: `next trigger: ${triggerDate[0]}`, fill: "green", shape: "dot" })
                 }
 
                 newCronJobs.clear();
