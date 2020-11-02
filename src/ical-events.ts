@@ -166,7 +166,7 @@ module.exports = function (RED: Red) {
 
     function cronCheckJob(node: IcalNode) {
         if (node.job && node.job.running) {
-            node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toISOString()}` });
+            node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
         }
         else {
             node.status({});
@@ -212,14 +212,14 @@ module.exports = function (RED: Red) {
                     newCronJobs.forEach((job, key) => {
                         try {
                             let nextDates = job.nextDates();
-                            triggerDate.push(nextDates.toString());
-
-                            job.start();
-
-                            node.debug("starting - " + key);
-                            startedCronJobs[key] = job;
+                            if (nextDates.toDate() > dateNow) {
+                                triggerDate.push(nextDates.toString());
+                                job.start();
+                                node.debug("starting - " + key);
+                                startedCronJobs[key] = job;
+                            }
                         } catch (newCronErr) {
-                            node.error(newCronErr);
+                            node.warn(newCronErr);
                         }
                     });
 
