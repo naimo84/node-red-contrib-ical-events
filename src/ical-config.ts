@@ -11,6 +11,7 @@ export interface Config extends NodeProperties {
     password?: string,
     calendar?: string,  
     filter?: string,
+    filterProperty?: string,
     trigger?: string,
     endpreview?: number,
     endpreviewUnits?: string,

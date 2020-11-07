@@ -20,7 +20,7 @@ export interface IcalNode extends Node {
     config: Config;
     cache: NodeCache;
     red: Red;
-    msg:any;
+    msg: any;
 }
 
 export interface CalEvent {
@@ -55,7 +55,7 @@ export function getICal(node: IcalNode, config, callback) {
     }
 
     for (let config of configs) {
-     
+
         getEvents(node, config, (err, data) => {
             if (node.config.usecache && node.cache) {
                 if (data) {
@@ -86,6 +86,7 @@ export function getConfig(config: Config, node: any, msg: any): Config {
         password: msg?.password || config?.password,
         calendar: msg?.calendar || config?.calendar,
         filter: msg?.filter || node.filter,
+        filterProperty: msg?.filterProperty || node.filterProperty,
         trigger: msg?.trigger || node.trigger || 'always',
         preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
         previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
@@ -132,6 +133,51 @@ function uuidv4() {
     });
 }
 
+export function filterOutput(node, ev) {
+    let output = false;
+    let filterProperty = ev.summary;
+    if (node.config.filterProperty) {
+        filterProperty = ev[node.config.filterProperty.toLowerCase()]
+    }
+    let regex = new RegExp(node.config.filter || "");
+    if (node.config.trigger == 'match') {
+        if (node.config.filterProperty && node.config.filterProperty == "attendee") {
+            if (Array.isArray(filterProperty)){
+                for (const attendee of filterProperty) {
+                    if (regex.test(attendee.jCal[1].cn)) {
+                        output = true; break;
+                    }
+                }
+            } else {
+                if (regex.test(filterProperty.params.CN)) {
+                    output=true;
+                }
+            }
+        } else if (regex.test(filterProperty)) {
+            output = true;
+        }
+    } else if (node.config.trigger == 'nomatch') {
+        if (node.config.filterProperty && node.config.filterProperty == "attendee") {
+            if (Array.isArray(filterProperty)){
+                for (const attendee of filterProperty) {
+                    if (!regex.test(attendee.jCal[1].cn)) {
+                        output = true; break;
+                    }
+                }
+            } else {
+                if (!regex.test(filterProperty.params.CN)) {
+                    output=true;
+                }
+            }
+        } else if (!regex.test(filterProperty)) {
+            output = true;
+        }
+    } else {
+        output = true;
+    }
+    return output;
+}
+
 export function convertEvent(e) {
     if (e) {
         let startDate = e.startDate?.toJSDate() || e.start;
@@ -171,7 +217,7 @@ export function convertEvent(e) {
             end: endDate,
             summary: e.summary || '',
             description: e.description || '',
-            attendees: e.attendees,
+            attendee: e.attendees || e.attendee,
             duration: e.duration?.toICALString(),
             durationSeconds: e.duration?.toSeconds(),
             location: e.location || '',

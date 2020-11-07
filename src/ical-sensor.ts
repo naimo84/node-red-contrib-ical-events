@@ -3,7 +3,7 @@ import { Red, Node } from 'node-red';
 import * as crypto from "crypto-js";
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
-import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode } from './helper';
+import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode, filterOutput } from './helper';
 import * as NodeCache from 'node-cache';
 var RRule = require('rrule').RRule;
 var ce = require('cloneextend');
@@ -214,16 +214,8 @@ module.exports = function (RED: Red) {
 
         if (eventStart <= dateNow && eventEnd >= dateNow) {
 
-            let output = false;
-            if (node.config.trigger == 'match') {
-                let regex = new RegExp(node.config.filter)
-                if (regex.test(ev.summary)) output = true;
-            } else if (node.config.trigger == 'nomatch') {
-                let regex = new RegExp(node.config.filter)
-                if (!regex.test(ev.summary)) output = true;
-            } else {
-                output = true;
-            }
+        
+            let output = filterOutput(node, ev)
 
 
             let uid = crypto.MD5(ev.created + ev.summary).toString();

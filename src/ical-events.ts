@@ -5,7 +5,7 @@ import { CronJob } from 'cron';
 import { CronTime } from 'cron';
 import * as parser from 'cron-parser';
 import { Config } from './ical-config';
-import { getICal, CalEvent, countdown, getConfig, IcalNode, addOffset, getTimezoneOffset } from './helper';
+import { getICal, CalEvent, countdown, getConfig, IcalNode, addOffset, getTimezoneOffset, filterOutput } from './helper';
 import * as NodeCache from 'node-cache';
 var ce = require('cloneextend');
 var RRule = require('rrule').RRule;
@@ -250,16 +250,9 @@ module.exports = function (RED: Red) {
 
     function processData(ev: any, possibleUids, dateNow, node) {
 
-        let output = false;
-        if (node.config.trigger == 'match') {
-            let regex = new RegExp(node.config.filter);
-            if (regex.test(ev.summary)) output = true;
-        } else if (node.config.trigger == 'nomatch') {
-            let regex = new RegExp(node.config.filter);
-            if (!regex.test(ev.summary)) output = true;
-        } else {
-            output = true;
-        }
+        
+        
+        let output = filterOutput(node, ev)
         if (output) {
             const eventStart = new Date(ev.start);
             const eventEnd = new Date(ev.end);

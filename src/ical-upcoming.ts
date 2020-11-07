@@ -2,7 +2,7 @@ import { Red, Node } from 'node-red';
 import { CronJob } from 'cron';
 import { Config } from './ical-config';
 import * as moment from 'moment';
-import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode } from './helper';
+import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode, filterOutput } from './helper';
 import * as NodeCache from 'node-cache';
 
 var parser = require('cron-parser');
@@ -257,16 +257,7 @@ module.exports = function (RED: Red) {
             }
         }
 
-        let output = false;
-        if (node.config.trigger == 'match') {
-            let regex = new RegExp(node.config.filter);
-            if (regex.test(ev.summary)) output = true;
-        } else if (node.config.trigger == 'nomatch') {
-            let regex = new RegExp(node.config.filter);
-            if (!regex.test(ev.summary)) output = true;
-        } else {
-            output = true;
-        }
+        let output = filterOutput(node, ev)
         if (output) {
             node.debug('Event: ' + JSON.stringify(ev))
             if (fullday) {
@@ -281,7 +272,7 @@ module.exports = function (RED: Red) {
                         date: date.text.trim(),
                         summary: ev.summary,
                         topic: ev.summary,
-                        calendarName: ev.calendarName||node.config.name,
+                        calendarName: ev.calendarName || node.config.name,
                         event: reason,
                         eventStart: new Date(ev.start.getTime()),
                         eventEnd: new Date(ev.end.getTime()),
@@ -394,7 +385,7 @@ module.exports = function (RED: Red) {
             }
         }
 
-        node.send(Object.assign(node.msg,{
+        node.send(Object.assign(node.msg, {
             today: todayEventcounter,
             tomorrow: tomorrowEventcounter,
             total: node.datesArray.length,

@@ -22,6 +22,9 @@
                 trigger: {
                     value: ""
                 },
+                filterProperty: {
+                    value: '',
+                },
                 filter: {
                     value: "",
                     required: false,
@@ -100,6 +103,15 @@
           <option value="always">Always</option>
           <option value="match">Match</option>
           <option value="nomatch">No match</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-filterProperty"><i class="icon-filter"></i> Filter property</label>
+        <select id="node-input-filterProperty" style="width:250px !important">
+            <option value="summary">Summary</option>
+            <option value="description">Description</option>
+            <option value="attendee">Attendee</option>
+         
         </select>
     </div>
     <div class="form-row">
