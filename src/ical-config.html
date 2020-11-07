@@ -59,9 +59,12 @@
                     }).attr('selected', true);
                 }
 
+            
+
                 $('#node-config-input-caldav').change(function () {
                     var value = $('#node-config-input-caldav').val();
                     if (!value || value === 'false') {
+                        $('#icloud-tip').hide();
                         $('#node-config-input-username').parent().hide();
                         $('#node-config-input-password').parent().hide();
                         $('#node-config-input-calendar').parent().hide();
@@ -70,12 +73,14 @@
                         return;
                     }
                     if (value === 'true') {
+                        $('#icloud-tip').hide();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().show();
                         $('#node-config-input-pastWeeks').parent().show();
                         $('#node-config-input-futureWeeks').parent().show();
                     } else {
+                        $('#icloud-tip').show();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().hide();
@@ -131,6 +136,10 @@
             <i class="fa fa-key"></i>
             <span>Password:</span></label>
         <input type="password" id="node-config-input-password" placeholder="" style="width:280px !important">
+    </div>
+    <div class="form-tips" id="icloud-tip">     
+        <i class="fa fa-exclamation"></i>
+            <b>CAUTION:</b> for iCloud secure get app a specific password, described like here: <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a>
     </div>
     <div class="form-row">
         <label for="node-config-input-usecache" style="width:160px !important">
@@ -190,8 +199,8 @@
         <li><b>Language</b> if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
         <li><b>Cron</b> cron-expression for checking the url, if no cron is specified, it's only checked on input.
         <li><b>Username</b> HTTP Basic authentication user
-        <li><b>Password</b> HTTP Basic authentication user
-        <li><b>Type</b> Type can be ical, caldav or iCloud secure (for iCloud, see <a href="https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6">https://community.openhab.org/t/solved-apple-icloud-caldav-connection/32510/6</a> to find the url, username and password to access an iCloud calendar)
+        <li><b>Password</b> HTTP Basic authentication user, <b>CAUTION:</b> for iCloud secure get app a specific password, described like here: <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a>
+        <li><b>Type</b> Type can be ical, caldav or iCloud secure (for iCloud, see <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a> to find the url, username and password to access an iCloud calendar)
         <li><b>Calendar</b> <i>Type "caldav" only</i> Calendar name
         <li><b>Past Weeks</b> <i>Type "caldav" only</i> Number of weeks ago to load events
         <li><b>Future Weeks</b> <i>Type "caldav" only</i> Number of weeks in the future to load events
