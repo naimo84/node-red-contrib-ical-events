@@ -18,9 +18,9 @@ module.exports = function (RED: Red) {
             node.cache = new NodeCache();
             node.msg = {};
             node.on('input', (msg) => {
-                node.msg= RED.util.cloneMessage(msg);
+
                 node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
-                cronCheckJob(node);
+                cronCheckJob(node, msg);
             });
 
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
@@ -42,7 +42,7 @@ module.exports = function (RED: Red) {
                     default:
                         break;
                 }
-                node.job = new CronJob(cron, cronCheckJob.bind(null, node));
+                node.job = new CronJob(cron, cronCheckJob.bind(null, node, null));
                 node.job.start();
 
                 node.on('close', () => {
@@ -50,7 +50,7 @@ module.exports = function (RED: Red) {
                 });
             }
 
-            cronCheckJob(node);
+            cronCheckJob(node, null);
         }
         catch (err) {
             node.error('Error: ' + err.message);
@@ -143,14 +143,14 @@ module.exports = function (RED: Red) {
     }
 
 
-    function cronCheckJob(node: IcalNode) {
+    function cronCheckJob(node: IcalNode, message: any) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toISOString()}` });
         }
         else {
             node.status({});
         }
-
+        if (!message) message = {};
         var dateNow = new Date();
         getICal(node, node.config, (err, data) => {
             if (err || !data) {
@@ -178,10 +178,10 @@ module.exports = function (RED: Red) {
 
                         if (ev instanceof Array && ev.length >= 1) {
                             for (let e of ev) {
-                                current = processData(e, dateNow, node, last, current)
+                                current = processData(e, dateNow, node, last, current, message)
                             }
                         } else {
-                            current = processData(ev, dateNow, node, last, current)
+                            current = processData(ev, dateNow, node, last, current, message)
                         }
                     }
                 }
@@ -191,13 +191,14 @@ module.exports = function (RED: Red) {
                 const event = {
                     on: false
                 }
-
-                node.send(Object.assign(node.msg,{
+                let msg = RED.util.cloneMessage(message);
+                delete msg._msgid;
+                node.send(Object.assign(msg, {
                     payload: event
                 }));
 
                 if (last != current) {
-                    node.send([null, Object.assign(node.msg,{
+                    node.send([null, Object.assign(msg, {
                         payload: event
                     })]);
                 }
@@ -208,7 +209,7 @@ module.exports = function (RED: Red) {
         });
     }
 
-    function processData(ev, dateNow, node, last, current) {
+    function processData(ev, dateNow, node, last, current, message) {
         const eventStart = new Date(ev.start);
         const eventEnd = new Date(ev.end);
 
@@ -237,18 +238,19 @@ module.exports = function (RED: Red) {
                     eventEnd: new Date(ev.end),
                     description: ev.description,
                     on: true,
-                    calendarName: ev.calendarName||node.config.name,
+                    calendarName: ev.calendarName || node.config.name,
                     countdown: countdown(new Date(ev.start))
                 }
             }
-
-            node.send(Object.assign(node.msg,{
+            let msg = RED.util.cloneMessage(message);
+            delete msg._msgid;
+            node.send(Object.assign(msg, {
                 payload: event
             }));
             current = true;
 
             if (last != current) {
-                node.send([null, Object.assign(node.msg,{
+                node.send([null, Object.assign(msg, {
                     payload: event
                 })]);
             }
