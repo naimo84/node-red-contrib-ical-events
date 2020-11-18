@@ -82,6 +82,9 @@ module.exports = function (RED: Red) {
                 if (err) {
                     node.error('Error: ' + err);
                     node.status({ fill: 'red', shape: 'ring', text: err.message });
+                    node.send({
+                        error: err
+                    });
                     return;
                 }
 
@@ -317,8 +320,8 @@ module.exports = function (RED: Red) {
 
     function checkICal(callback, node) {
         getICal(node, node.config, (err, data) => {
-            if (err || !data) {
-                callback(err);
+            if (err) {
+                callback(null,err);
                 return;
             }
             node.debug('Ical read successfully ' + node.config.url);

@@ -153,7 +153,13 @@ module.exports = function (RED: Red) {
         if (!message) message = {};
         var dateNow = new Date();
         getICal(node, node.config, (err, data) => {
-            if (err || !data) {
+            if (err) {
+              
+                node.error('Error: ' + err);
+                    node.status({ fill: 'red', shape: 'ring', text: err.message });
+                    node.send({
+                        error: err
+                    });
                 return;
             }
 
@@ -215,7 +221,7 @@ module.exports = function (RED: Red) {
 
         if (eventStart <= dateNow && eventEnd >= dateNow) {
 
-        
+
             let output = filterOutput(node, ev)
 
 

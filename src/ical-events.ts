@@ -174,7 +174,13 @@ module.exports = function (RED: Red) {
         let dateNow = new Date();
         let possibleUids = [];
         getICal(node, node.config, (err, data) => {
-            if (err || !data) {
+
+            if (err) {
+                node.error('Error: ' + err);
+                node.status({ fill: 'red', shape: 'ring', text: err.message });
+                node.send({
+                    error: err
+                });
                 return;
             }
 
@@ -250,8 +256,8 @@ module.exports = function (RED: Red) {
 
     function processData(ev: any, possibleUids, dateNow, node) {
 
-        
-        
+
+
         let output = filterOutput(node, ev)
         if (output) {
             const eventStart = new Date(ev.start);
