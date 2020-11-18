@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.19.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.18.0...v0.19.0) (2020-11-18)
+
+
+### Features
+
+* issue [#65](https://github.com/naimo84/node-red-contrib-ical-events/issues/65), message in case of failed request ([78850ab](https://github.com/naimo84/node-red-contrib-ical-events/commit/78850ab736751cefd8bcdbd2ff81b572c942a8c7))
+
 ## [0.18.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.6...v0.18.0) (2020-11-18)
 
 ### [0.17.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.5...v0.17.6) (2020-11-18)
