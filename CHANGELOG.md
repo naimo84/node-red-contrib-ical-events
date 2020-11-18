@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.5...v0.17.6) (2020-11-18)
+
+
+### Features
+
+* [#63](https://github.com/naimo84/node-red-contrib-ical-events/issues/63), filter destination ([09e3cad](https://github.com/naimo84/node-red-contrib-ical-events/commit/09e3cad2b521cec368f3bbbdaa8429778b020a80))
+* [#70](https://github.com/naimo84/node-red-contrib-ical-events/issues/70), added app specific password hint ([d6ec8f5](https://github.com/naimo84/node-red-contrib-ical-events/commit/d6ec8f5e1c5800b0544bab8c52200de9aa3e60b1))
+
+
+### Bug Fixes
+
+*  issue [#69](https://github.com/naimo84/node-red-contrib-ical-events/issues/69), do not trigger Date in past ([39363a9](https://github.com/naimo84/node-red-contrib-ical-events/commit/39363a910c8b2de968d5f04b2b1820bca2c43470))
+* issue [#71](https://github.com/naimo84/node-red-contrib-ical-events/issues/71), Sensor duplicate msgid ([a73b998](https://github.com/naimo84/node-red-contrib-ical-events/commit/a73b998bdaab21a0b5a3936cd7c69c3362688125))
+
 ### [0.17.5](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.17.3...v0.17.5) (2020-08-28)
 
 
