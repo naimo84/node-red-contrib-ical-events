@@ -38,7 +38,8 @@ export interface CalEvent {
     on?: boolean,
     off?: boolean,
     countdown?: object,
-    calendarName?: string
+    calendarName?: string,
+    categories?: string[]
 
 }
 

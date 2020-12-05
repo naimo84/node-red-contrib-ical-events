@@ -270,6 +270,7 @@ module.exports = function (RED: Red) {
                 possibleUids.push(uid);
                 const event: CalEvent = {
                     summary: ev.summary,
+                    categories: ev.categories,
                     topic: ev.summary,
                     id: uid,
                     location: ev.location,
@@ -315,6 +316,7 @@ module.exports = function (RED: Red) {
                 possibleUids.push(uid);
                 const event: CalEvent = {
                     summary: ev.summary,
+                    categories: ev.categories,
                     topic: ev.summary,
                     id: uid,
                     location: ev.location,

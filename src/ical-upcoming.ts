@@ -273,6 +273,7 @@ module.exports = function (RED: Red) {
 
                     insertSorted(node.datesArray, {
                         date: date.text.trim(),
+                        categories: ev.categories,
                         summary: ev.summary,
                         topic: ev.summary,
                         calendarName: ev.calendarName || node.config.name,
@@ -299,6 +300,7 @@ module.exports = function (RED: Red) {
                     date = formatDate(ev.start, ev.end, true, false, config);
                     insertSorted(node.datesArray, {
                         date: date.text.trim(),
+                        categories: ev.categories,
                         event: reason,
                         summary: ev.summary,
                         topic: ev.summary,

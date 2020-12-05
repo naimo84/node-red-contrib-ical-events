@@ -238,6 +238,7 @@ module.exports = function (RED: Red) {
                 event = {
                     summary: ev.summary,
                     topic: ev.summary,
+                    categories: ev.categories,
                     id: uid,
                     location: ev.location,
                     eventStart: new Date(ev.start),
