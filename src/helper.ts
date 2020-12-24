@@ -338,6 +338,12 @@ function getEvents(node: IcalNode, config: Config, callback) {
         });
     } else {
         node.debug('ical');
+
+        if (config?.url?.match(/^webcal:\/\//)){
+            config.url=config.url.replace("webcal","https")
+        }
+
+
         if (config?.url?.match(/^https?:\/\//)) {
             let header = {};
             let username = config.username;
