@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.21.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.20.0...v0.21.0) (2020-12-26)
+
+
+### Features
+
+* [#75](https://github.com/naimo84/node-red-contrib-ical-events/issues/75),[#74](https://github.com/naimo84/node-red-contrib-ical-events/issues/74): webcal support ([4d9b062](https://github.com/naimo84/node-red-contrib-ical-events/commit/4d9b062f900088badbbbbd73021b3b7e4adc948c))
+
 ## [0.20.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.19.0...v0.20.0) (2020-12-05)
 
 
