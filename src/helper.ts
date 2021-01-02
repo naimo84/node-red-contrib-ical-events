@@ -65,13 +65,15 @@ export async function getICal(node: IcalNode, config) {
         }
         catch (err) {
             if (node.config.usecache && node.cache) {
-                let data = node.cache.get("events");
-                datas.push(data)
-                console.log(err);
+                datas = node.cache.get("events");
             }
+            node.error(err);
         }
     }
 
+    if (node.config.usecache && node.cache) {
+        node.cache.set("events",datas);
+    }
     return datas;
 }
 
@@ -343,6 +345,10 @@ async function getEvents(node: IcalNode, config: Config) {
         }
     } else {
         node.debug('ical');
+        if (config?.url?.match(/^webcal:\/\//)){
+            config.url=config.url.replace("webcal","https")
+        }
+
         if (config?.url?.match(/^https?:\/\//)) {
             let header = {};
             let username = config.username;
