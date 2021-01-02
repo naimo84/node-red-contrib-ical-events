@@ -152,16 +152,8 @@ module.exports = function (RED: Red) {
         }
         if (!message) message = {};
         var dateNow = new Date();
-        getICal(node, node.config, (err, data) => {
-            if (err) {
-              
-                node.error('Error: ' + err);
-                    node.status({ fill: 'red', shape: 'ring', text: err.message });
-                    node.send({
-                        error: err
-                    });
-                return;
-            }
+        getICal(node, node.config).then(data => {
+            
 
             node.debug('Ical read successfully ' + node.config.url);
             if (!data) return;
@@ -212,7 +204,16 @@ module.exports = function (RED: Red) {
 
             node.context().set('on', current);
 
-        });
+        }).catch(err => {
+            if (err) {
+                node.error('Error: ' + err);
+                node.status({ fill: 'red', shape: 'ring', text: err.message });
+                node.send({
+                    error: err
+                });
+                return;
+            }
+        });;
     }
 
     function processData(ev, dateNow, node, last, current, message) {

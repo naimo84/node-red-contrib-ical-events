@@ -43,7 +43,7 @@ export interface CalEvent {
 
 }
 
-export function getICal(node: IcalNode, config, callback) {
+export async function getICal(node: IcalNode, config) {
     let configs = [];
     if (node.config.checkall) {
         node.red.nodes.eachNode(n => {
@@ -55,23 +55,24 @@ export function getICal(node: IcalNode, config, callback) {
         configs.push(node.config);
     }
 
+    let datas = [];
     for (let config of configs) {
-
-        getEvents(node, config, (err, data) => {
-            if (node.config.usecache && node.cache) {
-                if (data) {
-                    node.cache.set("events", data);
-                    callback && callback(null, data);
-                }
-                if (err) {
-                    data = node.cache.get("events");
-                    callback && callback(null, data);
-                }
-            } else {
-                callback && callback(err, data);
+        try {
+            let data = await getEvents(node, config)
+            for (let d in data) {
+                datas.push(data[d])
             }
-        });
+        }
+        catch (err) {
+            if (node.config.usecache && node.cache) {
+                let data = node.cache.get("events");
+                datas.push(data)
+                console.log(err);
+            }
+        }
     }
+
+    return datas;
 }
 
 export function getConfig(config: Config, node: any, msg: any): Config {
@@ -143,7 +144,7 @@ export function filterOutput(node, ev) {
     let regex = new RegExp(node.config.filter || "");
     if (node.config.trigger == 'match') {
         if (node.config.filterProperty && node.config.filterProperty == "attendee") {
-            if (Array.isArray(filterProperty)){
+            if (Array.isArray(filterProperty)) {
                 for (const attendee of filterProperty) {
                     if (regex.test(attendee.jCal[1].cn)) {
                         output = true; break;
@@ -151,7 +152,7 @@ export function filterOutput(node, ev) {
                 }
             } else {
                 if (regex.test(filterProperty.params.CN)) {
-                    output=true;
+                    output = true;
                 }
             }
         } else if (regex.test(filterProperty)) {
@@ -159,7 +160,7 @@ export function filterOutput(node, ev) {
         }
     } else if (node.config.trigger == 'nomatch') {
         if (node.config.filterProperty && node.config.filterProperty == "attendee") {
-            if (Array.isArray(filterProperty)){
+            if (Array.isArray(filterProperty)) {
                 for (const attendee of filterProperty) {
                     if (!regex.test(attendee.jCal[1].cn)) {
                         output = true; break;
@@ -167,7 +168,7 @@ export function filterOutput(node, ev) {
                 }
             } else {
                 if (!regex.test(filterProperty.params.CN)) {
-                    output=true;
+                    output = true;
                 }
             }
         } else if (!regex.test(filterProperty)) {
@@ -305,18 +306,19 @@ export function countdown(date) {
     };
 }
 
-function getEvents(node: IcalNode, config: Config, callback) {
+async function getEvents(node: IcalNode, config: Config) {
     if (config.caldav && config.caldav === 'icloud') {
         node.debug('icloud');
         const now = moment();
         const when = now.toDate();
 
-        loadEventsForDay(moment(when), config, (list, start, end) => {
-            callback && callback(null, list);
-        });
+        let list = await loadEventsForDay(moment(when), config);
+        return list;
+
     } else if (config.caldav && JSON.parse(config.caldav) === true) {
         node.debug('caldav');
-        CalDav(config).then((data) => {
+        try {
+            let data = await CalDav(config);
             let retEntries = {};
             if (data) {
                 for (let events of data) {
@@ -326,24 +328,21 @@ function getEvents(node: IcalNode, config: Config, callback) {
                     }
                 }
             }
-            callback(null, retEntries);
-        }).catch((err) => {
+            return retEntries;
+        }
+        catch (err) {
             node.debug(`caldav - get calendar went wrong. Error Message: ${err}`)
             node.debug(`caldav - using fallback`)
-            Fallback(config).then((data) => {
-                callback(null, data)
-            }).catch(err_fallback => {
+            try {
+                let data = await Fallback(config)
+                return data;
+            }
+            catch (err_fallback) {
                 node.error(`caldav - get calendar went wrong. Error Message: ${err_fallback}`)
-            })
-        });
+            }
+        }
     } else {
         node.debug('ical');
-
-        if (config?.url?.match(/^webcal:\/\//)){
-            config.url=config.url.replace("webcal","https")
-        }
-
-
         if (config?.url?.match(/^https?:\/\//)) {
             let header = {};
             let username = config.username;
@@ -358,28 +357,20 @@ function getEvents(node: IcalNode, config: Config, callback) {
                 };
             }
 
-            nodeIcal.fromURL(config.url, header, (err, data) => {
-                if (err) {
-                    callback && callback(err, null);
-                    return;
-                }
-                callback && callback(null, data);
-            });
+            let data = await nodeIcal.async.fromURL(config.url, header);
+            return data;
+
         } else {
             if (!config.url) {
                 node.error("URL/File is not defined");
                 node.status({ fill: 'red', shape: 'ring', text: "URL/File is not defined" });
-                callback && callback(null, {});
+
             }
-            nodeIcal.parseFile(config.url, (err, data) => {
-                if (err) {
-                    callback && callback(err, null);
-                    return;
-                }
-                callback && callback(null, data);
-            });
+            let data = await nodeIcal.async.parseFile(config.url)
+            return data;
+
+
         }
     }
 }
-
 

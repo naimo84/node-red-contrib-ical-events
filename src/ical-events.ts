@@ -173,16 +173,9 @@ module.exports = function (RED: Red) {
         }
         let dateNow = new Date();
         let possibleUids = [];
-        getICal(node, node.config, (err, data) => {
+        getICal(node, node.config).then((data) => {
 
-            if (err) {
-                node.error('Error: ' + err);
-                node.status({ fill: 'red', shape: 'ring', text: err.message });
-                node.send({
-                    error: err
-                });
-                return;
-            }
+
 
             node.debug('Ical read successfully ' + node.config.url);
             if (data) {
@@ -250,6 +243,15 @@ module.exports = function (RED: Red) {
                         delete startedCronJobs[key];
                     }
                 }
+            }
+        }).catch(err => {
+            if (err) {
+                node.error('Error: ' + err);
+                node.status({ fill: 'red', shape: 'ring', text: err.message });
+                node.send({
+                    error: err
+                });
+                return;
             }
         });
     }

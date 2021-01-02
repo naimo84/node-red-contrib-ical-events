@@ -321,11 +321,8 @@ module.exports = function (RED: Red) {
     }
 
     function checkICal(callback, node) {
-        getICal(node, node.config, (err, data) => {
-            if (err) {
-                callback(null,err);
-                return;
-            }
+        getICal(node, node.config).then(data => {
+           
             node.debug('Ical read successfully ' + node.config.url);
 
             try {
@@ -366,6 +363,15 @@ module.exports = function (RED: Red) {
             } catch (e) {
                 node.debug(JSON.stringify(e));
                 callback('no Data' + e);
+            }
+        }).catch(err => {
+            if (err) {
+                node.error('Error: ' + err);
+                node.status({ fill: 'red', shape: 'ring', text: err.message });
+                node.send({
+                    error: err
+                });
+                return;
             }
         });
     }
