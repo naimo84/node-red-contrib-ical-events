@@ -1,8 +1,11 @@
 # Node RED ical events
 
-This Node RED module gets the events from an ical-URL or from a caldav-server.
+This Node RED module gets the events from an ical-URL, a caldav-server or from iCloud.
 
-> Node-RED is a tool for wiring together hardware devices, APIs and online services in new and interesting ways.
+**Please Note** that:
+
+* v1+ requires Node.js v10+ and recommends Node-RED v1+
+* v1+ includes breaking changes from v0.22, please see the [CHANGELOG](CHANGELOG.md) for details.
 
 ## :question: Get Help
 
