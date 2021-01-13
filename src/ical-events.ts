@@ -96,6 +96,23 @@ module.exports = function (RED: any) {
 
                         const eventStart = new Date(ev.eventStart);
                         const eventEnd = new Date(ev.eventEnd);
+
+                        if (node.config.offset) {
+                            if (node.config?.offsetUnits === 'seconds') {
+                                eventStart.setSeconds(eventStart.getSeconds() + node.config.offset);
+                                eventEnd.setSeconds(eventEnd.getSeconds() + node.config.offset);
+                            } else if (node.config?.offsetUnits === 'hours') {
+                                eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
+                                eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
+                            } else if (node.config?.offsetUnits === 'days') {
+                                eventStart.setDate(eventStart.getDate() + node.config.offset);
+                                eventEnd.setDate(eventEnd.getDate() + node.config.offset);
+                            } else {
+                                eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
+                                eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
+                            }
+                        }
+
                         if (eventStart > dateNow) {
 
                             let uid = crypto.MD5(ev.uid + ev.summary + "start").toString();
@@ -108,19 +125,6 @@ module.exports = function (RED: any) {
                                 id: uid,
                                 calendarName: ev.calendarName || node.config.name
                             });
-
-                            if (node.config.offset) {
-                                if (node.config?.offsetUnits === 'seconds') {
-                                    eventStart.setSeconds(eventStart.getSeconds() + node.config.offset);
-                                } else if (node.config?.offsetUnits === 'hours') {
-                                    eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
-                                } else if (node.config?.offsetUnits === 'days') {
-                                    eventStart.setDate(eventStart.getDate() + node.config.offset);
-                                } else {
-                                    eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
-                                }
-                            }
-
 
                             let job2 = new CronJob(moment(eventStart), cronJobStart.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
@@ -148,18 +152,6 @@ module.exports = function (RED: any) {
                                 calendarName: ev.calendarName || node.config.name
                             });
 
-                            if (node.config.offset) {
-                                if (node.config?.offsetUnits === 'seconds') {
-                                    eventEnd.setSeconds(eventEnd.getSeconds() + node.config.offset);
-                                } else if (node.config?.offsetUnits === 'hours') {
-                                    eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
-                                } else if (node.config?.offsetUnits === 'days') {
-                                    eventEnd.setDate(eventEnd.getDate() + node.config.offset);
-                                } else {
-                                    eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
-                                }
-                            }
-
                             let job2 = new CronJob(moment(eventEnd), cronJobEnd.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
                             if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
@@ -173,8 +165,6 @@ module.exports = function (RED: any) {
                                 node.debug("started - " + uid);
                             }
                         }
-
-
                     }
                 }
 
