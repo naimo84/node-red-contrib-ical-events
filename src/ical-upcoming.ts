@@ -127,10 +127,9 @@ module.exports = function (RED:any) {
         for (var i = 0; i < datesArray.length; i++) {
             if (text)
                 text += '<br/>\n';
-            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();
-            text += '</span>';
+            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();            
         }
-
+        text += '</span>';
         return text;
     }
 

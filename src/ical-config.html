@@ -76,23 +76,17 @@
                         $('#node-config-input-username').parent().hide();
                         $('#node-config-input-password').parent().hide();
                         $('#node-config-input-calendar').parent().hide();
-                        $('#node-config-input-pastWeeks').parent().hide();
-                        $('#node-config-input-futureWeeks').parent().hide();
                         return;
                     } else if (value === 'caldav') {
                         $('#icloud-tip').hide();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().show();
-                        $('#node-config-input-pastWeeks').parent().show();
-                        $('#node-config-input-futureWeeks').parent().show();
                     } else if (value === 'icloud') {
                         $('#icloud-tip').show();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().hide();
-                        $('#node-config-input-pastWeeks').parent().hide();
-                        $('#node-config-input-futureWeeks').parent().hide();
                     }
                 });
 
@@ -187,20 +181,6 @@
         </label>
         <input type="text" id="node-config-input-calendar" placeholder="" style="width:280px !important">
     </div>
-    <!-- <div class="form-row">
-        <label for="node-config-input-pastWeeks" style="width:160px !important">
-            <i class="fa fa-calendar"></i>
-            <span>Past Weeks:</span>
-        </label>
-        <input type="text" id="node-config-input-pastWeeks" placeholder="" style="width:280px !important">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-futureWeeks" style="width:160px !important">
-            <i class="fa fa-calendar"></i>
-            <span>Future Weeks:</span>
-        </label>
-        <input type="text" id="node-config-input-futureWeeks" placeholder="" style="width:280px !important">
-    </div> -->
 </script>
 
 <script type="text/x-red" data-help-name="ical-config">

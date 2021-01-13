@@ -61,9 +61,37 @@ npm install /path/to/node-red-contrib-ical-events
 
 ### node explanation
 
-#### events
+#### trigger
 
 The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.
+
+##### Configuration
+
+-   "Check every": how often the calendar is checked for new events
+-   "Trigger": possible values:
+
+    -   Always (Filter expression is ignored)
+    -   Match (only events that match the Filter expression are processed)
+    -   No Match (only events that don't match the Filter expression are processed)
+
+-   "Filter property": possible values:
+        -     summary
+        -     description
+        -     attendee
+        -     category
+        -     start date
+        -     end date   
+
+    if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:  
+    filter format for dates is **YYYY-MM-DD_hh:mm:sss**     
+    
+    "Filter operator": possible values:
+    -   between
+    -   before
+    -   after
+-   "Filter": filter property of the events from above is filtered against this regular expression
+-   "Offset": offset, when the start/end cronjob will be triggered (seconds, minutes, hours)
+-   "Name": Displayname
 
 ---
 
@@ -80,28 +108,47 @@ The calendar is checked for running events on input or configurable timeout.
     -   Match (only events that match the Filter expression are processed)
     -   No Match (only events that don't match the Filter expression are processed)
 
--   "Filter": events are filterd against this regular expression
+-   "Filter property": possible values:
+        -     summary
+        -     description
+        -     attendee
+        -     category
+        -     start date
+        -     end date   
+
+    if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:  
+    filter format for dates is **YYYY-MM-DD_hh:mm:sss**     
+    
+    "Filter operator": possible values:
+    -   between
+    -   before
+    -   after
+-   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Name": Displayname
 
 If an event is running at time of checking, **msg.on** is true, otherwise false.
 
 The message additionaly contains the following values of the calendar entry
 
--   summary
--   id
--   location
--   eventStart
--   eventEnd
--   description
+- summary
+- id
+- location
+- eventStart
+- eventEnd
+- description
+- allDay
+- attendee
+- isRecurring
+- calendarName
+- organizer
+- categories
+- duration
 
 ---
 
 #### upcoming
 
 As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
-
----
-
 ##### Configuration
 
 -   "Check every": how often the calendar is checked for new events
@@ -111,12 +158,29 @@ As of the events node, its checked on input or cronjob. The msg.payload contains
     -   Match (only events that match the Filter expression are processed)
     -   No Match (only events that don't match the Filter expression are processed)
 
--   "Filter": events are filterd against this regular expression
+-   "Filter property": possible values:
+        -     summary
+        -     description
+        -     attendee
+        -     category
+        -     start date
+        -     end date   
+        
+    if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:  
+    filter format for dates is **YYYY-MM-DD_hh:mm:sss**     
+    
+    "Filter operator": possible values:
+    -   between
+    -   before
+    -   after
+-   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Name": Displayname
 -   "Preview": Only Events within now and this **future** value are checked.
 -   "Past view": Only Events within now and this **past** value are checked.
 
 ### INPUT
+
+The configuration of the nodes baove can be overwritten with the following input message properties:
 
 msg.url
 msg.language
@@ -146,15 +210,21 @@ Additional msg properties are:
 -   msg.htmlTable - a html formated table of upcoming events
 -   msg.payload - arraylist of upcoming events
     -   date
-    -   summary
     -   event
-    -   eventStart
-    -   eventEnd
-    -   description
-    -   id
-    -   allDay
     -   rule
-    -   location
+    - summary
+    - id
+    - location
+    - eventStart
+    - eventEnd
+    - description
+    - allDay
+    - attendee
+    - isRecurring
+    - calendarName
+    - organizer
+    - categories
+    - duration
 
 ---
 
@@ -167,14 +237,11 @@ Additional msg properties are:
 -   **_Password_** HTTP Basic authentication user
 -   **_Type_** Type can be ical or caldav
 
-instead of cron-expression, an input node can be used.
 
 ![example.png](https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png)
 
 ## :scroll: Credits
 
--   Thanks to https://github.com/kelektiv/node-cron
--   Thanks to https://github.com/jens-maus/node-ical
 -   The whole module is inspired by ioBroker's adapter https://github.com/iobroker-community-adapters/ioBroker.ical. Many many thanks folks ;)
 
 ## :scroll: The MIT License

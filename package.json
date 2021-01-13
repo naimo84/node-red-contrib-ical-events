@@ -1,10 +1,13 @@
 {
   "name": "node-red-contrib-ical-events",
   "version": "0.22.0",
-  "description": "NodeRed iCal Adapter",
+  "description": "NodeRed calender event adapter",
   "author": {
     "name": "naimo84",
     "email": "git@neumann-benjamin.de"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   },
   "contributors": [
     {
@@ -24,6 +27,7 @@
     "ical",
     "calendar",
     "caldav",
+    "icloud",
     "ics",
     "Smart Home",
     "home automation"
@@ -48,24 +52,6 @@
     "watch": "tsc -w -p ./tsconfig.json",
     "dev": "gulp develop",
     "build": "gulp"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "test/*",
-      "docs/*"
-    ],
-    "delay": "2500ms",
-    "verbose": true,
-    "ext": "js,html"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint --edit"
-    }
-  },
-  "funding": {
-    "type": "paypal",
-    "url": "https://paypal.me/NeumannBenjamin"
   },
   "dependencies": {
     "cloneextend": "0.0.3",
@@ -181,5 +167,23 @@
         ]
       ]
     }
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "docs/*"
+    ],
+    "delay": "2500ms",
+    "verbose": true,
+    "ext": "js,html"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint --edit"
+    }
+  },
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/NeumannBenjamin"
   }
 }

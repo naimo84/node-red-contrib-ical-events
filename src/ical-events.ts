@@ -200,7 +200,7 @@ module.exports = function (RED: any) {
                     });
 
                     if (triggerDate.length > 0)
-                        node.status({ text: `next trigger: ${moment(triggerDate[0]).toLocaleString()}`, fill: "green", shape: "dot" })
+                        node.status({ text: `next trigger: ${triggerDate[0].toLocaleString()}`, fill: "green", shape: "dot" })
                 }
 
                 newCronJobs.clear();

@@ -388,10 +388,6 @@
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
         <input type="text" id="node-input-cron">
     </div>
-    <div class="form-tips">     
-        <i class="fas fa-exclamation"></i>
-            <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
-    </div>
     
 </script>
 
@@ -405,14 +401,28 @@
      
     <br/> • "Name": Displayname
     <br/> • "Offset": positive or negative value, when output is triggered before/after the event-startdate
-    <span><br/> • <b>"Trigger"</b>: possible values:
+    <span><br/> • <b>"Trigger"</b>: possible values: 
         <br/>&emsp;     Always (Filter expression is ignored)
         <br/> &emsp;      Match (only events that match the Filter expression are processed)
         <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
     </span>
-    <br/> • <b>"Filter"</b>: summary of the events is filtered against this regular expression
-    <br/><br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') <b>DEPRECATED:</b> Cron Setting will be remove in future releases. 
-
+    <span><br/> • <b>"Filter property"</b>: possible values:
+        <br/>&emsp;     summary
+        <br/>&emsp;     description
+        <br/>&emsp;     attendee
+        <br/>&emsp;     category
+        <br/>&emsp;     start date
+        <br/>&emsp;     end date   
+    </span>
+    <br/>&emsp; if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:
+    <br/>&emsp;   filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
+    <br/>&emsp; <b>"Filter operator"</b>: possible values:
+    <br/>&emsp;     between
+    <br/>&emsp;     bofore
+    <br/>&emsp;     after
+    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
+    <br/><br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') 
+    <h3>Output</h3>
     <p>The msg.payload contains the following values of the calendar entry</p>
     <br/> • summary
     <br/> • id
@@ -420,4 +430,11 @@
     <br/> • eventStart
     <br/> • eventEnd
     <br/> • description
+    <br/> • allDay
+    <br/> • attendee
+    <br/> • isRecurring
+    <br/> • calendarName
+    <br/> • organizer
+    <br/> • categories
+    <br/> • duration
 </script>
