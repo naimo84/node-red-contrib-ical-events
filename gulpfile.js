@@ -6,37 +6,46 @@ var nodemon = require('gulp-nodemon');
 var watch = require('gulp-watch');
 
 var paths = {
-    pages: ['src/*.html'],
-    assets: ['src/icons/*.png'],
+    pages: ['src/*.html'],   
     src: 'src',
     dist: 'dist'
 };
 
 function copyHtml() {
-    return gulp.src(paths.pages, { base: paths.src })    
+    return gulp.src(paths.pages, { base: paths.src })
         .pipe(gulp.dest(paths.dist));
 }
 
 gulp.task("copy-html", copyHtml);
 
-gulp.task("copy-assets", function () {
-    return gulp.src(paths.assets)
-        .pipe(gulp.dest(paths.dist + "/icons"));
-});
-
 gulp.task('develop', function (done) {
     var stream = nodemon({
-        legacyWatch:true,
+        legacyWatch: true,
+        exec: 'node --inspect=9229 --preserve-symlinks      --experimental-modules       --trace-warnings     /usr/lib/node_modules/node-red/red.js',
         ext: '*.js',
         watch: [paths.dist],
         ignore: ["*.map"],
-        done: done,        
-        verbose: true
+        done: done,
+        verbose: true,
+        delay: 6000,
+        env: { "NO_UPDATE_NOTIFIER": "1" }
     });
 
     copyHtml();
 
     watch(paths.pages).on('change', () => {
+        copyHtml();
+        stream.emit('restart', 10)
+    });
+
+    watch(paths.src).on('change', () => {
+       tsProject.src()
+            .pipe(sourcemaps.init())
+            .pipe(tsProject())
+            .js
+            .pipe(sourcemaps.write('.'))
+            .pipe(gulp.dest(paths.dist));
+        
         stream.emit('restart', 10)
     });
 
@@ -51,8 +60,7 @@ gulp.task('develop', function (done) {
 })
 
 gulp.task("default", gulp.series(
-    gulp.parallel('copy-html'),
-    gulp.parallel('copy-assets'),
+    gulp.parallel('copy-html'),   
     () => {
         return tsProject.src()
             .pipe(sourcemaps.init())

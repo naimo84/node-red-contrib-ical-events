@@ -7,13 +7,10 @@
                 url: {
                     value: '',
                 },
-                username: {
-                    value: '',
-                },
-                password: {
-                    value: '',
-                },
                 caldav: {
+                    value: '',
+                },
+                caltype: {
                     value: '',
                 },
                 name: {
@@ -44,6 +41,10 @@
                     }
                 },
             },
+            credentials: {
+                username: { type: "text" },
+                password: { type: "password" }
+            },
             label: function () {
                 if (this.name) {
                     return this.name;
@@ -53,17 +54,24 @@
             oneditprepare: function () {
                 var node = this;
 
-                if (this.caldav == undefined) {
-                    $('#node-config-input-caldav option').filter(function () {
-                        return $(this).val() == 'false';
+                if (!node.caltype) {
+                    let caltype='ical';
+                    if (node.caldav === "false")
+                        caltype = "ical"
+                    else if (node.caldav === "true")
+                        caltype = "caldav"
+                    else if (node.caldav === "icloud")
+                        caltype = "icloud"
+                    $('#node-config-input-caltype option').filter(function () {
+                        return $(this).val() == caltype;
                     }).attr('selected', true);
                 }
 
-            
 
-                $('#node-config-input-caldav').change(function () {
-                    var value = $('#node-config-input-caldav').val();
-                    if (!value || value === 'false') {
+
+                $('#node-config-input-caltype').change(function () {
+                    var value = $('#node-config-input-caltype').val();
+                    if (!value || value === 'ical') {
                         $('#icloud-tip').hide();
                         $('#node-config-input-username').parent().hide();
                         $('#node-config-input-password').parent().hide();
@@ -71,15 +79,14 @@
                         $('#node-config-input-pastWeeks').parent().hide();
                         $('#node-config-input-futureWeeks').parent().hide();
                         return;
-                    }
-                    if (value === 'true') {
+                    } else if (value === 'caldav') {
                         $('#icloud-tip').hide();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().show();
                         $('#node-config-input-pastWeeks').parent().show();
                         $('#node-config-input-futureWeeks').parent().show();
-                    } else {
+                    } else if (value === 'icloud') {
                         $('#icloud-tip').show();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
@@ -116,12 +123,13 @@
         <input type="text" id="node-config-input-url" placeholder="" style="width:100% !important">
     </div>
     <div class="form-row">
-        <label for="node-config-input-caldav" style="width:160px !important">
+        <label for="node-config-input-caltype" style="width:160px !important">
             <i class="fa fa-calendar"></i>
             <span>Type:</span></label>
-            <select id="node-config-input-caldav">
-                <option value="false">iCal</option>
-                <option value="true">CalDav</option>
+            <input type="hidden" id="node-config-input-caldav"/>
+            <select id="node-config-input-caltype">
+                <option value="ical">iCal</option>
+                <option value="caldav">CalDav</option>
                 <option value="icloud">iCloud secure</option>
             </select>     
     </div>
