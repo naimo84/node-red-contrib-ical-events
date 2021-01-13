@@ -60,7 +60,9 @@ export async function getICal(node: IcalNode, config) {
         try {
             let data = await getEvents(node, config)
             for (let d in data) {
-                datas.push(data[d])
+                let event=data[d];
+                if(!event.calendarName) event.calendarName=config.name;
+                datas.push(event)
             }
         }
         catch (err) {
