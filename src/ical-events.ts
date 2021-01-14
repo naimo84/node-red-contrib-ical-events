@@ -102,8 +102,8 @@ module.exports = function (RED: any) {
                                 eventStart.setSeconds(eventStart.getSeconds() + node.config.offset);
                                 eventEnd.setSeconds(eventEnd.getSeconds() + node.config.offset);
                             } else if (node.config?.offsetUnits === 'hours') {
-                                eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
-                                eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
+                                eventStart.setHours(eventStart.getHours() + node.config.offset);
+                                eventEnd.setHours(eventEnd.getHours() + node.config.offset);
                             } else if (node.config?.offsetUnits === 'days') {
                                 eventStart.setDate(eventStart.getDate() + node.config.offset);
                                 eventEnd.setDate(eventEnd.getDate() + node.config.offset);
