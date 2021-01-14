@@ -264,6 +264,23 @@ module.exports = function (RED: Red) {
         if (output) {
             const eventStart = new Date(ev.start);
             const eventEnd = new Date(ev.end);
+
+            if (node.config.offset) {
+                if (node.config?.offsetUnits === 'seconds') {
+                    eventStart.setSeconds(eventStart.getSeconds() + node.config.offset);
+                    eventEnd.setSeconds(eventEnd.getSeconds() + node.config.offset);
+                } else if (node.config?.offsetUnits === 'hours') {
+                    eventStart.setHours(eventStart.getHours() + node.config.offset);
+                    eventEnd.setHours(eventEnd.getHours() + node.config.offset);
+                } else if (node.config?.offsetUnits === 'days') {
+                    eventStart.setDate(eventStart.getDate() + node.config.offset);
+                    eventEnd.setDate(eventEnd.getDate() + node.config.offset);
+                } else {
+                    eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
+                    eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
+                }
+            }
+        
             if (eventStart > dateNow) {
                 let uid = crypto.MD5(ev.created + ev.summary + "start").toString();
                 if (ev.uid) {
@@ -282,20 +299,6 @@ module.exports = function (RED: Red) {
                     calendarName: ev.calendarName || node.config.name,
                     countdown: countdown(new Date(ev.start))
                 }
-
-
-                if (node.config.offset) {
-                    if (node.config?.offsetUnits === 'seconds') {
-                        eventStart.setSeconds(eventStart.getSeconds() + node.config.offset);
-                    } else if (node.config?.offsetUnits === 'hours') {
-                        eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
-                    } else if (node.config?.offsetUnits === 'days') {
-                        eventStart.setDate(eventStart.getDate() + node.config.offset);
-                    } else {
-                        eventStart.setMinutes(eventStart.getMinutes() + node.config.offset);
-                    }
-                }
-
 
                 let job2 = new CronJob(eventStart, cronJobStart.bind(null, event, node));
                 let cronJob = startedCronJobs[uid];
@@ -327,18 +330,6 @@ module.exports = function (RED: Red) {
                     description: ev.description,
                     calendarName: ev.calendarName || node.config.name,
                     countdown: countdown(new Date(ev.start))
-                }
-
-                if (node.config.offset) {
-                    if (node.config?.offsetUnits === 'seconds') {
-                        eventEnd.setSeconds(eventEnd.getSeconds() + node.config.offset);
-                    } else if (node.config?.offsetUnits === 'hours') {
-                        eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
-                    } else if (node.config?.offsetUnits === 'days') {
-                        eventEnd.setDate(eventEnd.getDate() + node.config.offset);
-                    } else {
-                        eventEnd.setMinutes(eventEnd.getMinutes() + node.config.offset);
-                    }
                 }
 
                 let job2 = new CronJob(eventEnd, cronJobEnd.bind(null, event, node));
