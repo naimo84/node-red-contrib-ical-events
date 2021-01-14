@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v1.0.0-beta.0) (2021-01-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* credentials are now stored in the node-red internal crendential store. It's safer, but need to reenter credentials.
+
+### Features
+
+* outsourced the whole fetching logic to kalender-events ([72d1b71](https://github.com/naimo84/node-red-contrib-ical-events/commit/72d1b717c7fd3db271bb737bfd4d42dd5e5f13bc))
+
+
+### Bug Fixes
+
+* date in past for cronjob ([29c1196](https://github.com/naimo84/node-red-contrib-ical-events/commit/29c1196204b90d277dc1d4135ca05de4a806c56c))
+
 ## [0.22.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.21.0...v0.22.0) (2021-01-03)
 
 
