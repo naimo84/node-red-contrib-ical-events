@@ -9,12 +9,11 @@ import { IKalenderEvent } from 'kalender-events/types/event';
 import { NodeMessageInFlow, NodeMessage } from "node-red";
 import moment = require("moment");
 module.exports = function (RED: any) {
-    let newCronJobs = new Map();
-    let startedCronJobs = {};
+    
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         let node: IcalNode = this;
-
+        let startedCronJobs = {};
         try {
             node.cache = new NodeCache();
             node.msg = {};
@@ -22,7 +21,7 @@ module.exports = function (RED: any) {
                 node.msg = RED.util.cloneMessage(msg);
                 send = send || function () { node.send.apply(node, arguments) }
                 node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, config, msg);
-                cronCheckJob(node, msg, send, done, config.confignode);
+                cronCheckJob(node, msg, send, done, config.confignode,startedCronJobs);
             });
 
             node.on('close', () => {
@@ -77,8 +76,8 @@ module.exports = function (RED: any) {
         }
     }
 
-    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config) {
-
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config,startedCronJobs) {
+        let newCronJobs = new Map();
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
         }
@@ -114,10 +113,9 @@ module.exports = function (RED: any) {
                         }
 
                         if (eventStart > dateNow) {
-
                             let uid = crypto.MD5(ev.uid + ev.summary + "start").toString();
                             if (ev.uid) {
-                                uid = ev.uid.uid + ev.uid.uid + "start";
+                                uid = ev.uid.uid + eventStart.toISOString() + "start";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
@@ -128,24 +126,18 @@ module.exports = function (RED: any) {
 
                             let job2 = new CronJob(moment(eventStart), cronJobStart.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
-                            if (!newCronJobs.has(uid) && !cronJob) {
-                                newCronJobs.set(uid, job2);
-                                node.debug("new - " + uid);
+                            if (cronJob) {
+                                cronJob.stop();                                
                             }
-                            else if (cronJob) {
-                                cronJob.stop();
-                                job2 = new CronJob(moment(eventStart), cronJobStart.bind(null, event, send, done, msg));
-                                newCronJobs.set(uid, job2);
-                                node.debug("started - " + uid);
-                            }
+                            newCronJobs.set(uid, job2);
                         }
+
                         if (eventEnd > dateNow) {
                             let uid = crypto.MD5(ev.uid + ev.summary + "end").toString();
                             if (ev.uid) {
-                                uid = ev.uid.uid + ev.uid.uid + "end";
+                                uid = ev.uid.uid +  eventEnd.toISOString() + "end";
                             }
                             possibleUids.push(uid);
-
                             let event: CalEvent = Object.assign(ev, {
                                 topic: ev.summary,
                                 id: uid,
@@ -154,16 +146,10 @@ module.exports = function (RED: any) {
 
                             let job2 = new CronJob(moment(eventEnd), cronJobEnd.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
-                            if (!newCronJobs.has(uid) && !startedCronJobs[uid]) {
-                                newCronJobs.set(uid, job2);
-                                node.debug("new - " + uid);
+                            if (cronJob) {
+                                cronJob.stop();                                
                             }
-                            else if (startedCronJobs[uid]) {
-                                cronJob.stop();
-                                job2 = new CronJob(moment(eventEnd), cronJobEnd.bind(null, event, send, done, msg));
-                                newCronJobs.set(uid, job2);
-                                node.debug("started - " + uid);
-                            }
+                            newCronJobs.set(uid, job2);
                         }
                     }
                 }

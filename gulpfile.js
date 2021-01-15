@@ -6,7 +6,7 @@ var nodemon = require('gulp-nodemon');
 var watch = require('gulp-watch');
 
 var paths = {
-    pages: ['src/*.html'],   
+    pages: ['src/*.html'],
     src: 'src',
     dist: 'dist'
 };
@@ -27,25 +27,31 @@ gulp.task('develop', function (done) {
         ignore: ["*.map"],
         done: done,
         verbose: true,
-        delay: 6000,
+        delay: 2000,
         env: { "NO_UPDATE_NOTIFIER": "1" }
     });
 
     copyHtml();
+    tsProject.src()
+        .pipe(sourcemaps.init())
+        .pipe(tsProject())
+        .js
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(paths.dist));
 
     watch(paths.pages).on('change', () => {
         copyHtml();
         stream.emit('restart', 10)
     });
 
-    watch(paths.src).on('change', () => {
-       tsProject.src()
+    watch('src/*.ts').on('change', () => {
+        tsProject.src()
             .pipe(sourcemaps.init())
             .pipe(tsProject())
             .js
             .pipe(sourcemaps.write('.'))
             .pipe(gulp.dest(paths.dist));
-        
+
         stream.emit('restart', 10)
     });
 
@@ -60,7 +66,7 @@ gulp.task('develop', function (done) {
 })
 
 gulp.task("default", gulp.series(
-    gulp.parallel('copy-html'),   
+    gulp.parallel('copy-html'),
     () => {
         return tsProject.src()
             .pipe(sourcemaps.init())
