@@ -1,0 +1,80 @@
+<script type="text/javascript">
+
+
+    RED
+        .nodes
+        .registerType('ical-create-ics', {
+            category: 'ical',
+            defaults: {
+               event:{},
+               eventType:{}
+               
+            },
+            inputs: 1,
+            outputs: 1,
+            outputLabels: ["ics string"],
+            color: "#DEBD5C",
+            label: function () {
+                if (this.name) {
+                    return this.name;
+                } else if (this.confignode.name) {
+                    return this.confignode.name;
+                }
+
+                return "create ics string";
+            },
+            icon: "font-awesome/fa-calendar",
+            paletteLabel: "create ics",
+            oneditprepare: function () {
+                var node = this;   
+                $("#node-input-event").typedInput({
+                    types: ["msg", "json"],
+                    typeField: "#node-input-eventType"
+                });
+             
+            }
+        });
+</script>
+
+<script type="text/x-red" data-template-name="ical-create-ics">
+    <style>
+        .event {
+            display:flex;
+        }
+        .event input {
+            flex:1
+        }
+        .event select {
+            flex:2
+        }
+        .event label {
+            min-width: 110px;
+            align-self: center;
+        }  
+        .padding-top {
+            padding-top: 10px;
+        }
+    </style>   
+
+    <div class="form-row event">        
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name">
+    </div>
+    <hr/>
+    <div class="form-row event">
+        <label for="node-input-event"><i class="fa fa-globe"></i> <span>Config</span></label>
+        <input type="text" id="node-input-event">
+        <input type="hidden" id="node-input-eventType">
+
+    </div>
+    
+    
+    
+  
+    
+</script>
+
+<script type="text/x-red" data-help-name="ical-create-ics">
+    
+    
+</script>
