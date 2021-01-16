@@ -1,13 +1,15 @@
 <script type="text/javascript">
+
+
     RED.nodes.registerType('ical-upcoming', {
         category: 'ical',
         defaults: {
             confignode: {
                 value: '',
                 type: 'ical-config',
-                required:false
+                required: false
             },
-            checkall:{
+            checkall: {
                 value: false,
             },
             cron: {
@@ -43,19 +45,40 @@
             pastviewUnits: {
                 value: '',
             },
-            trigger: {
-                value: '',
-            },
-            filterProperty: {
-                value: '',
-            },
-            filter: {
-                value: '',
+            trigger: {},
+            filterProperty: {},
+            filterOperator: {},
+            filter2: {
                 required: false,
                 validate: function (v) {
+                    let val = $("#node-input-filter2").val();
+                    if (!val) return true;
                     try {
-                        new RegExp(v);
-                        return true;
+                        if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
+                            let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
+                            return reg.test(v)
+                        } else {
+                            new RegExp(v);
+                            return true;
+                        }
+                    } catch (e) {
+                        return false;
+                    }
+                },
+            },
+            filter: {
+                required: false,
+                validate: function (v) {
+                    let val = $("#node-input-filter").val();
+                    if (!val) return true;
+                    try {
+                        if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
+                            let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
+                            return reg.test(v)
+                        } else {
+                            new RegExp(v);
+                            return true;
+                        }
                     } catch (e) {
                         return false;
                     }
@@ -64,7 +87,7 @@
         },
         inputs: 1,
         outputs: 1,
-        color: '#E7AE24',
+        color: '#DEBD5C',
         label: function () {
             if (this.name) {
                 return this.name;
@@ -74,8 +97,8 @@
 
             return 'upcoming events';
         },
-        icon: 'calendar.png',
-        paletteLabel: 'Upcoming',
+        icon: "font-awesome/fa-calendar",
+        paletteLabel: 'upcoming',
         oneditprepare: function () {
             var node = this;
             $('#node-input-timeout').spinner({ min: 0 });
@@ -98,7 +121,7 @@
 
             if (!node.previewUnits) {
                 $('#node-input-previewUnits option')
-                    .filter(function () {                        
+                    .filter(function () {
                         if (node.endpreviewUnits) {
                             return $(this).val() == node.endpreviewUnits;
                         } else {
@@ -127,27 +150,225 @@
                     })
                     .attr('selected', true);
             }
+
+            if (node.trigger && !node.filterProperty) {
+                $('#node-input-filterProperty option')
+                    .filter(function () {
+                        return $(this).val() == 'summary';
+                    })
+                    .attr('selected', true);
+            }
+
+            if (node.trigger && node.filterProperty && node.filterProperty.indexOf('event') >= 0 && !node.filterOperator) {
+                $('#node-input-filterOperator option')
+                    .filter(function () {
+                        return $(this).val() == 'between';
+                    })
+                    .attr('selected', true);
+            }
+
+            $('#node-input-filter2').parent().hide();
+            $('#node-input-trigger').change(function () {
+                var value = $('#node-input-trigger').val();
+                let filterProperty = $('#node-input-filterProperty').val();
+                if (value && value === 'always') {
+                    $('#node-input-filterProperty').parent().hide();
+                    $('#node-input-filter').parent().hide();
+                    $('#node-input-filter2').parent().hide();
+                    $('#node-input-filterOperator').parent().hide();
+                    $('#filter-tip').hide();
+
+                    return;
+                } else {
+                    $('#node-input-filterProperty').parent().show();
+                    $('#node-input-filter').parent().show();
+                    if (!node.filterProperty) {
+                        $('#node-input-filterProperty option')
+                            .filter(function () {
+                                return $(this).val() == 'summary';
+                            })
+                            .attr('selected', true);
+                    }
+
+                    if (!node.filterOperator) {
+
+                        $('#node-input-filterOperator option')
+                            .filter(function () {
+                                return $(this).val() == 'between';
+                            })
+                            .attr('selected', true);
+                        $('#node-input-filter-label1').hide();
+                        $('#node-input-filter-label2').show();
+                        $('#node-input-filter2-label1').hide();
+                        $('#node-input-filter2-label2').show();
+                        $('#node-input-filter-label3').hide();
+                    }
+                    if (filterProperty && filterProperty.indexOf('event') >= 0) {
+                        $('#node-input-filter2').parent().show();
+                        $('#node-input-filterOperator').parent().show();
+                        $('#filter-tip').show();
+                        var filterOperator = $('#node-input-filterOperator').val();
+                        if (filterOperator === 'between') {
+                            $('#node-input-filter-label1').hide();
+                            $('#node-input-filter-label2').show();
+                            $('#node-input-filter2-label1').hide();
+                            $('#node-input-filter2-label2').show();
+                            $('#node-input-filter-label3').hide();
+                        } else {
+                            $('#node-input-filter2-label2').hide();
+                            $('#node-input-filter2-label1').show();
+                            if (filterOperator === 'before') {
+                                $('#node-input-filter-label2').hide();
+                                $('#node-input-filter-label3').show();
+                                $('#node-input-filter-label1').hide();
+                            } else {
+                                $('#node-input-filter-label2').show();
+                                $('#node-input-filter-label3').hide();
+                                $('#node-input-filter-label1').hide();
+                            }
+                        }
+                    } else {
+                        $('#node-input-filter2').parent().hide();
+                        $('#node-input-filterOperator').parent().hide();
+                        $('#filter-tip').hide();
+                        $('#node-input-filter-label2').hide();
+                        $('#node-input-filter-label1').show();
+                        $('#node-input-filter-label3').hide();
+
+                    }
+                }
+            });
+
+            $('#node-input-filterProperty').change(function () {
+                var value = $('#node-input-filterProperty').val();
+                var trigger = $('#node-input-trigger').val();
+                if (!node.filterProperty) {
+                    $('#node-input-filterProperty option')
+                        .filter(function () {
+                            return $(this).val() == 'summary';
+                        })
+                        .attr('selected', true);
+                }
+
+                if (!node.filterOperator) {
+                    $('#node-input-filterOperator option')
+                        .filter(function () {
+                            return $(this).val() == 'between';
+                        })
+                        .attr('selected', true);
+                    $('#node-input-filter-label1').hide();
+                    $('#node-input-filter-label2').show();
+                    $('#node-input-filter2-label1').hide();
+                    $('#node-input-filter2-label2').show();
+                    $('#node-input-filter-label3').hide();
+                }
+                if (trigger === "always") return;
+                if (value && value.indexOf('event') >= 0) {
+                    $('#node-input-filter2').parent().show();
+                    $('#node-input-filterOperator').parent().show();
+
+                    $('#filter-tip').show();
+                    var filterOperator = $('#node-input-filterOperator').val();
+                    if (filterOperator === 'between') {
+                        $('#node-input-filter-label1').hide();
+                        $('#node-input-filter-label2').show();
+                        $('#node-input-filter2-label1').hide();
+                        $('#node-input-filter2-label2').show();
+                        $('#node-input-filter-label3').hide();
+                    } else {
+                        $('#node-input-filter2-label2').hide();
+                        $('#node-input-filter2-label1').show();
+                        if (filterOperator === 'before') {
+                            $('#node-input-filter-label2').hide();
+                            $('#node-input-filter-label3').show();
+                            $('#node-input-filter-label1').hide();
+                        } else {
+                            $('#node-input-filter-label2').show();
+                            $('#node-input-filter-label3').hide();
+                            $('#node-input-filter-label1').hide();
+                        }
+                    }
+                } else {
+                    $('#node-input-filter2').parent().hide();
+                    $('#node-input-filterOperator').parent().hide();
+                    $('#filter-tip').hide();
+                    $('#node-input-filter-label2').hide();
+                    $('#node-input-filter-label1').show();
+                    $('#node-input-filter-label3').hide();
+
+                }
+
+            });
+
+            $('#node-input-filterOperator').change(function () {
+                var value = $('#node-input-filterOperator').val();
+                var trigger = $('#node-input-trigger').val();
+                var filterProperty = $('#node-input-filterProperty').val();
+                if (trigger === "always") return;
+                if (filterProperty && ['eventStart', 'eventEnd'].indexOf(filterProperty) >= 0) {
+                    if (value === 'between') {
+                        $('#node-input-filter2').parent().show();
+                        $('#node-input-filter-label1').hide();
+                        $('#node-input-filter-label2').show();
+                        $('#node-input-filter2-label1').hide();
+                        $('#node-input-filter2-label2').show();
+                        $('#node-input-filter-label3').hide();
+                    } else {
+                        $('#node-input-filter2').parent().hide();
+                        $('#node-input-filter2-label2').hide();
+                        $('#node-input-filter2-label1').show();
+                        if (value === 'before') {
+                            $('#node-input-filter-label2').hide();
+                            $('#node-input-filter-label3').show();
+                            $('#node-input-filter-label1').hide();
+                        } else {
+                            $('#node-input-filter-label2').show();
+                            $('#node-input-filter-label3').hide();
+                            $('#node-input-filter-label1').hide();
+                        }
+                    }
+                }
+            });
         },
     });
 </script>
 
 <script type="text/x-red" data-template-name="ical-upcoming">
-    <div class="form-row">
+    <style>
+        .event {
+            display:flex;
+        }
+        .event input {
+            flex:1
+        }
+        .event select {
+            flex:1
+        }
+        .event label {
+            min-width: 110px;
+            align-self: center;
+        }  
+        .padding-top {
+            padding-top: 10px;
+        }
+    </style>  
+
+    <div class="form-row event">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name">
     </div>
     <hr/>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
     </div>
-    <div class="form-row">
-        <label for="node-input-checkall" style="width:160px !important">
+    <div class="form-row padding-top">
+        <label for="node-input-checkall" style="width:200px !important">
             <i class="fa fa-asterisk"></i>
             <span>Fetch all configs concurrent</span></label>
         <input type="checkbox" id="node-input-checkall" placeholder="" style="width:16px !important">
     </div>
-    <div class="form-row" id="delay-details-for">
+    <div class="form-row event" id="delay-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
         <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
         <select id="node-input-timeoutUnits" style="width:200px !important">
@@ -156,43 +377,65 @@
           <option value="hours">Hours</option>
           <option value="days">Days</option>
         </select>
-    </div>
-   
-    <div class="form-row">
-        <label for="node-input-trigger"><i class="fa fa-clock-o"></i> <span>Trigger</span></label>
-        <select id="node-input-trigger" style="width:250px !important">
+    </div>   
+    <div class="form-row event">
+        <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>
+        <select id="node-input-trigger">
           <option value="always">Always</option>
           <option value="match">Match</option>
           <option value="nomatch">No match</option>
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-filterProperty"><i class="icon-filter"></i> Filter property</label>
-        <select id="node-input-filterProperty" style="width:250px !important">
-            <option value="summary">Summary</option>
-            <option value="description">Description</option>
-            <option value="attendee">Attendee</option>
+    <div class="form-row event">
+        <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
+        <select id="node-input-filterProperty">
+            <option value="summary">summary</option>
+            <option value="description">description</option>
+            <option value="attendee">attendee</option>
+            <option value="categories">category</option>
+            <option value="eventStart">start date</option>
+            <option value="eventEnd">end date</option>
           
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-filter"><i class="icon-filter"></i> Filter</label>
-        <input type="text" id="node-input-filter"  style="width:250px !important">
+    <div class="form-row event">
+        <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
+        <select id="node-input-filterOperator">
+            <option value="between">between</option>
+            <option value="before">before</option>
+            <option value="after">after</option> 
+        </select>
     </div>
-    <div class="form-row" id="delay-details-for">
+    <div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
+        <i class="fa fa-exclamation"></i>
+            <b>HINT:</b> filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
+    </div>
+    <div class="form-row event">
+        <label for="node-input-filter" id="node-input-filter-label1"><i class="fa fa-filter"></i> Filter</label>
+        <label for="node-input-filter" id="node-input-filter-label2"><i class="fa fa-filter"></i> after</label>
+        <label for="node-input-filter" id="node-input-filter-label3"><i class="fa fa-filter"></i> before</label>
+        <input type="text" id="node-input-filter">
+    </div>
+    <div class="form-row event">
+        <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
+        <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
+        <input type="text" id="node-input-filter2" >
+    </div>
+
+    <div class="form-row event" id="delay-details-for">
         <label for="node-input-preview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
         <input type="text" id="node-input-preview" style="text-align:end; width:50px !important">
-        <select id="node-input-previewUnits" style="width:200px !important">
+        <select id="node-input-previewUnits">
           <option value="seconds">Seconds</option>
           <option value="minutes">Minutes</option>
           <option value="hours">Hours</option>
           <option value="days">Days</option>
         </select>
     </div>
-    <div class="form-row" id="pastview-details-for">
+    <div class="form-row event" id="pastview-details-for">
         <label for="node-input-pastview"><i class="fa fa-clock-o"></i> <span>Past view</span></label>
         <input type="text" id="node-input-pastview" style="text-align:end; width:50px !important">
-        <select id="node-input-pastviewUnits" style="width:200px !important">
+        <select id="node-input-pastviewUnits">
           <option value="seconds">Seconds</option>
           <option value="minutes">Minutes</option>
           <option value="hours">Hours</option>
@@ -200,51 +443,70 @@
         </select>
     </div>
    
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
         <input type="text" id="node-input-cron">
     </div> 
-    <div class="form-tips">     
-        <i class="fas fa-exclamation"></i>
-            <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
-    </div>
+ 
 </script>
 
 <!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-upcoming">
-        <h1>A node for upcoming events</h1>
+    <h1>A node for upcoming events</h1>
 
-        <p>As of the events node, its checked on input or cronjob.</p>
-          <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
-        <h3>Configuration</h3>
-        <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>
-        <br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
-        <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i> <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
-        <span><br/> • <b>"Trigger"</b>: possible values:
-            <br/>&emsp;     Always (Filter expression is ignored)
-            <br/> &emsp;      Match (only events that match the Filter expression are processed)
-            <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
-        </span>
-        <br/> • <b>"Filter"</b>: summary of the events is filtered against this regular expression
-        <br/> • <b>"Preview"</b>: Only Events within now and this <b>future</b> value are checked.
-        <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.
-        <br/> • <b>"Name"</b>: Displayname
-        <br/><br/>
-        <p>The <b>msg.payload</b> contains an array of the following values for each calendar entry
-        <br/> • summary
-        <br/> • id
-        <br/> • location
-        <br/> • eventStart
-        <br/> • eventEnd
-        <br/> • description
-        <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
-        <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i> <b>DEPRECATED:</b> Cron Setting will be remove in future releases.  
+    <p>As of the events node, its checked on input or cronjob.</p>
+        <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
+    <h3>Configuration</h3>
+    <br/> • <b>"Name"</b>: Displayname of the node
+    <br/> • <b>"Fetch all configs concurrent"</b>: All Configs will be fetched concurrent and only one message will be send
+    <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>       
+    <span><br/> • <b>"Trigger"</b>: possible values:
+        <br/>&emsp;     Always (Filter expression is ignored)
+        <br/>&emsp;      Match (only events that match the Filter expression are processed)
+        <br/>&emsp;      No Match (only events that don't match the Filter expression are processed)
+    </span>
+    <span><br/> • <b>"Filter property"</b>: possible values:
+        <br/>&emsp;     summary
+        <br/>&emsp;     description
+        <br/>&emsp;     attendee
+        <br/>&emsp;     category
+        <br/>&emsp;     start date
+        <br/>&emsp;     end date   
+    </span>
+    <br/>&emsp; if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:
+    <br/>&emsp;   filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
+    <br/>&emsp; <b>"Filter operator"</b>: possible values:
+    <br/>&emsp;     between
+    <br/>&emsp;     bofore
+    <br/>&emsp;     after
+    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
+    <br/> • <b>"Preview"</b>: Only Events within now and this <b>future</b> value are checked.
+    <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.   
+    <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
+    <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
+    <br/><br/>
+    <h3>Output</h3>
+    <p>The <b>msg.payload</b> contains an array of the following values for each calendar entry
+    <br/> • summary
+    <br/> • id
+    <br/> • location
+    <br/> • eventStart
+    <br/> • eventEnd
+    <br/> • description
+    <br/> • allDay
+    <br/> • attendee
+    <br/> • isRecurring
+    <br/> • calendarName
+    <br/> • organizer
+    <br/> • categories
+    <br/> • duration
     </p>
      <br/>
         <p><b>additional msg. values:</b>
-        <br/> • today: todayEventcounter
-        <br/> • tomorrow: tomorrowEventcounter
-        <br/> • total: datesArray.length
+        <br/> • today: counter for today's events
+        <br/> • tomorrow: counter for tomorrow's events
+        <br/> • total: total counter of all events
+        <br/> • htmlTable: br separated list
         </p>
         <p>example output:</p>
         <pre>{

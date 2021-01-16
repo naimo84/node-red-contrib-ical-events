@@ -1,26 +1,24 @@
 
-import { Red, Node } from 'node-red';
-import * as crypto from "crypto-js";
+import { NodeMessage, NodeMessageInFlow } from 'node-red';
 import { CronJob } from 'cron';
-import { Config } from './ical-config';
-import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode, filterOutput } from './helper';
+import { IcalEventsConfig } from './ical-config';
+import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 import * as NodeCache from 'node-cache';
-var RRule = require('rrule').RRule;
-var ce = require('cloneextend');
+import { KalenderEvents } from 'kalender-events';
+import { IKalenderEvent } from 'kalender-events/types/event';
 
-module.exports = function (RED: Red) {
+module.exports = function (RED: any) {
     function sensorNode(config: any) {
         RED.nodes.createNode(this, config);
         let node: IcalNode = this;
 
         try {
-            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
             node.cache = new NodeCache();
             node.msg = {};
-            node.on('input', (msg) => {
-
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
-                cronCheckJob(node, msg);
+            node.on('input', (msg, send, done) => {
+                send = send || function () { node.send.apply(node, arguments) }
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, config, msg);
+                cronCheckJob(node, msg, send, done);
             });
 
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
@@ -42,15 +40,14 @@ module.exports = function (RED: Red) {
                     default:
                         break;
                 }
-                node.job = new CronJob(cron, cronCheckJob.bind(null, node, null));
+                node.job = new CronJob(cron, function () { node.emit("input", {}); });
                 node.job.start();
 
                 node.on('close', () => {
                     node.job.stop();
                 });
             }
-
-            cronCheckJob(node, null);
+            node.emit("input", {});
         }
         catch (err) {
             node.error('Error: ' + err.message);
@@ -58,103 +55,18 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function processRRule(ev, node: IcalNode, dateNow) {
-        var eventLength = ev.end.getTime() - ev.start.getTime();
 
-        var options = RRule.parseString(ev.rrule.toString());
-        options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
-        if (options.until) {
-            options.until = addOffset(options.until, -getTimezoneOffset(options.until));
-        }
-        //node.debug('options:' + JSON.stringify(options));
-
-        var rule = new RRule(options);
-        var now2 = new Date();
-        now2.setHours(0, 0, 0, 0);
-        var now3 = new Date(now2.getTime() - eventLength);
-        if (now2 < now3) now3 = now2;
-
-        var dates = [];
-        try {
-            dates = rule.between(now3, addOffset(new Date(), 24 * 60), true);
-        } catch (e) {
-            node.error(
-                'Issue detected in RRule, event ignored; ' +
-                e.stack +
-                '\n' +
-                'RRule object: ' +
-                JSON.stringify(rule) +
-                '\n' +
-                'now3: ' +
-                now3 +
-                '\n' +
-                'string: ' +
-                ev.rrule.toString() +
-                '\n' +
-                'options: ' +
-                JSON.stringify(options)
-            );
-        }
-
-        node.debug('dates:' + JSON.stringify(dates));
-        let reslist = [];
-        if (dates.length > 0) {
-            for (var i = 0; i < dates.length; i++) {
-                var ev2 = ce.clone(ev);
-                var start = dates[i];
-                ev2.start = addOffset(start, getTimezoneOffset(start));
-
-                var end = new Date(start.getTime() + eventLength);
-                ev2.end = addOffset(end, getTimezoneOffset(end));
-
-                node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
-
-                var checkDate = true;
-                if (ev2.exdate) {
-                    for (var d in ev2.exdate) {
-                        let exdate = ev2.exdate[d]
-                        if (exdate) {
-                            if (exdate.getTime() === ev2.start.getTime()) {
-                                checkDate = false;
-                                node.debug('   ' + i + ': sort out');
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (checkDate && ev.recurrences) {
-                    for (var dOri in ev.recurrences) {
-                        let recurrenceid = ev.recurrences[dOri].recurrenceid
-                        if (recurrenceid) {
-                            if (recurrenceid.getTime() === ev2.start.getTime()) {
-                                ev2 = ce.clone(ev.recurrences[dOri]);
-                                node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
-                            }
-                        }
-                    }
-                }
-
-                if (checkDate && ev2.start <= dateNow && ev2.end >= dateNow) {
-                    reslist.push(ev2);
-                }
-            }
-        }
-        return reslist;
-    }
-
-
-    function cronCheckJob(node: IcalNode, message: any) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void) {
         if (node.job && node.job.running) {
-            node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toISOString()}` });
+            node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
         }
         else {
             node.status({});
         }
-        if (!message) message = {};
+        //@ts-ignore
+        if (!msg) msg = {};
         var dateNow = new Date();
-        getICal(node, node.config).then(data => {
-            
-
+        getICal(node).then(data => {
             node.debug('Ical read successfully ' + node.config.url);
             if (!data) return;
 
@@ -164,24 +76,14 @@ module.exports = function (RED: Red) {
             for (let k in data) {
                 if (data.hasOwnProperty(k)) {
                     let ev = data[k];
-                    //delete data[k];
-                    if (ev.type == 'VEVENT') {
-                        let ev2;
-                        if (ev.rrule !== undefined) {
-                            ev2 = ce.clone(processRRule(ev, node, dateNow));
+                    if (ev instanceof Array && ev.length >= 1) {
+                        for (let e of ev) {
+                            current = processData(e, dateNow, node, last, current, msg, send)
                         }
-                        if (ev2) {
-                            ev = ev2
-                        }
-
-                        if (ev instanceof Array && ev.length >= 1) {
-                            for (let e of ev) {
-                                current = processData(e, dateNow, node, last, current, message)
-                            }
-                        } else {
-                            current = processData(ev, dateNow, node, last, current, message)
-                        }
+                    } else {
+                        current = processData(ev, dateNow, node, last, current, msg, send)
                     }
+
                 }
             }
 
@@ -189,14 +91,14 @@ module.exports = function (RED: Red) {
                 const event = {
                     on: false
                 }
-                let msg = RED.util.cloneMessage(message);
-                delete msg._msgid;
-                node.send(Object.assign(msg, {
+                let msg2 = RED.util.cloneMessage(msg);
+                delete msg2._msgid;
+                send(Object.assign(msg2, {
                     payload: event
                 }));
 
                 if (last != current) {
-                    node.send([null, Object.assign(msg, {
+                    send([null, Object.assign(msg2, {
                         payload: event
                     })]);
                 }
@@ -205,60 +107,33 @@ module.exports = function (RED: Red) {
             node.context().set('on', current);
 
         }).catch(err => {
-            if (err) {
-                node.error('Error: ' + err);
-                node.status({ fill: 'red', shape: 'ring', text: err.message });
-                node.send({
-                    error: err
-                });
-                return;
-            }
-        });;
+            node.status({ fill: 'red', shape: 'ring', text: err.message });
+            send({
+                //@ts-ignore
+                error: err
+            });
+        });
     }
 
-    function processData(ev, dateNow, node, last, current, message) {
-        const eventStart = new Date(ev.start);
-        const eventEnd = new Date(ev.end);
+    function processData(ev: IKalenderEvent, dateNow, node, last, current, message, send) {
+        const eventStart = new Date(ev.eventStart);
+        const eventEnd = new Date(ev.eventEnd);
 
         if (eventStart <= dateNow && eventEnd >= dateNow) {
-
-
-            let output = filterOutput(node, ev)
-
-
-            let uid = crypto.MD5(ev.created + ev.summary).toString();
-            if (ev.uid) {
-                uid = ev.uid;
-            }
-
-            let event: CalEvent = {
-                on: false
-            }
-
-            if (output) {
-                event = {
-                    summary: ev.summary,
-                    topic: ev.summary,
-                    categories: ev.categories,
-                    id: uid,
-                    location: ev.location,
-                    eventStart: new Date(ev.start),
-                    eventEnd: new Date(ev.end),
-                    description: ev.description,
-                    on: true,
-                    calendarName: ev.calendarName || node.config.name,
-                    countdown: countdown(new Date(ev.start))
-                }
-            }
+            let event: CalEvent = Object.assign(ev, {
+                topic: ev.summary,
+                on: true,
+                calendarName: ev.calendarName || node.config.name
+            });
             let msg = RED.util.cloneMessage(message);
             delete msg._msgid;
-            node.send(Object.assign(msg, {
+            send(Object.assign(msg, {
                 payload: event
             }));
             current = true;
 
             if (last != current) {
-                node.send([null, Object.assign(msg, {
+                send([null, Object.assign(msg, {
                     payload: event
                 })]);
             }

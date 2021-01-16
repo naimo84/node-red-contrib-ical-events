@@ -1,66 +1,58 @@
-import { Red, Node } from 'node-red';
+import { NodeMessage, NodeMessageInFlow } from 'node-red';
 import { CronJob } from 'cron';
-import { Config } from './ical-config';
-import * as moment from 'moment';
-import { getICal, CalEvent, countdown, addOffset, getTimezoneOffset, getConfig, IcalNode, filterOutput } from './helper';
-import * as NodeCache from 'node-cache';
-
+import { IcalEventsConfig } from './ical-config';
+import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 var parser = require('cron-parser');
-var RRule = require('rrule').RRule;
-
 var ce = require('cloneextend');
 
-module.exports = function (RED: Red) {
-
-
-    function upcomingNode(config: any) {
-        RED.nodes.createNode(this, config);
+module.exports = function (RED:any) {
+    function upcomingNode(n: any) {
+        RED.nodes.createNode(this, n);
         let node: IcalNode = this;
-        node.cache = new NodeCache();
         node.red = RED;
         node.msg = {};
-        node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, null);
-        node.on('input', (msg) => {
-            node.msg = RED.util.cloneMessage(msg);
-            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as Config, config, msg);
-            cronCheckJob(node);
+        
+        node.on('input', (msg, send, done) => {
+            node.msg = RED.util.cloneMessage(msg);   
+            send = send || function () { node.send.apply(node, arguments) }
+            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, n, msg);        
+            cronCheckJob(node, msg, send, done);
         });
+
+
         try {
             let cron = '';
-
-            if (config.timeout && config.timeout !== '' && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== '') {
-                switch (config.timeoutUnits) {
+            if (n.timeout && n.timeout !== '' && parseInt(n.timeout) > 0 && n.timeoutUnits && n.timeoutUnits !== '') {
+                switch (n.timeoutUnits) {
                     case 'seconds':
-                        cron = `*/${config.timeout} * * * * *`;
+                        cron = `*/${n.timeout} * * * * *`;
                         break;
                     case 'minutes':
-                        cron = `0 */${config.timeout} * * * *`;
+                        cron = `0 */${n.timeout} * * * *`;
                         break;
                     case 'hours':
-                        cron = `0 0 */${config.timeout} * * *`;
+                        cron = `0 0 */${n.timeout} * * *`;
                         break;
                     case 'days':
-                        cron = `0 0 0 */${config.timeout} * *`;
+                        cron = `0 0 0 */${n.timeout} * *`;
 
                         break;
                     default:
                         break;
                 }
             }
-            if (config.cron && config.cron !== '') {
-                parser.parseExpression(config.cron);
-                cron = config.cron;
+            if (n.cron && n.cron !== '') {
+                parser.parseExpression(n.cron);
+                cron = n.cron;
             }
 
             if (cron !== '') {
-                node.job = new CronJob(cron, cronCheckJob.bind(null, node));
+                node.job = new CronJob(cron, function () { node.emit("input", {}); }, null, true);
 
                 node.on('close', () => {
                     node.job.stop();
                     node.debug('cron stopped');
                 });
-
-                node.job.start();
             }
         } catch (err) {
             node.error('Error: ' + err.message);
@@ -68,550 +60,57 @@ module.exports = function (RED: Red) {
         }
     }
 
-    function cronCheckJob(node: IcalNode) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void) {
+       
         if (node.job && node.job.running) {
             node.status({ fill: 'green', shape: 'dot', text: `next check: ${node.job.nextDate().toISOString()}` });
         } else {
             node.status({});
         }
 
-        node.datesArray_old = ce.clone(node.datesArray);
+       
         node.datesArray = [];
-        checkICal(
-            (data, err) => {
-                if (err) {
-                    node.error('Error: ' + err);
-                    node.status({ fill: 'red', shape: 'ring', text: err.message });
-                    node.send({
-                        error: err
-                    });
-                    return;
-                }
-
-                displayDates(node, node.config);
-            },
-            node
-
-        );
-    }
-
-    function processRRule(ev, preview, today, realnow, node: IcalNode, config) {
-        var eventLength = ev.end.getTime() - ev.start.getTime();
-
-        var options = RRule.parseString(ev.rrule.toString());
-        options.dtstart = addOffset(ev.start, -getTimezoneOffset(ev.start));
-        if (options.until) {
-            options.until = addOffset(options.until, -getTimezoneOffset(options.until));
-        }
-        node.debug('options:' + JSON.stringify(options));
-
-        var rule = new RRule(options);
-        var now2 = new Date();
-        now2.setHours(0, 0, 0, 0);
-        var now3 = new Date(now2.getTime() - eventLength);
-        if (now2 < now3) now3 = now2;
-        node.debug(
-            'RRule event:' +
-            ev.summary +
-            '; start:' +
-            ev.start.toString() +
-            '; preview:' +
-            preview.toString() +
-            '; today:' +
-            today +
-            '; now2:' +
-            now2 +
-            '; now3:' +
-            now3 +
-            '; rule:' +
-            JSON.stringify(rule)
-        );
-
-        var dates = [];
-        try {
-            dates = rule.between(now3, preview, true);
-        } catch (e) {
-            node.error(
-                'Issue detected in RRule, event ignored; ' +
-                e.stack +
-                '\n' +
-                'RRule object: ' +
-                JSON.stringify(rule) +
-                '\n' +
-                'now3: ' +
-                now3 +
-                '\n' +
-                'preview: ' +
-                preview +
-                '\n' +
-                'string: ' +
-                ev.rrule.toString() +
-                '\n' +
-                'options: ' +
-                JSON.stringify(options)
-            );
-        }
-
-        node.debug('dates:' + JSON.stringify(dates));
-
-        if (dates.length > 0) {
-            for (var i = 0; i < dates.length; i++) {
-                var ev2 = ce.clone(ev);
-                var start = dates[i];
-                ev2.start = addOffset(start, getTimezoneOffset(start));
-
-                var end = new Date(start.getTime() + eventLength);
-                ev2.end = addOffset(end, getTimezoneOffset(end));
-
-                node.debug('   ' + i + ': Event (' + JSON.stringify(ev2.exdate) + '):' + ev2.start.toString() + ' ' + ev2.end.toString());
-
-                var checkDate = true;
-                if (ev2.exdate) {
-                    for (var d in ev2.exdate) {
-                        if (ev2.exdate[d].getTime() === ev2.start.getTime()) {
-                            checkDate = false;
-                            node.debug('   ' + i + ': sort out');
-                            break;
-                        }
-                    }
-                }
-                if (checkDate && ev.recurrences) {
-                    for (var dOri in ev.recurrences) {
-                        let recurrenceid = ev.recurrences[dOri].recurrenceid
-                        if (recurrenceid) {
-                            if (recurrenceid.getTime() === ev2.start.getTime()) {
-                                ev2 = ce.clone(ev.recurrences[dOri]);
-                                node.debug('   ' + i + ': different recurring found replaced with Event:' + ev2.start + ' ' + ev2.end);
-                            }
-                        }
-                    }
-                }
-
-
-                if (checkDate) {
-                    checkDates(ev2, preview, today, realnow, ' rrule ', node, config);
-                }
-            }
-        }
-    }
-
-
-    function processData(data, realnow, pastview, preview, callback, node, config) {
-        var processedEntries = 0;
-        for (var k in data) {
-            var ev = data[k];
-            delete data[k];
-
-            if (ev.type === 'VEVENT') {
-                if (!ev.end) {
-                    ev.end = ce.clone(ev.start);
-                    if (!ev.start.getHours() && !ev.start.getMinutes() && !ev.start.getSeconds()) {
-                        ev.end.setDate(ev.end.getDate() + 1);
-                    }
-                }
-
-                if (ev.rrule === undefined) {
-                    checkDates(ev, preview, pastview, realnow, ' ', node, config);
-                } else {
-                    processRRule(ev, preview, pastview, realnow, node, config);
-                }
-            }
-
-            if (++processedEntries > 100) {
-                break;
-            }
-        }
-        if (!Object.keys(data).length) {
-            return;
-        } else {
-            processData(data, realnow, pastview, preview, callback, node, config);
-        }
-    }
-
-    function checkDates(ev, preview, pastview, realnow, rule, node, config: Config) {
-        var fullday = false;
-        var reason;
-        var date;
-
-        if (ev.summary && ev.summary.hasOwnProperty('val')) {
-            reason = ev.summary.val;
-        } else {
-            reason = ev.summary;
-        }
-        var location = ev.location || '';
-
-        if (!ev.start) return;
-        if (!ev.end) ev.end = ev.start;
-        ev.start = new Date(ev.start);
-        ev.end = new Date(ev.end);
-        if (
-            !ev.start.getHours() &&
-            !ev.start.getMinutes() &&
-            !ev.start.getSeconds() &&
-            !ev.end.getHours() &&
-            !ev.end.getMinutes() &&
-            !ev.end.getSeconds()
-        ) {
-            if (ev.end.getTime() == ev.start.getTime() && ev.datetype == 'date') {
-                ev.end.setDate(ev.end.getDate() + 1);
-            }
-            if (ev.end.getTime() !== ev.start.getTime()) {
-                fullday = true;
-            }
-        }
-
-        let output = filterOutput(node, ev)
-        if (output) {
-            node.debug('Event: ' + JSON.stringify(ev))
-            if (fullday) {
-                if (
-                    (ev.start < preview && ev.start >= pastview) ||
-                    (ev.end > pastview && ev.end <= preview) ||
-                    (ev.start < pastview && ev.end > pastview)
-                ) {
-                    date = formatDate(ev.start, ev.end, true, true, config);
-
-                    insertSorted(node.datesArray, {
-                        date: date.text.trim(),
-                        categories: ev.categories,
-                        summary: ev.summary,
-                        topic: ev.summary,
-                        calendarName: ev.calendarName || node.config.name,
-                        event: reason,
-                        eventStart: new Date(ev.start.getTime()),
-                        eventEnd: new Date(ev.end.getTime()),
-                        description: ev.description,
-                        id: ev.uid,
-                        allDay: true,
-                        rule: rule,
-                        location: location,
-                        countdown: countdown(new Date(ev.start))
-                    });
-
-                    node.debug('Event (full day) added : ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
-                }
-            } else {
-                // Event with time              
-                if (
-                    (ev.start >= pastview && ev.start < preview) ||
-                    (ev.end >= realnow && ev.end <= preview) ||
-                    (ev.start < realnow && ev.end > realnow)
-                ) {
-                    date = formatDate(ev.start, ev.end, true, false, config);
-                    insertSorted(node.datesArray, {
-                        date: date.text.trim(),
-                        categories: ev.categories,
-                        event: reason,
-                        summary: ev.summary,
-                        topic: ev.summary,
-                        calendarName: ev.calendarName || node.config.name,
-                        eventStart: new Date(ev.start.getTime()),
-                        eventEnd: new Date(ev.end.getTime()),
-                        description: ev.description,
-                        id: ev.uid,
-                        allDay: false,
-                        rule: rule,
-                        location: location,
-                        countdown: countdown(new Date(ev.start))
-                    });
-                    node.debug('Event with time added: ' + JSON.stringify(rule) + ' ' + reason + ' at ' + date.text);
-                }
-            }
-        }
-    }
-
-    function checkICal(callback, node) {
-        getICal(node, node.config).then(data => {
-           
+        getICal(node).then(data => {
             node.debug('Ical read successfully ' + node.config.url);
+            node.datesArray = data || [];
 
-            try {
-                if (data) {
-                    var realnow = new Date();
-                    var preview = new Date();
-                    var pastview = new Date();
+            let todayEventcounter = 0;
+            let tomorrowEventcounter = 0;
+            let today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let oneDay = 24 * 60 * 60 * 1000;
+            let tomorrow = new Date(today.getTime() + oneDay);
+            let dayAfterTomorrow = new Date(tomorrow.getTime() + oneDay);
 
-                    if (node.config.previewUnits === 'days') {
-                        if (node.config.preview == 1) {
-                            preview = moment(preview).endOf('day').add(node.config.preview - 1, 'days').toDate();
-                        } else {
-                            preview = moment(preview).endOf('day').add(node.config.preview, 'days').toDate();
-                        }
-                    } else {
-                        preview = moment(preview)
-                            .add(node.config.preview, node.config.previewUnits.charAt(0))
-                            .toDate();
-                    }
-
-                    if (node.config.pastviewUnits === 'days') {
-                        if (node.config.pastview == 1) {
-                            pastview = moment(pastview).startOf('day').subtract(node.config.pastview - 1, 'days').toDate();
-                        } else {
-                            pastview = moment(pastview).startOf('day').subtract(node.config.pastview, 'days').toDate();
-                        }
-                    } else {
-                        pastview = moment(pastview)
-                            .subtract(node.config.pastview, node.config.pastviewUnits.charAt(0))
-                            .toDate();
-                    }
-
-                    processData(data, realnow, pastview, preview, callback, node, node.config);
-                    callback(data);
-                } else {
-                    callback(null, 'no Data');
+            for (var t = 0; t < node.datesArray.length; t++) {
+                if (node.datesArray[t].eventEnd.getTime() > today.getTime() && node.datesArray[t].eventStart.getTime() < tomorrow.getTime()) {
+                    todayEventcounter++;
                 }
-            } catch (e) {
-                node.debug(JSON.stringify(e));
-                callback('no Data' + e);
+                if (node.datesArray[t].eventEnd.getTime() > tomorrow.getTime() && node.datesArray[t].eventStart.getTime() < dayAfterTomorrow.getTime()) {
+                    tomorrowEventcounter++;
+                }
+            }
+            send = send || function () { node.send.apply(node, arguments); };
+            send(Object.assign(node.msg, {
+                today: todayEventcounter,
+                tomorrow: tomorrowEventcounter,
+                total: node.datesArray.length,
+                htmlTable: brSeparatedList(node.datesArray, node.config),
+                payload: node.datesArray,
+            }));
+            if (done) {
+                done();
             }
         }).catch(err => {
-            if (err) {
-                node.error('Error: ' + err);
-                node.status({ fill: 'red', shape: 'ring', text: err.message });
-                node.send({
-                    error: err
-                });
-                return;
+            node.status({ fill: 'red', shape: 'ring', text: err.message });
+            //@ts-ignore
+            send({ error: err });
+            if (done) {
+                done(err);
+            } else {
+                node.error(err, msg);
             }
         });
-    }
-
-
-
-    function displayDates(node: any, config: Config) {
-        let todayEventcounter = 0;
-        let tomorrowEventcounter = 0;
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let oneDay = 24 * 60 * 60 * 1000;
-        let tomorrow = new Date(today.getTime() + oneDay);
-        let dayAfterTomorrow = new Date(tomorrow.getTime() + oneDay);
-
-        for (var t = 0; t < node.datesArray.length; t++) {
-            if (node.datesArray[t].eventEnd.getTime() > today.getTime() && node.datesArray[t].eventStart.getTime() < tomorrow.getTime()) {
-                todayEventcounter++;
-            }
-            if (node.datesArray[t].eventEnd.getTime() > tomorrow.getTime() && node.datesArray[t].eventStart.getTime() < dayAfterTomorrow.getTime()) {
-                tomorrowEventcounter++;
-            }
-        }
-
-        node.send(Object.assign(node.msg, {
-            today: todayEventcounter,
-            tomorrow: tomorrowEventcounter,
-            total: node.datesArray.length,
-            htmlTable: brSeparatedList(node.datesArray, config),
-            payload: node.datesArray,
-        }));
-    }
-
-    let dictionary = {
-        today: {
-            en: 'Today',
-            it: 'Oggi',
-            es: 'Hoy',
-            pl: 'Dzisiaj',
-            fr: "Aujourd'hui",
-            de: 'Heute',
-            ru: 'Сегодня',
-            nl: 'Vandaag',
-        },
-        tomorrow: {
-            en: 'Tomorrow',
-            it: 'Domani',
-            es: 'Mañana',
-            pl: 'Jutro',
-            fr: 'Demain',
-            de: 'Morgen',
-            ru: 'Завтра',
-            nl: 'Morgen',
-        },
-        dayafter: {
-            en: 'Day After Tomorrow',
-            it: 'Dopodomani',
-            es: 'Pasado mañana',
-            pl: 'Pojutrze',
-            fr: 'Après demain',
-            de: 'Übermorgen',
-            ru: 'Послезавтра',
-            nl: 'Overmorgen',
-        },
-        '3days': {
-            en: 'In 3 days',
-            it: 'In 3 giorni',
-            es: 'En 3 días',
-            pl: 'W 3 dni',
-            fr: 'Dans 3 jours',
-            de: 'In 3 Tagen',
-            ru: 'Через 2 дня',
-            nl: 'Over 3 dagen',
-        },
-        '4days': {
-            en: 'In 4 days',
-            it: 'In 4 giorni',
-            es: 'En 4 días',
-            pl: 'W 4 dni',
-            fr: 'Dans 4 jours',
-            de: 'In 4 Tagen',
-            ru: 'Через 3 дня',
-            nl: 'Over 4 dagen',
-        },
-        '5days': {
-            en: 'In 5 days',
-            it: 'In 5 giorni',
-            es: 'En 5 días',
-            pl: 'W ciągu 5 dni',
-            fr: 'Dans 5 jours',
-            de: 'In 5 Tagen',
-            ru: 'Через 4 дня',
-            nl: 'Over 5 dagen',
-        },
-        '6days': {
-            en: 'In 6 days',
-            it: 'In 6 giorni',
-            es: 'En 6 días',
-            pl: 'W ciągu 6 dni',
-            fr: 'Dans 6 jours',
-            de: 'In 6 Tagen',
-            ru: 'Через 5 дней',
-            nl: 'Over 6 dagen',
-        },
-        oneweek: {
-            en: 'In one week',
-            it: 'In una settimana',
-            es: 'En una semana',
-            pl: 'W jeden tydzień',
-            fr: 'Dans une semaine',
-            de: 'In einer Woche',
-            ru: 'Через неделю',
-            nl: 'Binnen een week',
-        },
-        '1week_left': {
-            en: 'One week left',
-            it: 'Manca una settimana',
-            es: 'Queda una semana',
-            pl: 'Został jeden tydzień',
-            fr: 'Reste une semaine',
-            de: 'Noch eine Woche',
-            ru: 'Ещё неделя',
-            nl: 'Over een week',
-        },
-        '2week_left': {
-            en: 'Two weeks left',
-            it: 'Due settimane rimaste',
-            es: 'Dos semanas restantes',
-            pl: 'Zostały dwa tygodnie',
-            fr: 'Il reste deux semaines',
-            de: 'Noch zwei Wochen',
-            ru: 'Ещё две недели',
-            nl: 'Over twee weken',
-        },
-        '3week_left': {
-            en: 'Three weeks left',
-            it: 'Tre settimane rimanenti',
-            es: 'Tres semanas quedan',
-            pl: 'Pozostały trzy tygodnie',
-            fr: 'Trois semaines restantes',
-            de: 'Noch drei Wochen',
-            ru: 'Ещё три недели',
-            nl: 'Over drie weken',
-        },
-        '4week_left': {
-            en: 'Four weeks left',
-            it: 'Quattro settimane rimaste',
-            es: 'Cuatro semanas quedan',
-            pl: 'Pozostały cztery tygodnie',
-            fr: 'Quatre semaines à gauche',
-            de: 'Noch vier Wochen',
-            ru: 'Ещё три недели',
-            nl: 'Over vier weken',
-        },
-        '5week_left': {
-            en: 'Five weeks left',
-            it: 'Cinque settimane rimaste',
-            es: 'Quedan cinco semanas',
-            pl: 'Pozostało pięć tygodni',
-            fr: 'Cinq semaines à gauche',
-            de: 'Noch fünf Wochen',
-            ru: 'Ещё пять недель',
-            nl: 'Over vijf weken',
-        },
-        '6week_left': {
-            en: 'Six weeks left',
-            it: 'Sei settimane a sinistra',
-            es: 'Seis semanas restantes',
-            pl: 'Pozostało sześć tygodni',
-            fr: 'Six semaines à gauche',
-            de: 'Noch sechs Wochen',
-            ru: 'Ещё шесть недель',
-            nl: 'Over zes weken',
-        },
-        left: {
-            en: 'left',
-            it: 'sinistra',
-            es: 'izquierda',
-            pl: 'lewo',
-            fr: 'la gauche',
-            de: ' ',
-            ru: 'осталось',
-            nl: 'over',
-        },
-        still: { en: ' ', it: '', es: '', pl: '', fr: '', de: 'Noch', ru: ' ', nl: 'nog' },
-        days: { en: 'days', it: 'Giorni', es: 'dias', pl: 'dni', fr: 'journées', de: 'Tage', ru: 'дней', nl: 'dagen' },
-        day: { en: 'day', it: 'giorno', es: 'día', pl: 'dzień', fr: 'journée', de: 'Tag', ru: 'день', nl: 'dag' },
-        hours: {
-            en: 'hours',
-            it: 'ore',
-            es: 'horas',
-            pl: 'godziny',
-            fr: 'heures',
-            de: 'Stunden',
-            ru: 'часов',
-            nl: 'uren',
-        },
-        hour: { en: 'hour', it: 'ora', es: 'hora', pl: 'godzina', fr: 'heure', de: 'Stunde', ru: 'час', nl: 'uur' },
-    };
-
-    function _(text, config) {
-        if (!text) return '';
-
-        if (dictionary[text]) {
-            var newText = dictionary[text][config.language];
-            if (newText) {
-                return newText;
-            } else if (config.language !== 'en') {
-                newText = dictionary[text].en;
-                if (newText) {
-                    return newText;
-                }
-            }
-        }
-        return text;
-    }
-
-    function insertSorted(arr: CalEvent[], element: CalEvent) {
-        if (!arr.length) {
-            arr.push(element);
-        } else {
-            if (arr[0].eventStart > element.eventStart) {
-                arr.unshift(element);
-            } else if (arr[arr.length - 1].eventStart < element.eventStart) {
-                arr.push(element);
-            } else {
-                if (arr.length === 1) {
-                    arr.push(element);
-                } else {
-                    for (var i = 0; i < arr.length - 1; i++) {
-                        if (arr[i].eventStart <= element.eventStart && element.eventStart < arr[i + 1].eventStart) {
-                            arr.splice(i + 1, 0, element);
-                            element = null;
-                            break;
-                        }
-                    }
-                    if (element) arr.push(element);
-                }
-            }
-        }
     }
 
     function brSeparatedList(datesArray: CalEvent[], config) {
@@ -626,252 +125,14 @@ module.exports = function (RED: Red) {
         dayafter.setHours(0, 0, 0, 0);
 
         for (var i = 0; i < datesArray.length; i++) {
-            var date = formatDate(datesArray[i].eventStart, datesArray[i].eventEnd, true, datesArray[i].allDay, config);
-
-            if (text) text += '<br/>\n';
-            text += (date.text.trim() + ' ' + datesArray[i].event).trim()
-            text += '</span>';
+            if (text)
+                text += '<br/>\n';
+            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();            
         }
-
+        text += '</span>';
         return text;
     }
 
-    function formatDate(_date, _end: Date, withTime, fullday, config) {
-        var day = _date.getDate();
-        var month = _date.getMonth() + 1;
-        var year = _date.getFullYear();
-        var endday = _end.getDate();
-        var endmonth = _end.getMonth() + 1;
-        var endyear = _end.getFullYear();
-        var _time = '';
-        var alreadyStarted = _date < new Date();
-
-        if (withTime) {
-            var hours = _date.getHours();
-            var minutes = _date.getMinutes();
-
-            if (!alreadyStarted) {
-                if (hours < 10) hours = '0' + hours.toString();
-                if (minutes < 10) minutes = '0' + minutes.toString();
-                _time = ' ' + hours + ':' + minutes;
-            }
-            var timeDiff = _end.getTime() - _date.getTime();
-            if (timeDiff === 0 && hours === 0 && minutes === 0) {
-                _time = ' ';
-            } else if (timeDiff > 0) {
-                if (!alreadyStarted) {
-                    _time += '-';
-                } else {
-                    _time += ' ';
-                }
-
-                var endhours = _end.getHours().toString();
-                var endminutes = _end.getMinutes().toString();
-
-                if (parseInt(endhours) < 10) endhours = '0' + endhours.toString();
-
-                if (parseInt(endminutes) < 10) endminutes = '0' + endminutes.toString();
-                _time += endhours + ':' + endminutes;
-
-                var startDayEnd = new Date();
-                startDayEnd.setFullYear(_date.getFullYear());
-                startDayEnd.setMonth(_date.getMonth());
-                startDayEnd.setDate(_date.getDate() + 1);
-                startDayEnd.setHours(0, 0, 0, 0);
-
-                if (_end > startDayEnd) {
-                    var start = new Date();
-                    if (!alreadyStarted) {
-                        start.setDate(_date.getDate());
-                        start.setMonth(_date.getMonth());
-                        start.setFullYear(_date.getFullYear());
-                    }
-                    start.setHours(0, 0, 1, 0);
-                    var fullTimeDiff = timeDiff;
-                    timeDiff = _end.getTime() - start.getTime();
-
-                    if (fullTimeDiff >= 24 * 60 * 60 * 1000) {
-                        _time += '+' + Math.floor(timeDiff / (24 * 60 * 60 * 1000));
-                    }
-                } else if (config.replacedates && _end.getHours() === 0 && _end.getMinutes() === 0) {
-                    _time = ' ';
-                }
-            }
-        }
-        var _class = '';
-        var d = new Date();
-        d.setHours(0, 0, 0, 0);
-        var d2 = new Date();
-        d2.setDate(d.getDate() + 1);
-
-        var todayOnly = false;
-        if (
-            day === d.getDate() &&
-            month === d.getMonth() + 1 &&
-            year === d.getFullYear() &&
-            endday === d2.getDate() &&
-            endmonth === d2.getMonth() + 1 &&
-            endyear === d2.getFullYear() &&
-            fullday
-        ) {
-            todayOnly = true;
-        }
-
-        if (todayOnly || !alreadyStarted) {
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_today';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_tomorrow';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_dayafter';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_3days';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_4days';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_5days';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_6days';
-            }
-
-            d.setDate(d.getDate() + 1);
-            if (day === d.getDate() && month === d.getMonth() + 1 && year === d.getFullYear()) {
-                _class = 'ical_oneweek';
-            }
-
-            if (config.replacedates) {
-                if (_class === 'ical_today')
-                    return {
-                        text: _('today', config) + _time,
-                        _class: _class,
-                    };
-                if (_class === 'ical_tomorrow') return { text: _('tomorrow', config) + _time, _class: _class };
-                if (_class === 'ical_dayafter') return { text: _('dayafter', config) + _time, _class: _class };
-                if (_class === 'ical_3days') return { text: _('3days', config) + _time, _class: _class };
-                if (_class === 'ical_4days') return { text: _('4days', config) + _time, _class: _class };
-                if (_class === 'ical_5days') return { text: _('5days', config) + _time, _class: _class };
-                if (_class === 'ical_6days') return { text: _('6days', config) + _time, _class: _class };
-                if (_class === 'ical_oneweek') return { text: _('oneweek', config) + _time, _class: _class };
-            }
-        } else {
-            _class = 'ical_today';
-            var daysleft = Math.round((_end.getDate() - new Date().getDate()) / (1000 * 60 * 60 * 24));
-            var hoursleft = Math.round((_end.getDate() - new Date().getDate()) / (1000 * 60 * 60));
-
-            if (config.replacedates) {
-                var _left = _('left', config) !== ' ' ? ' ' + _('left', config) : '';
-                var text;
-                if (daysleft === 42) {
-                    text = _('6week_left', config);
-                } else if (daysleft === 35) {
-                    text = _('5week_left', config);
-                } else if (daysleft === 28) {
-                    text = _('4week_left', config);
-                } else if (daysleft === 21) {
-                    text = _('3week_left', config);
-                } else if (daysleft === 14) {
-                    text = _('2week_left', config);
-                } else if (daysleft === 7) {
-                    text = _('1week_left', config);
-                } else if (daysleft >= 1) {
-                    if (config.language === 'ru') {
-                        var c = daysleft % 10;
-                        var cc = Math.floor(daysleft / 10) % 10;
-                        if (daysleft === 1) {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + daysleft + ' ' + _('day', config) + _left;
-                        } else if (cc > 1 && (c > 1 || c < 5)) {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + daysleft + ' ' + 'дня' + _left;
-                        } else {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + daysleft + ' ' + _('days', config) + _left;
-                        }
-                    } else {
-                        text =
-                            (_('still', config) !== ' ' ? _('still', config) : '') +
-                            ' ' +
-                            daysleft +
-                            ' ' +
-                            (daysleft === 1 ? _('day', config) : _('days', config)) +
-                            _left;
-                    }
-                } else {
-                    if (config.language === 'ru') {
-                        var c = hoursleft % 10;
-                        var cc = Math.floor(hoursleft / 10) % 10;
-                        if (hoursleft === 1) {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + hoursleft + ' ' + _('hour', config) + _left;
-                        } else if (cc !== 1 && (c > 1 || c < 5)) {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + hoursleft + ' ' + 'часа' + _left;
-                        } else {
-                            text = (_('still', config) !== ' ' ? _('still', config) : '') + ' ' + hoursleft + ' ' + _('hours', config) + _left;
-                        }
-                    } else {
-                        text =
-                            (_('still', config) !== ' ' ? _('still', config) : '') +
-                            ' ' +
-                            hoursleft +
-                            ' ' +
-                            (hoursleft === 1 ? _('hour', config) : _('hours', config)) +
-                            _left;
-                    }
-                }
-            } else {
-                day = _end.getDate();
-                if (fullday) {
-                    day -= 1;
-                    withTime = false;
-                }
-                month = _end.getMonth() + 1;
-                year = _end.getFullYear();
-
-                if (day < 10) day = '0' + day.toString();
-                if (month < 10) month = '0' + month.toString();
-
-                text = day + '.' + month + '.';
-                text += year;
-
-                if (withTime) {
-                    let endhours = _end.getHours().toString();
-                    let endminutes = _end.getMinutes().toString();
-
-                    if (parseInt(endhours) < 10) {
-                        endhours = '0' + endhours.toString();
-                    }
-                    if (parseInt(endminutes) < 10) {
-                        endminutes = '0' + endminutes.toString();
-                    }
-                    text += ' ' + endhours + ':' + endminutes;
-                }
-            }
-
-            return { text: text, _class: _class };
-        }
-
-        if (day < 10) day = '0' + day.toString();
-        if (month < 10) month = '0' + month.toString();
-
-        return {
-            text: (day + '.' + month + '.' + year + _time).trim(),
-            _class: _class,
-        };
-    }
 
     RED.nodes.registerType('ical-upcoming', upcomingNode);
 };
