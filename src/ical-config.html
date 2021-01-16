@@ -69,7 +69,9 @@
                     }).attr('selected', true);
                 }
 
-
+                if (node.user || (!node.username && !node.user)) {
+                    $('#hint_v1').hide()
+                }
 
                 $('#node-config-input-caltype').change(function () {
                     var value = $('#node-config-input-caltype').val();
@@ -129,7 +131,7 @@
                 <option value="icloud">iCloud secure</option>
             </select>     
     </div>
-    <div class="form-tips" >     
+    <div class="form-tips" id="hint_v1">     
         <i class="fa fa-exclamation"></i>
             <b>CAUTION:</b> with v1.0.0 credentials are stored in the node-red internal credential store. It's safer, but you need to reenter credentials.
     </div>
