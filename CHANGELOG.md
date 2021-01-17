@@ -10,18 +10,6 @@ All notable changes to this project will be documented in this file. See [standa
 * display v1 hint, only when credentials were entered ([ff73c38](https://github.com/naimo84/node-red-contrib-ical-events/commit/ff73c3813a126ca47d389ea740cab61adc764c9f))
 * outsourced the whole fetching logic into an external library ([4fed9db](https://github.com/naimo84/node-red-contrib-ical-events/commit/4fed9db0a16c507b4d9bdf9151dd3fd7be78b89d))
 
-## [1.0.0-beta.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v1.0.0-beta.0) (2021-01-14)
-
-
-### ⚠ BREAKING CHANGES
-
-* credentials are now stored in the node-red internal crendential store. It's safer, but need to reenter credentials.
-
-### Features
-
-* outsourced the whole fetching logic to kalender-events ([72d1b71](https://github.com/naimo84/node-red-contrib-ical-events/commit/72d1b717c7fd3db271bb737bfd4d42dd5e5f13bc))
-
-
 ### Bug Fixes
 
 * date in past for cronjob ([29c1196](https://github.com/naimo84/node-red-contrib-ical-events/commit/29c1196204b90d277dc1d4135ca05de4a806c56c))
