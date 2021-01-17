@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.23.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v0.23.0) (2021-01-17)
+
+
+### Bug Fixes
+
+* issue [#72](https://github.com/naimo84/node-red-contrib-ical-events/issues/72), set calenderName = config.name if not set ([a7ba7b5](https://github.com/naimo84/node-red-contrib-ical-events/commit/a7ba7b535feab034503e8cfecc180e7681048ea7))
+* issue [#76](https://github.com/naimo84/node-red-contrib-ical-events/issues/76), trigger cronjob event in past ([bd381cf](https://github.com/naimo84/node-red-contrib-ical-events/commit/bd381cf35799cb083b2aae7d61b6adcce9b62e6d))
+
 ## [0.22.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.21.0...v0.22.0) (2021-01-03)
 
 
