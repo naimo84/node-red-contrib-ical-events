@@ -9,6 +9,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 * issue [#72](https://github.com/naimo84/node-red-contrib-ical-events/issues/72), set calenderName = config.name if not set ([a7ba7b5](https://github.com/naimo84/node-red-contrib-ical-events/commit/a7ba7b535feab034503e8cfecc180e7681048ea7))
 * issue [#76](https://github.com/naimo84/node-red-contrib-ical-events/issues/76), trigger cronjob event in past ([bd381cf](https://github.com/naimo84/node-red-contrib-ical-events/commit/bd381cf35799cb083b2aae7d61b6adcce9b62e6d))
+## [1.0.0-beta.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v1.0.0-beta.1) (2021-01-17)
+
+
+### Features
+
+* display v1 hint, only when credentials were entered ([ff73c38](https://github.com/naimo84/node-red-contrib-ical-events/commit/ff73c3813a126ca47d389ea740cab61adc764c9f))
+* outsourced the whole fetching logic into an external library ([4fed9db](https://github.com/naimo84/node-red-contrib-ical-events/commit/4fed9db0a16c507b4d9bdf9151dd3fd7be78b89d))
+
+### Bug Fixes
+
+* date in past for cronjob ([29c1196](https://github.com/naimo84/node-red-contrib-ical-events/commit/29c1196204b90d277dc1d4135ca05de4a806c56c))
 
 ## [0.22.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.21.0...v0.22.0) (2021-01-03)
 

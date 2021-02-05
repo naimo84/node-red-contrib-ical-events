@@ -1,13 +1,10 @@
-import moment = require('moment');
-import { loadEventsForDay } from './icloud';
-import { CalDav, Fallback } from './caldav';
-import { Config } from './ical-config';
+import { IcalEventsConfig } from './ical-config';
 import { CronJob } from 'cron';
-import { Red, Node } from 'node-red';
+import { Node } from 'node-red';
 import * as NodeCache from 'node-cache';
-
-const nodeIcal = require('node-ical');
-
+import { KalenderEvents } from "kalender-events";
+import { IKalenderEvent } from 'kalender-events/types/event';
+const kalenderEvents = new KalenderEvents()
 export interface Job {
     id: string,
     cronjob: any
@@ -17,38 +14,69 @@ export interface IcalNode extends Node {
     datesArray_old: any;
     datesArray: any;
     job: CronJob;
-    config: Config;
+    config: IcalEventsConfig;
     cache: NodeCache;
-    red: Red;
+    red: any;
     msg: any;
+    ke: KalenderEvents;
 }
 
-export interface CalEvent {
-    summary?: string,
+export interface CalEvent extends IKalenderEvent {
     topic?: string,
-    location?: string,
-    eventStart?: Date
-    eventEnd?: Date,
-    date?: string,
-    event?: string,
-    description?: string,
-    id?: string,
-    allDay?: boolean,
-    rule?: string,
     on?: boolean,
     off?: boolean,
-    countdown?: object,
-    calendarName?: string,
-    categories?: string[]
-
 }
 
-export async function getICal(node: IcalNode, config) {
-    let configs = [];
+
+export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): IcalEventsConfig {
+
+    let type = msg?.caldav || msg?.type || config?.caltype;
+    if (!type && config?.caldav) {
+        if (config.caldav === "false")
+            type = "ical"
+        else if (config.caldav === "true")
+            type = "caldav"
+        else if (config.caldav === "icloud")
+            type = "icloud"
+    }
+
+    const icalConfig = {
+        url: msg?.url || config?.url,
+        name: msg?.calendarName || config?.name,
+        language: msg?.language || config?.language,
+        checkall: msg?.checkall || node?.checkall || false,
+        replacedates: msg?.replacedates || config?.replacedates,
+        type: type,
+        username: msg?.username || config?.credentials?.user || config?.username,
+        usecache: msg?.usecache || config?.usecache || false,
+        password: msg?.password || config?.credentials?.pass || config?.password,
+        calendar: msg?.calendar || config?.calendar,
+        filter: msg?.filter || node?.filter,
+        filter2: msg?.filter2 || node?.filter2,
+        filterProperty: msg?.filterProperty || node?.filterProperty,
+        filterOperator: msg?.filterOperator || node?.filterOperator,
+        trigger: msg?.trigger || node?.trigger || 'always',
+        preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
+        previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
+        pastview: parseInt(msg?.pastview || node?.pastview || 0),
+        pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
+        offset: parseInt(msg?.offset || node?.offset || 0),
+        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
+        rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false
+    } as IcalEventsConfig;
+
+    return icalConfig;
+}
+
+
+export async function getICal(node: IcalNode) {
+
+
+    let configs: IcalEventsConfig[] = [];
     if (node.config.checkall) {
         node.red.nodes.eachNode(n => {
             if (n.type === 'ical-config') {
-                configs.push(n);
+                configs.push(node.red.nodes.getNode(n.id));
             }
         })
     } else {
@@ -58,11 +86,23 @@ export async function getICal(node: IcalNode, config) {
     let datas = [];
     for (let config of configs) {
         try {
-            let data = await getEvents(node, config)
-            for (let d in data) {
-                let event=data[d];
-                if(!event.calendarName) event.calendarName=config.name;
-                datas.push(event)
+            if (configs.length === 1) {
+                let icalConfig = node.config;
+                let data = await kalenderEvents.getEvents(icalConfig)
+                for (let d in data) {
+                    let event = data[d];
+                    if (!event.calendarName) event.calendarName = config.name;
+                    datas.push(event)
+                }
+            }
+            else {
+                let icalConfig = getConfig(config, node.config);
+                let data = await kalenderEvents.getEvents(icalConfig)
+                for (let d in data) {
+                    let event = data[d];
+                    if (!event.calendarName) event.calendarName = icalConfig.name;
+                    datas.push(event)
+                }
             }
         }
         catch (err) {
@@ -74,311 +114,13 @@ export async function getICal(node: IcalNode, config) {
     }
 
     if (node.config.usecache && node.cache) {
-        node.cache.set("events",datas);
+        node.cache.set("events", datas);
     }
     return datas;
 }
 
-export function getConfig(config: Config, node: any, msg: any): Config {
-    return {
-        url: msg?.url || config?.url,
-        name: msg?.calendarName || config?.name,
-        language: msg?.language || config?.language,
-        checkall: msg?.checkall || node?.checkall || false,
-        replacedates: msg?.replacedates || config?.replacedates,
-        caldav: msg?.caldav || config?.caldav,
-        username: msg?.username || config?.username,
-        usecache: msg?.usecache || config?.usecache || false,
-        password: msg?.password || config?.password,
-        calendar: msg?.calendar || config?.calendar,
-        filter: msg?.filter || node.filter,
-        filterProperty: msg?.filterProperty || node.filterProperty,
-        trigger: msg?.trigger || node.trigger || 'always',
-        preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
-        previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
-        pastview: parseInt(msg?.pastview || node?.pastview || 0),
-        pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
-        offset: parseInt(msg?.offset || node?.offset || 0),
-        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
-        rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false
-    } as Config;
-}
-
-export function convertEvents(events) {
-    let retEntries = [];
-    if (events) {
-        if (Array.isArray(events)) {
-            events.forEach(event => {
-                let ev = convertScrapegoat(event.data);
-                retEntries.push(ev);
-            });
-        }
-        else {
-            if (events.events) {
-                events.events.forEach(event => {
-                    let ev = convertEvent(event);
-                    retEntries.push(ev);
-                });
-            }
-            if (events.occurrences && events.occurrences.length > 0) {
-                events.occurrences.forEach(event => {
-                    let ev = convertEvent(event);
-                    retEntries.push(ev);
-                });
-            }
-        }
-    }
-
-    return retEntries;
-}
-
-function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-export function filterOutput(node, ev) {
-    let output = false;
-    let filterProperty = ev.summary;
-    if (node.config.filterProperty) {
-        filterProperty = ev[node.config.filterProperty.toLowerCase()]
-    }
-    let regex = new RegExp(node.config.filter || "");
-    if (node.config.trigger == 'match') {
-        if (node.config.filterProperty && node.config.filterProperty == "attendee") {
-            if (Array.isArray(filterProperty)) {
-                for (const attendee of filterProperty) {
-                    if (regex.test(attendee.jCal[1].cn)) {
-                        output = true; break;
-                    }
-                }
-            } else {
-                if (regex.test(filterProperty.params.CN)) {
-                    output = true;
-                }
-            }
-        } else if (regex.test(filterProperty)) {
-            output = true;
-        }
-    } else if (node.config.trigger == 'nomatch') {
-        if (node.config.filterProperty && node.config.filterProperty == "attendee") {
-            if (Array.isArray(filterProperty)) {
-                for (const attendee of filterProperty) {
-                    if (!regex.test(attendee.jCal[1].cn)) {
-                        output = true; break;
-                    }
-                }
-            } else {
-                if (!regex.test(filterProperty.params.CN)) {
-                    output = true;
-                }
-            }
-        } else if (!regex.test(filterProperty)) {
-            output = true;
-        }
-    } else {
-        output = true;
-    }
-    return output;
-}
-
-export function convertEvent(e) {
-    if (e) {
-        let startDate = e.startDate?.toJSDate() || e.start;
-        let endDate = e.endDate?.toJSDate() || e.end;
-
-        const recurrence = e.recurrenceId;
-
-        if (e.item) {
-            e = e.item
-        }
-        if (e.type && e.type !== "VEVENT") {
-            return;
-        }
-        if (e.duration?.wrappedJSObject) {
-            delete e.duration.wrappedJSObject
-        }
-
-        let uid = e.uid || uuidv4();
-        if (recurrence) {
-            uid += new Date(recurrence.year, recurrence.month, recurrence.day, recurrence.hour, recurrence.minute, recurrence.second).getTime().toString();
-        } else {
-            uid += startDate.getTime().toString();
-        }
-
-        let duration = e.duration;
-        let allday = false;
-        if (!duration) {
-            var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-            seconds = Number(seconds);
-            allday = ((seconds % 86400) === 0)
-        } else {
-            allday = ((duration.toSeconds() % 86400) === 0)
-        }
-
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.summary || '',
-            description: e.description || '',
-            attendee: e.attendees || e.attendee,
-            duration: e.duration?.toICALString(),
-            durationSeconds: e.duration?.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: uid,
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: allday,
-            calendarName: null
-        }
-    }
-}
-
-function convertScrapegoat(e) {
-    if (e) {
-        let startDate = moment(e.start).toDate();
-        let endDate = moment(e.end).toDate();
-
-        const recurrence = e.recurrenceId;
-
-        if (e.duration?.wrappedJSObject) {
-            delete e.duration.wrappedJSObject
-        }
-
-        let uid = e.uid || uuidv4();
-        uid += startDate.getTime().toString();
-
-        let duration = e.duration;
-        let allday = false;
-        if (!duration) {
-            var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-            seconds = Number(seconds);
-            allday = ((seconds % 86400) === 0)
-        } else {
-            allday = ((duration.toSeconds() % 86400) === 0)
-        }
-
-        return {
-            start: startDate,
-            end: endDate,
-            summary: e.title || '',
-            description: e.title || '',
-            attendees: e.attendees,
-            duration: e.duration?.toICALString(),
-            durationSeconds: e.duration?.toSeconds(),
-            location: e.location || '',
-            organizer: e.organizer || '',
-            uid: uid,
-            isRecurring: false,
-            datetype: 'date',
-            type: 'VEVENT',
-            allDay: allday,
-            calendarName: null
-        }
-    }
-}
-
-export function getTimezoneOffset(date: Date) {
-    const isoDate = date.toISOString();
-    var offset = moment(isoDate).utcOffset();
-    return -offset;
-}
-
-export function addOffset(time, offset) {
-    return new Date(time.getTime() + offset * 60 * 1000);
-}
-
-export function countdown(date) {
-
-    var seconds = (date.getTime() - new Date().getTime()) / 1000;
-    seconds = Number(seconds);
-
-    var d = Math.floor(seconds / (3600 * 24));
-    var h = Math.floor(seconds % (3600 * 24) / 3600);
-    var m = Math.floor(seconds % 3600 / 60);
-    var s = Math.floor(seconds % 60);
-
-    return {
-        days: d,
-        hours: h,
-        minutes: m,
-        seconds: s,
-    };
-}
-
-async function getEvents(node: IcalNode, config: Config) {
-    if (config.caldav && config.caldav === 'icloud') {
-        node.debug('icloud');
-        const now = moment();
-        const when = now.toDate();
-
-        let list = await loadEventsForDay(moment(when), config);
-        return list;
-
-    } else if (config.caldav && JSON.parse(config.caldav) === true) {
-        node.debug('caldav');
-        try {
-            let data = await CalDav(config);
-            let retEntries = {};
-            if (data) {
-                for (let events of data) {
-                    for (let event in events) {
-                        var ev = events[event];
-                        retEntries[ev.uid] = ev;
-                    }
-                }
-            }
-            return retEntries;
-        }
-        catch (err) {
-            node.debug(`caldav - get calendar went wrong. Error Message: ${err}`)
-            node.debug(`caldav - using fallback`)
-            try {
-                let data = await Fallback(config)
-                return data;
-            }
-            catch (err_fallback) {
-                node.error(`caldav - get calendar went wrong. Error Message: ${err_fallback}`)
-            }
-        }
-    } else {
-        node.debug('ical');
-        if (config?.url?.match(/^webcal:\/\//)){
-            config.url=config.url.replace("webcal","https")
-        }
-
-        if (config?.url?.match(/^https?:\/\//)) {
-            let header = {};
-            let username = config.username;
-            let password = config.password;
-
-            if (username && password) {
-                var auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
-                header = {
-                    headers: {
-                        'Authorization': auth,
-                    },
-                };
-            }
-
-            let data = await nodeIcal.async.fromURL(config.url, header);
-            return data;
-
-        } else {
-            if (!config.url) {
-                node.error("URL/File is not defined");
-                node.status({ fill: 'red', shape: 'ring', text: "URL/File is not defined" });
-
-            }
-            let data = await nodeIcal.async.parseFile(config.url)
-            return data;
 
 
-        }
-    }
-}
+
+
 
