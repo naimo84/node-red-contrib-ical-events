@@ -88,6 +88,9 @@ export async function getICal(node: IcalNode) {
         try {
             if (configs.length === 1) {
                 let icalConfig = node.config;
+                if ((new Date(node.msg.payload)).getTime() > 0) {
+                    icalConfig = Object.assign(icalConfig, { now: new Date(node.msg.payload) })
+                }
                 let data = await kalenderEvents.getEvents(icalConfig)
                 for (let d in data) {
                     let event = data[d];
