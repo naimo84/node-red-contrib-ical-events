@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.2](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.23.0...v1.0.0-beta.2) (2021-02-15)
+
+
+### Features
+
+* configurable timestamp to check as payload ([71547e3](https://github.com/naimo84/node-red-contrib-ical-events/commit/71547e3a963a5eba80cd606e2fa9a047d2bbdf4f))
+
+## [1.0.0-beta.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v1.0.0-beta.1) (2021-01-17)
+
+
+### Features
+
+* display v1 hint, only when credentials were entered ([ff73c38](https://github.com/naimo84/node-red-contrib-ical-events/commit/ff73c3813a126ca47d389ea740cab61adc764c9f))
+* outsourced the whole fetching logic into an external library ([4fed9db](https://github.com/naimo84/node-red-contrib-ical-events/commit/4fed9db0a16c507b4d9bdf9151dd3fd7be78b89d))
+
 ## [0.23.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v0.22.0...v0.23.0) (2021-01-17)
 
 
