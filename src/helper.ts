@@ -4,7 +4,7 @@ import { Node } from 'node-red';
 import * as NodeCache from 'node-cache';
 import { KalenderEvents } from "kalender-events";
 import { IKalenderEvent } from 'kalender-events/types/event';
-const kalenderEvents = new KalenderEvents()
+
 export interface Job {
     id: string,
     cronjob: any
@@ -70,7 +70,7 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
 
 
 export async function getICal(node: IcalNode) {
-
+    const kalenderEvents = new KalenderEvents()
 
     let configs: IcalEventsConfig[] = [];
     if (node.config.checkall) {
