@@ -23,6 +23,7 @@
                 trigger: {},
                 filterProperty: {},
                 filterOperator: {},
+                combineResponse: {},
                 filter2: {
                     required: false,
                     validate: function (v) {
@@ -111,6 +112,15 @@
                         .attr('selected', true);
                 }
 
+                $('#node-input-combineResponse').change(() => {
+                    var value = $('#node-input-combineResponse').prop('checked');
+                    if (value) {
+                        $('#combine-response-hint').show();
+                    } else {
+                        $('#combine-response-hint').hide();
+
+                    }
+                });
                 $('#node-input-trigger').change(function () {
                     var value = $('#node-input-trigger').val();
                     let filterProperty = $('#node-input-filterProperty').val();
@@ -357,6 +367,13 @@
         <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
         <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
         <input type="text" id="node-input-filter2" >
+    </div>
+    <div class="form-row event">
+        <label for="node-input-combineResponse" style="width:190px !important">
+            <i class="fa fa-asterisk"></i>
+            <span>combine to one message</span></label>
+        <input type="checkbox" id="node-input-combineResponse" placeholder="" style="flex:0; width: auto; margin-right: 10px">
+        <span id="combine-response-hint">(payload will be an array)</span>
     </div>
 </script>
 

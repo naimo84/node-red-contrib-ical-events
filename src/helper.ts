@@ -19,6 +19,7 @@ export interface IcalNode extends Node {
     red: any;
     msg: any;
     ke: KalenderEvents;
+    combineResponse:boolean
 }
 
 export interface CalEvent extends IKalenderEvent {
@@ -62,7 +63,9 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
         offset: parseInt(msg?.offset || node?.offset || 0),
         offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
-        rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false
+        rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
+        combineResponse: msg?.combineResponse || node?.combineResponse || false
+
     } as IcalEventsConfig;
 
     return icalConfig;

@@ -5,3 +5,4 @@ test/*
 src/*
 gulpfile.js
 examples/*.png
+*.tgz

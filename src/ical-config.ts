@@ -8,7 +8,8 @@ export interface IcalEventsConfig extends Config {
     caldav?: string,
     name: string,
     id: any,
-    type: any
+    type: any,
+    combineResponse: boolean
 }
 
 
