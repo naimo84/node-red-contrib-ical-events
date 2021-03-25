@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2021-03-25)
+
+
+### Features
+
+* issue [#83](https://github.com/naimo84/node-red-contrib-ical-events/issues/83), combine Response of sensor node ([80490fc](https://github.com/naimo84/node-red-contrib-ical-events/commit/80490fcecc8832a44958c6af3a953b330695e3a5))
+
 ## [1.0.0-beta.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2021-03-25)
 
 
