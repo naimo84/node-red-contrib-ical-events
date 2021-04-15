@@ -83,10 +83,10 @@ module.exports = function (RED:any) {
             let dayAfterTomorrow = new Date(tomorrow.getTime() + oneDay);
 
             for (var t = 0; t < node.datesArray.length; t++) {
-                if (node.datesArray[t].eventEnd.getTime() > today.getTime() && node.datesArray[t].eventStart.getTime() < tomorrow.getTime()) {
+                if (new Date(node.datesArray[t].eventEnd).getTime() > today.getTime() && new Date(node.datesArray[t].eventStart).getTime() < tomorrow.getTime()) {
                     todayEventcounter++;
                 }
-                if (node.datesArray[t].eventEnd.getTime() > tomorrow.getTime() && node.datesArray[t].eventStart.getTime() < dayAfterTomorrow.getTime()) {
+                if (new Date(node.datesArray[t].eventEnd).getTime() > tomorrow.getTime() && new Date(node.datesArray[t].eventStart).getTime() < dayAfterTomorrow.getTime()) {
                     tomorrowEventcounter++;
                 }
             }

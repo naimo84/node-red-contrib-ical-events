@@ -4,6 +4,7 @@ import { Node } from 'node-red';
 import * as NodeCache from 'node-cache';
 import { KalenderEvents } from "kalender-events";
 import { IKalenderEvent } from 'kalender-events/types/event';
+import { DateTime } from "luxon";
 
 export interface Job {
     id: string,
@@ -19,7 +20,8 @@ export interface IcalNode extends Node {
     red: any;
     msg: any;
     ke: KalenderEvents;
-    combineResponse:boolean
+    combineResponse: boolean;
+    timezone:string;
 }
 
 export interface CalEvent extends IKalenderEvent {
@@ -53,6 +55,7 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         password: msg?.password || config?.credentials?.pass || config?.password,
         calendar: msg?.calendar || config?.calendar,
         filter: msg?.filter || node?.filter,
+        timezone: msg?.timezone || node?.timezone,
         filter2: msg?.filter2 || node?.filter2,
         filterProperty: msg?.filterProperty || node?.filterProperty,
         filterOperator: msg?.filterOperator || node?.filterOperator,
@@ -65,12 +68,19 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false
-
     } as IcalEventsConfig;
 
     return icalConfig;
 }
 
+function extendEvent(event:IKalenderEvent, config: IcalEventsConfig) {
+    if (config.timezone) { 
+        event.eventStart = DateTime.fromJSDate(new Date(event.eventStart)).setZone( config.timezone).toString(); 
+        event.eventEnd = DateTime.fromJSDate(new Date(event.eventEnd)).setZone( config.timezone).toString(); 
+    }
+    if (!event.calendarName) event.calendarName = config.name;  
+    return event;
+}
 
 export async function getICal(node: IcalNode) {
     const kalenderEvents = new KalenderEvents()
@@ -96,18 +106,14 @@ export async function getICal(node: IcalNode) {
                 }
                 let data = await kalenderEvents.getEvents(icalConfig)
                 for (let d in data) {
-                    let event = data[d];
-                    if (!event.calendarName) event.calendarName = config.name;
-                    datas.push(event)
+                    datas.push(extendEvent(data[d], icalConfig));
                 }
             }
             else {
                 let icalConfig = getConfig(config, node.config);
                 let data = await kalenderEvents.getEvents(icalConfig)
                 for (let d in data) {
-                    let event = data[d];
-                    if (!event.calendarName) event.calendarName = icalConfig.name;
-                    datas.push(event)
+                    datas.push(extendEvent(data[d], icalConfig));
                 }
             }
         }

@@ -1,4 +1,5 @@
 import { Config } from 'kalender-events/types/config';
+var moment = require('moment-timezone');
 
 export interface IcalEventsConfig extends Config {
     credentials: any;
@@ -13,7 +14,11 @@ export interface IcalEventsConfig extends Config {
 }
 
 
+
 module.exports = function (RED: any) {
+    RED.httpAdmin.get("/timezones", async (req, res) => {
+        res.json(moment.tz.names());    
+    });
     function icalConfig(config: IcalEventsConfig) {
         RED.nodes.createNode(this, config);
 

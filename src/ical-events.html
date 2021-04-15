@@ -30,6 +30,7 @@
                     value: ""
                 },
                 trigger: {},
+                timezone: {},
                 filterProperty: {},
                 filterOperator: {},
                 filter2: {
@@ -125,7 +126,7 @@
                         })
                         .attr('selected', true);
                 }
-
+                $("#node-input-timezone").focusin(timezones);
                 $('#node-input-trigger').change(function () {
                     var value = $('#node-input-trigger').val();
                     let filterProperty = $('#node-input-filterProperty').val();
@@ -382,6 +383,10 @@
             <option value="hours">Hours</option>
             <option value="days">Days</option>
           </select>
+    </div>
+    <div class="form-row event">
+        <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
+        <input type="text" id="node-input-timezone" placeholder="default is UTC">
     </div>
     
     <div class="form-row event">

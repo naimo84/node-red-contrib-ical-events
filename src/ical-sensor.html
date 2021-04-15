@@ -1,5 +1,19 @@
 <script type="text/javascript">
-
+    function timezones() {
+        $.getJSON(`timezones`, function (data) {
+            var dataArray = [];
+            $.each(data, function (i, element) {
+                dataArray.push(element);
+            });
+            $("#node-input-timezone").autocomplete({
+                source: dataArray,
+                minLength: 0,
+                close: function (event, ui) {
+                    $("#node-input-timezone").autocomplete("destroy");
+                }
+            }).autocomplete("search", "");
+        });
+    }
 
     RED
         .nodes
@@ -21,6 +35,7 @@
                     value: ""
                 },
                 trigger: {},
+                timezone: {},
                 filterProperty: {},
                 filterOperator: {},
                 combineResponse: {},
@@ -103,6 +118,8 @@
                         })
                         .attr('selected', true);
                 }
+
+                $("#node-input-timezone").focusin(timezones);
 
                 if (node.trigger && node.filterProperty && node.filterProperty.indexOf('event') >= 0 && !node.filterOperator) {
                     $('#node-input-filterOperator option')
@@ -367,6 +384,10 @@
         <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
         <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
         <input type="text" id="node-input-filter2" >
+    </div>
+    <div class="form-row event">
+        <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
+        <input type="text" id="node-input-timezone" placeholder="default is UTC">
     </div>
     <div class="form-row event">
         <label for="node-input-combineResponse" style="width:190px !important">
