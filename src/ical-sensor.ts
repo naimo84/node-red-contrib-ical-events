@@ -110,34 +110,43 @@ module.exports = function (RED: any) {
                 }
             } else {
                 if (!node.config.combineResponse) {
-                    for (let event of events) {
-                        if (last != current) {
-                            send([
-                                Object.assign(msg, {
-                                    payload: event
-                                }),
-                                Object.assign(msg, {
-                                    payload: event
-                                })
-                            ]);
-                        } else {
-                            send(Object.assign(msg, {
-                                payload: event
-                            }));
-                        }
+                    let retEvents: NodeMessage[] = []
+                    for (let event of events) {                        
+                        let msg2 = RED.util.cloneMessage(msg);
+                        delete msg2._msgid;
+                        retEvents.push(Object.assign(msg2, {
+                            payload: event
+                        }))
                     }
+
+                    if (last != current) {
+                        send([
+                            //@ts-ignore
+                            retEvents,
+                            //@ts-ignore
+                            retEvents
+                        ])
+                    } else {
+                        send([
+                            //@ts-ignore
+                            retEvents
+                        ])
+                    }
+
                 } else {
+                    let msg2 = RED.util.cloneMessage(msg);
+                    delete msg2._msgid;
                     if (last !== current) {
                         send([
-                            Object.assign(msg, {
+                            Object.assign(msg2, {
                                 payload: events
                             }),
-                            Object.assign(msg, {
+                            Object.assign(msg2, {
                                 payload: events
                             })
                         ]);
                     } else {
-                        send(Object.assign(msg, {
+                        send(Object.assign(msg2, {
                             payload: events
                         }));
                     }
