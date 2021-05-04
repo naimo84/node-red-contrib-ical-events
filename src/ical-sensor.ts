@@ -111,7 +111,7 @@ module.exports = function (RED: any) {
             } else {
                 if (!node.config.combineResponse) {
                     let retEvents: NodeMessage[] = []
-                    for (let event of events) {                        
+                    for (let event of events) {
                         let msg2 = RED.util.cloneMessage(msg);
                         delete msg2._msgid;
                         retEvents.push(Object.assign(msg2, {
@@ -154,13 +154,16 @@ module.exports = function (RED: any) {
             }
 
             node.context().set('on', current);
-
+            if (done)
+                done();
         }).catch(err => {
             node.status({ fill: 'red', shape: 'ring', text: err.message });
             send({
                 //@ts-ignore
                 error: err
             });
+            if (done)
+                done(err);
         });
     }
 

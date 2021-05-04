@@ -9,7 +9,7 @@ import { IKalenderEvent } from 'kalender-events/types/event';
 import { NodeMessageInFlow, NodeMessage } from "node-red";
 import moment = require("moment");
 module.exports = function (RED: any) {
-    
+
     function eventsNode(config: any) {
         RED.nodes.createNode(this, config);
         let node: IcalNode = this;
@@ -17,11 +17,13 @@ module.exports = function (RED: any) {
         try {
             node.cache = new NodeCache();
             node.msg = {};
+            node.timezone = config.timezone;
+
             node.on('input', (msg, send, done) => {
                 node.msg = RED.util.cloneMessage(msg);
                 send = send || function () { node.send.apply(node, arguments) }
                 node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, config, msg);
-                cronCheckJob(node, msg, send, done, config.confignode,startedCronJobs);
+                cronCheckJob(node, msg, send, done, config.confignode, startedCronJobs);
             });
 
             node.on('close', () => {
@@ -76,7 +78,7 @@ module.exports = function (RED: any) {
         }
     }
 
-    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config,startedCronJobs) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config, startedCronJobs) {
         let newCronJobs = new Map();
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
@@ -115,7 +117,7 @@ module.exports = function (RED: any) {
                         if (eventStart > dateNow) {
                             let uid = crypto.MD5(ev.uid + ev.summary + "start").toString();
                             if (ev.uid) {
-                                uid = ev.uid.uid + eventStart.toISOString() + "start";
+                                uid = ev.uid.uid ? ev.uid.uid : ev.uid + eventStart.toISOString() + "start";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
@@ -127,7 +129,7 @@ module.exports = function (RED: any) {
                             let job2 = new CronJob(moment(eventStart), cronJobStart.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
                             if (cronJob) {
-                                cronJob.stop();                                
+                                cronJob.stop();
                             }
                             newCronJobs.set(uid, job2);
                         }
@@ -135,7 +137,7 @@ module.exports = function (RED: any) {
                         if (eventEnd > dateNow) {
                             let uid = crypto.MD5(ev.uid + ev.summary + "end").toString();
                             if (ev.uid) {
-                                uid = ev.uid.uid +  eventEnd.toISOString() + "end";
+                                uid = ev.uid.uid ? ev.uid.uid : ev.uid + eventEnd.toISOString() + "end";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
@@ -147,7 +149,7 @@ module.exports = function (RED: any) {
                             let job2 = new CronJob(moment(eventEnd), cronJobEnd.bind(null, event, send, done, msg));
                             let cronJob = startedCronJobs[uid];
                             if (cronJob) {
-                                cronJob.stop();                                
+                                cronJob.stop();
                             }
                             newCronJobs.set(uid, job2);
                         }
@@ -205,7 +207,10 @@ module.exports = function (RED: any) {
     }
 
     function cronJobStart(event: any, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
-        send([Object.assign(msg, {
+        let msg2 = RED.util.cloneMessage(msg);
+        delete msg2._msgid;
+        delete event.id;
+        send([Object.assign(msg2, {
             payload: event
         })]);
         if (done)
@@ -214,7 +219,10 @@ module.exports = function (RED: any) {
     }
 
     function cronJobEnd(event: any, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
-        send([null, Object.assign(msg, {
+        let msg2 = RED.util.cloneMessage(msg);
+        delete msg2._msgid;
+        delete event.id;
+        send([null, Object.assign(msg2, {
             payload: event
         })]);
         if (done)
