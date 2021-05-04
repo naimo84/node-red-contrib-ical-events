@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.7](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2021-05-04)
+
+
+### Bug Fixes
+
+* issue [#87](https://github.com/naimo84/node-red-contrib-ical-events/issues/87), node emits identical message for different events ([1057a7b](https://github.com/naimo84/node-red-contrib-ical-events/commit/1057a7b4974c7943fd8596710c4a40779bf68086))
+
 ## [1.0.0-beta.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2021-04-26)
 
 
