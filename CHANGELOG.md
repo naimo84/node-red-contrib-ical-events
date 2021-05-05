@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.8](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2021-05-05)
+
+
+### Bug Fixes
+
+* issue [#86](https://github.com/naimo84/node-red-contrib-ical-events/issues/86), Concurrent / overlapping events ([57d8241](https://github.com/naimo84/node-red-contrib-ical-events/commit/57d82413ab33ee3417857a5232759c0d119a5c56))
+
 ## [1.0.0-beta.7](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2021-05-04)
 
 
