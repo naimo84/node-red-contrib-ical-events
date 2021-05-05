@@ -22,6 +22,11 @@
       "url": "https://github.com/naimo84/node-red-contrib-ical-events/blob/master/LICENSE"
     }
   ],
+  "standard-version": {
+    "scripts": {
+      "posttag": "npm pack"
+    }
+  },
   "keywords": [
     "node-red",
     "ical",
