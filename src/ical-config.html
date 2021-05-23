@@ -26,6 +26,7 @@
                     value: false,
                 },
                 username:{},
+                includeTodo:{},
                 password:{},
                 calendar: {},
                 pastWeeks: {
@@ -77,17 +78,21 @@
                     var value = $('#node-config-input-caltype').val();
                     if (!value || value === 'ical') {
                         $('#icloud-tip').hide();
+                        $('#node-config-input-includeTodo').parent().show();
                         $('#node-config-input-username').parent().hide();
                         $('#node-config-input-password').parent().hide();
                         $('#node-config-input-calendar').parent().hide();
                         return;
                     } else if (value === 'caldav') {
                         $('#icloud-tip').hide();
+                        $('#node-config-input-includeTodo').parent().show();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().show();
                     } else if (value === 'icloud') {
                         $('#icloud-tip').show();
+                        
+                        $('#node-config-input-includeTodo').parent().hide();
                         $('#node-config-input-username').parent().show();
                         $('#node-config-input-password').parent().show();
                         $('#node-config-input-calendar').parent().hide();
@@ -131,6 +136,12 @@
                 <option value="icloud">iCloud secure</option>
             </select>     
     </div>
+    <div class="form-row">
+        <label for="node-config-input-includeTodo" style="width:160px !important">
+            <i class="fa fa-asterisk"></i>
+            <span>include Todos:</span></label>
+        <input type="checkbox" id="node-config-input-includeTodo" placeholder="" style="width:16px !important">
+    </div>
     <div class="form-tips" id="hint_v1">     
         <i class="fa fa-exclamation"></i>
             <b>CAUTION:</b> with v1.0.0 credentials are stored in the node-red internal credential store. It's safer, but you need to reenter credentials.
@@ -159,6 +170,7 @@
             <span>Use cache in case of an error:</span></label>
         <input type="checkbox" id="node-config-input-usecache" placeholder="" style="width:16px !important">
     </div>
+   
     <div class="form-row">
         <label for="node-config-input-replacedates" style="width:160px !important">
             <i class="fa fa-edit"></i>

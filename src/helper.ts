@@ -52,6 +52,7 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         type: type,
         username: msg?.username || config?.credentials?.user || config?.username,
         usecache: msg?.usecache || config?.usecache || false,
+        includeTodo: msg?.includeTodo || config?.includeTodo || false,
         password: msg?.password || config?.credentials?.pass || config?.password,
         calendar: msg?.calendar || config?.calendar,
         filter: msg?.filter || node?.filter,
@@ -75,7 +76,9 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
 
 function extendEvent(event:IKalenderEvent, config: IcalEventsConfig) {
     if (config.timezone) { 
+        //@ts-ignore
         event.eventStart = DateTime.fromJSDate(new Date(event.eventStart)).setZone( config.timezone).toString(); 
+        //@ts-ignore
         event.eventEnd = DateTime.fromJSDate(new Date(event.eventEnd)).setZone( config.timezone).toString(); 
     }
     if (!event.calendarName) event.calendarName = config.name;  

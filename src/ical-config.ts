@@ -11,6 +11,7 @@ export interface IcalEventsConfig extends Config {
     id: any,
     type: any,
     combineResponse: boolean
+    
 }
 
 
@@ -46,6 +47,7 @@ module.exports = function (RED: any) {
         this.usecache = config.usecache;
         this.username=config.username;
         this.password=config.password;
+        this.includeTodo=config.includeTodo;
     }
 
     RED.nodes.registerType('ical-config', icalConfig, {
