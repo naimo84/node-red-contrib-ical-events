@@ -52,8 +52,8 @@
   "scripts": {
     "start": "node-red",
     "test": "mocha \"test/**/*_spec.js\"",
-    "release": "standard-version",
-    "release-minor": "standard-version --release-as minor",
+    "release": "standard-version  --release-as minor",
+    "release-bugfix": "standard-version",
     "watch": "tsc -w -p ./tsconfig.json",
     "dev": "gulp develop",
     "build": "gulp",
