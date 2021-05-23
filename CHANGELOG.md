@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.8...v1.0.0) (2021-05-23)
+
+
+### Features
+
+* [#77](https://github.com/naimo84/node-red-contrib-ical-events/issues/77) add VTODO for caldav and ics ([6d0da9c](https://github.com/naimo84/node-red-contrib-ical-events/commit/6d0da9c35ffee239a2ae69e8828156ddda995273))
+
 ## [1.0.0-beta.8](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2021-05-05)
 
 
