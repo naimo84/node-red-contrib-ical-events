@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0...v1.0.1) (2021-05-25)
+
+
+### Bug Fixes
+
+* update kalender-events to 0.5.0, fix event is array ([a936740](https://github.com/naimo84/node-red-contrib-ical-events/commit/a936740d528f3c51b4c081dfb201944f14163d31))
+
 ## [1.0.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.0-beta.8...v1.0.0) (2021-05-23)
 
 
