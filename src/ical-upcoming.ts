@@ -5,17 +5,17 @@ import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 var parser = require('cron-parser');
 var ce = require('cloneextend');
 
-module.exports = function (RED:any) {
+module.exports = function (RED: any) {
     function upcomingNode(n: any) {
         RED.nodes.createNode(this, n);
         let node: IcalNode = this;
         node.red = RED;
         node.msg = {};
-        
+
         node.on('input', (msg, send, done) => {
-            node.msg = RED.util.cloneMessage(msg);   
+            node.msg = RED.util.cloneMessage(msg);
             send = send || function () { node.send.apply(node, arguments) }
-            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, n, msg);        
+            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, n, msg);
             cronCheckJob(node, msg, send, done);
         });
 
@@ -61,14 +61,14 @@ module.exports = function (RED:any) {
     }
 
     function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void) {
-       
+
         if (node.job && node.job.running) {
             node.status({ fill: 'green', shape: 'dot', text: `next check: ${node.job.nextDate().toISOString()}` });
         } else {
             node.status({});
         }
 
-       
+
         node.datesArray = [];
         getICal(node).then(data => {
             node.debug('Ical read successfully ' + node.config.url);
@@ -83,12 +83,16 @@ module.exports = function (RED:any) {
             let dayAfterTomorrow = new Date(tomorrow.getTime() + oneDay);
 
             for (var t = 0; t < node.datesArray.length; t++) {
-                if (new Date(node.datesArray[t].eventEnd).getTime() > today.getTime() && new Date(node.datesArray[t].eventStart).getTime() < tomorrow.getTime()) {
+                const eventStart = new Date(node.datesArray[t].eventStart);
+                const eventEnd = new Date(node.datesArray[t].eventEnd);
+
+                if (eventEnd.getTime() > today.getTime() && eventStart.getTime() < tomorrow.getTime()) {
                     todayEventcounter++;
                 }
-                if (new Date(node.datesArray[t].eventEnd).getTime() > tomorrow.getTime() && new Date(node.datesArray[t].eventStart).getTime() < dayAfterTomorrow.getTime()) {
+                if (eventEnd.getTime() > tomorrow.getTime() && eventStart.getTime() < dayAfterTomorrow.getTime()) {
                     tomorrowEventcounter++;
                 }
+                node.datesArray[t].on = (eventStart <= today && eventEnd >= today)               
             }
             send = send || function () { node.send.apply(node, arguments); };
             send(Object.assign(node.msg, {
@@ -127,7 +131,7 @@ module.exports = function (RED:any) {
         for (var i = 0; i < datesArray.length; i++) {
             if (text)
                 text += '<br/>\n';
-            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();            
+            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();
         }
         text += '</span>';
         return text;
