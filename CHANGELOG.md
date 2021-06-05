@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.1.0...v1.2.0) (2021-06-05)
+
+
+### Features
+
+* cron setting ([4621d91](https://github.com/naimo84/node-red-contrib-ical-events/commit/4621d913ca3324bb74761f2b20a0935177079e03))
+* update axios in kalender-events lib (issue [#90](https://github.com/naimo84/node-red-contrib-ical-events/issues/90)) ([93abe76](https://github.com/naimo84/node-red-contrib-ical-events/commit/93abe7688044c48e1839abb9a48e09d42e4e13c3))
+
 ## [1.1.0](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.0.1...v1.1.0) (2021-05-26)
 
 
