@@ -120,7 +120,15 @@
                 }
 
                 $("#node-input-timezone").focusin(timezones);
-
+                $('#node-input-cron').change(function () {
+                    var value = $('#node-input-cron').val();
+                    console.log(value);
+                    if(value){
+                        $('#timeout-details-for').hide();
+                    }else{
+                        $('#timeout-details-for').show();
+                    }
+                });
                 if (node.trigger && node.filterProperty && node.filterProperty.indexOf('event') >= 0 && !node.filterOperator) {
                     $('#node-input-filterOperator option')
                         .filter(function () {
@@ -332,7 +340,7 @@
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
     </div>    
-    <div class="form-row event padding-top" id="delay-details-for">
+    <div class="form-row event padding-top" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
         <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
         <select id="node-input-timeoutUnits" style="width:200px !important">          

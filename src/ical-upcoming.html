@@ -169,6 +169,16 @@
             }
             $("#node-input-timezone").focusin(timezones);
             $('#node-input-filter2').parent().hide();
+            $('#node-input-cron').change(function () {
+                var value = $('#node-input-cron').val();
+                console.log(value);
+                if(value){
+                    $('#timeout-details-for').hide();
+                }else{
+                    $('#timeout-details-for').show();
+                }
+            });
+
             $('#node-input-trigger').change(function () {
                 var value = $('#node-input-trigger').val();
                 let filterProperty = $('#node-input-filterProperty').val();
@@ -369,7 +379,7 @@
             <span>Fetch all configs concurrent</span></label>
         <input type="checkbox" id="node-input-checkall" placeholder="" style="width:16px !important">
     </div>
-    <div class="form-row event" id="delay-details-for">
+    <div class="form-row event" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
         <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
         <select id="node-input-timeoutUnits" style="width:200px !important">

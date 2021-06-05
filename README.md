@@ -91,7 +91,7 @@ The calendar is checked for new events on input or cronjob. For events in the fu
 -   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Offset": offset, when the start/end cronjob will be triggered (seconds, minutes, hours)
 -   "Name": Displayname
-
+-   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 ---
 
 #### sensor
@@ -124,7 +124,7 @@ The calendar is checked for running events on input or configurable timeout.
     -   after
 -   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Name": Displayname
-
+-   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 If an event is running at time of checking, **msg.on** is true, otherwise false.
 
 The message additionaly contains the following values of the calendar entry
@@ -176,28 +176,28 @@ As of the events node, its checked on input or cronjob. The msg.payload contains
 -   "Name": Displayname
 -   "Preview": Only Events within now and this **future** value are checked.
 -   "Past view": Only Events within now and this **past** value are checked.
-
+-   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 ### INPUT
 
 The configuration of the nodes baove can be overwritten with the following input message properties:
 
-msg.url
-msg.language
-msg.replacedates
-msg.caldav
-msg.username
-msg.password
-msg.calendar
-msg.pastWeeks
-msg.futureWeeks
-msg.filter
-msg.trigger
-msg.preview
-msg.previewUnits
-msg.pastview
-msg.pastviewUnits
-msg.offset
-msg.offsetUnits
+- msg.url  
+- msg.language  
+- msg.replacedates  
+- msg.caldav  
+- msg.username  
+- msg.password  
+- msg.calendar  
+- msg.pastWeeks  
+- msg.futureWeeks  
+- msg.filter  
+- msg.trigger  
+- msg.preview  
+- msg.previewUnits  
+- msg.pastview  
+- msg.pastviewUnits  
+- msg.offset  
+- msg.offsetUnits 
 
 ### OUTPUT
 
