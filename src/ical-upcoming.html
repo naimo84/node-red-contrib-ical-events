@@ -498,7 +498,17 @@
     <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.   
     <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
     <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
-    <br/><br/>
+    <br/><br/>   •  <b>"timezone for output"</b>: default is UTC, so eventStart and eventEnd will be a UTC string  
+    <pre>
+    <br/>eventStart: "2021-07-05T03:50:00.000Z"
+    <br/>eventEnd: "2021-07-05T04:30:00.000Z"
+    <br/></pre>
+    e.g. set timezone to <b>Europe/Berlin</b>
+    <br/><pre>
+    <br/>eventStart: "2021-07-05T05:50:00.000+02:00"
+    <br/>eventEnd: "2021-07-05T06:30:00.000+02:00"    
+    <br/></pre>
+    <hr/> 
     <h3>Output</h3>
     <p>The <b>msg.payload</b> contains an array of the following values for each calendar entry
     <br/> • summary

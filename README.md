@@ -94,6 +94,16 @@ The calendar is checked for new events on input or cronjob. For events in the fu
     -   after
 -   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Offset": offset, when the start/end cronjob will be triggered (seconds, minutes, hours)
+-   "timezone for output": default is UTC, so eventStart and eventEnd will be a UTC string  
+    ```json
+    eventStart: "2021-07-05T03:50:00.000Z"
+    eventEnd: "2021-07-05T04:30:00.000Z"
+    ```
+    e.g. set timezone to Europe/Berlin
+    ```json
+    eventStart: "2021-07-05T05:50:00.000+02:00"
+    eventEnd: "2021-07-05T06:30:00.000+02:00"    
+    ```    
 -   "Name": Displayname
 -   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 ---
@@ -128,6 +138,16 @@ The calendar is checked for running events on input or configurable timeout.
     -   after
 -   "Filter": filter property of the events from above is filtered against this regular expression
 -   "Name": Displayname
+-   "timezone for output": default is UTC, so eventStart and eventEnd will be a UTC string  
+    ```json
+    eventStart: "2021-07-05T03:50:00.000Z"
+    eventEnd: "2021-07-05T04:30:00.000Z"
+    ```
+    e.g. set timezone to Europe/Berlin
+    ```json
+    eventStart: "2021-07-05T05:50:00.000+02:00"
+    eventEnd: "2021-07-05T06:30:00.000+02:00"    
+    ```    
 -   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 If an event is running at time of checking, **msg.on** is true, otherwise false.
 
@@ -180,6 +200,16 @@ As of the events node, its checked on input or cronjob. The msg.payload contains
 -   "Name": Displayname
 -   "Preview": Only Events within now and this **future** value are checked.
 -   "Past view": Only Events within now and this **past** value are checked.
+-   "timezone for output": default is UTC, so eventStart and eventEnd will be a UTC string  
+    ```json
+    eventStart: "2021-07-05T03:50:00.000Z"
+    eventEnd: "2021-07-05T04:30:00.000Z"
+    ```
+    e.g. set timezone to Europe/Berlin
+    ```json
+    eventStart: "2021-07-05T05:50:00.000+02:00"
+    eventEnd: "2021-07-05T06:30:00.000+02:00"    
+    ```    
 -   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 ### INPUT
 

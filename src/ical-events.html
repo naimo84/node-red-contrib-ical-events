@@ -436,7 +436,18 @@
     <br/>&emsp;     bofore
     <br/>&emsp;     after
     <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
-    <br/><br/> • "Cron": Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') 
+    <br/><br/> • <b>"Cron"</b>: Cron expression, how often the calendar is checked for new events. Default is every hour ('0 0 * * * *') 
+    <br/><br/>    •  <b>"timezone for output"</b>: default is UTC, so eventStart and eventEnd will be a UTC string  
+    <pre>
+    <br/>eventStart: "2021-07-05T03:50:00.000Z"
+    <br/>eventEnd: "2021-07-05T04:30:00.000Z"
+    <br/></pre>
+    e.g. set timezone to <b>Europe/Berlin</b>
+    <br/><pre>
+    <br/>eventStart: "2021-07-05T05:50:00.000+02:00"
+    <br/>eventEnd: "2021-07-05T06:30:00.000+02:00"    
+    <br/></pre>
+    <hr/> 
     <h3>Output</h3>
     <p>The msg.payload contains the following values of the calendar entry</p>
     <br/> • summary
