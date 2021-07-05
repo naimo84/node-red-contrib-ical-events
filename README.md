@@ -56,6 +56,10 @@ cd ~/.node-red
 npm install /path/to/node-red-contrib-ical-events
 ```
 
+## :bug: How to debug
+
+[find out here](./help/debug.md)
+
 ## :memo: Documentation
 
 ### node explanation
