@@ -60,11 +60,23 @@ npm install /path/to/node-red-contrib-ical-events
 
 [find out here](./help/debug.md)
 
-## :memo: Documentation
+# :memo: Documentation
 
-### node explanation
+## TL;DR node explanation
 
-#### trigger
+
+There are three types of nodes:
+- upcoming - a list of events
+- sensors - check if a event is running currently
+- trigger - trigger a output on event start and event end  
+
+---
+
+## Detailed node explanation
+
+
+![trigger_node.png](examples/trigger_node.png)  
+## trigger
 
 The calendar is checked for new events on input or cronjob. For events in the future within the preview timespan, a separated cronjob is generated. It's fired on the start datetime of the ical event. So, on input or check-cronjob, no output is generated. Only when an event starts.
 
@@ -108,7 +120,9 @@ The calendar is checked for new events on input or cronjob. For events in the fu
 -   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
 ---
 
-#### sensor
+![sensor_node.png](examples/sensor_node.png)  
+
+## sensor Node
 
 The calendar is checked for running events on input or configurable timeout.
 
@@ -169,7 +183,8 @@ The message additionaly contains the following values of the calendar entry
 
 ---
 
-#### upcoming
+![upcoming_node.png](examples/upcoming_node.png)  
+## upcoming Node
 
 As of the events node, its checked on input or cronjob. The msg.payload contains a list of upcoming events.
 ##### Configuration
@@ -211,9 +226,40 @@ As of the events node, its checked on input or cronjob. The msg.payload contains
     eventEnd: "2021-07-05T06:30:00.000+02:00"    
     ```    
 -   "Cron": Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events. If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
+
+### OUTPUT
+
+Additional msg properties are:
+
+-   msg.today - number of upcoming events today
+-   msg.tomorrow - number of upcoming events tomorrow
+-   msg.total - number of upcoming events totally
+-   msg.htmlTable - a html formated table of upcoming events
+-   msg.payload - arraylist of upcoming events
+    - date
+    - event
+    - rule
+    - summary
+    - id
+    - location
+    - eventStart
+    - eventEnd
+    - description
+    - allDay
+    - attendee
+    - isRecurring
+    - calendarName
+    - organizer
+    - categories
+    - duration
+
+---
+## General 
+
+Valid for all three nodes
 ### INPUT
 
-The configuration of the nodes baove can be overwritten with the following input message properties:
+The configuration of the nodes above can be overwritten with the following input message properties:
 
 - msg.url  
 - msg.language  
@@ -233,35 +279,9 @@ The configuration of the nodes baove can be overwritten with the following input
 - msg.offset  
 - msg.offsetUnits 
 
-### OUTPUT
-
-Additional msg properties are:
-
--   msg.today - number of upcoming events today
--   msg.tomorrow - number of upcoming events tomorrow
--   msg.total - number of upcoming events totally
--   msg.htmlTable - a html formated table of upcoming events
--   msg.payload - arraylist of upcoming events
-    -   date
-    -   event
-    -   rule
-    - summary
-    - id
-    - location
-    - eventStart
-    - eventEnd
-    - description
-    - allDay
-    - attendee
-    - isRecurring
-    - calendarName
-    - organizer
-    - categories
-    - duration
-
 ---
 
-### General Configuration:
+### Configuration
 
 -   **_URL_** URL to Calendar
 -   **_Replace Dates with name_** Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
@@ -270,9 +290,25 @@ Additional msg properties are:
 -   **_Password_** HTTP Basic authentication user
 -   **_Type_** Type can be ical or caldav
 
+### Example (Google):
 
+Under settings and sharing you can find a public and a private URL for your calendar.  
+Warning: The public address won't work unless this calendar is public.  
+
+![google_example_1.png](examples/google_example_1.png)  
+![google_example_2.png](examples/google_example_2.png)  
+
+If you've copied the URL, add a new ical config and paste the URL into the first textbox.  
+
+![google_example_3.png](examples/google_example_3.png)  
+![google_example_4.png](examples/google_example_4.png)  
+
+
+That's it :wink:  
 ![example.png](https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png)
 
+
+---
 ## :scroll: Credits
 
 -   The whole module is inspired by ioBroker's adapter https://github.com/iobroker-community-adapters/ioBroker.ical. Many many thanks folks ;)
