@@ -21,7 +21,7 @@ export interface IcalNode extends Node {
     msg: any;
     ke: KalenderEvents;
     combineResponse: boolean;
-    timezone:string;
+    timezone: string;
 }
 
 export interface CalEvent extends IKalenderEvent {
@@ -74,14 +74,15 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
     return icalConfig;
 }
 
-function extendEvent(event:IKalenderEvent, config: IcalEventsConfig) {
-    if (config.timezone) { 
+function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEvents?: KalenderEvents) {
+    if (config.timezone) {
         //@ts-ignore
-        event.eventStart = DateTime.fromJSDate(new Date(event.eventStart)).setZone( config.timezone).toString(); 
+        event.eventStart = DateTime.fromJSDate(new Date(event.eventStart)).setZone(config.timezone).toString();
         //@ts-ignore
-        event.eventEnd = DateTime.fromJSDate(new Date(event.eventEnd)).setZone( config.timezone).toString(); 
+        event.eventEnd = DateTime.fromJSDate(new Date(event.eventEnd)).setZone(config.timezone).toString();
     }
-    if (!event.calendarName) event.calendarName = config.name;  
+    event.countdown = kalenderEvents.countdown(event.eventStart);
+    if (!event.calendarName) event.calendarName = config.name;
     return event;
 }
 
@@ -109,14 +110,14 @@ export async function getICal(node: IcalNode) {
                 }
                 let data = await kalenderEvents.getEvents(icalConfig)
                 for (let d in data) {
-                    datas.push(extendEvent(data[d], icalConfig));
+                    datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
                 }
             }
             else {
                 let icalConfig = getConfig(config, node.config);
                 let data = await kalenderEvents.getEvents(icalConfig)
                 for (let d in data) {
-                    datas.push(extendEvent(data[d], icalConfig));
+                    datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
                 }
             }
         }
