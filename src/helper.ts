@@ -81,7 +81,7 @@ function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEv
         //@ts-ignore
         event.eventEnd = DateTime.fromJSDate(new Date(event.eventEnd)).setZone(config.timezone).toString();
     }
-    event.countdown = kalenderEvents.countdown(event.eventStart);
+    event.countdown = kalenderEvents.countdown(new Date(event.eventStart));
     if (!event.calendarName) event.calendarName = config.name;
     return event;
 }
