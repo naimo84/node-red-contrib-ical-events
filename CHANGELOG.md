@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.4](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.3...v1.2.4) (2021-07-22)
+
+
+### Bug Fixes
+
+* [#97](https://github.com/naimo84/node-red-contrib-ical-events/issues/97), error when timezone is set ([e93614c](https://github.com/naimo84/node-red-contrib-ical-events/commit/e93614c0d6aa43d1a57cd5a21a792c6ac4fe44b8))
+
 ### [1.2.3](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.2...v1.2.3) (2021-07-22)
 
 
