@@ -68,7 +68,8 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         offset: parseInt(msg?.offset || node?.offset || 0),
         offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
-        combineResponse: msg?.combineResponse || node?.combineResponse || false
+        combineResponse: msg?.combineResponse || node?.combineResponse || false,
+        cache: new NodeCache()
     } as IcalEventsConfig;
 
     return icalConfig;
