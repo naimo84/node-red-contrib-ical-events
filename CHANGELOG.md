@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.7](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.6...v1.2.7) (2021-08-01)
+
+
+### Bug Fixes
+
+* issue [#98](https://github.com/naimo84/node-red-contrib-ical-events/issues/98), previewUnits must to lowercase, convert automatically ([4a046bf](https://github.com/naimo84/node-red-contrib-ical-events/commit/4a046bf74c9a2e6cd787978f3c19ee6d5d985d94))
+
 ### [1.2.6](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.5...v1.2.6) (2021-07-27)
 
 
