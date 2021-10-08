@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.11](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.10...v1.2.11) (2021-10-08)
+
+
+### Bug Fixes
+
+* issue [#102](https://github.com/naimo84/node-red-contrib-ical-events/issues/102), ev2.exdate[d].getTime is not a function ([47448ee](https://github.com/naimo84/node-red-contrib-ical-events/commit/47448ee48a95fe518e9b37924102ba08c6fb6f44))
+
 ### [1.2.10](https://github.com/naimo84/node-red-contrib-ical-events/compare/v1.2.9...v1.2.10) (2021-08-20)
 
 
