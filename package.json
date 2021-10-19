@@ -1,0 +1,34 @@
+{
+  "name": "node-red-contrib-ical-events",
+  "displayName": "node-red-contrib-ical-events - Documentation of httpyYac",
+  "version": "1.0.0",
+  "description": "github pages of node-red-contrib-ical-events",
+  "main": "index.js",
+  "scripts": {
+    "serve": "vuepress dev docs",
+    "build": "vuepress build docs"
+  },
+  "keywords": [
+    "node-red-contrib-ical-events",
+    "vuepress",
+    "docs"
+  ],
+  "homepage": "https://github.com/naimo84/node-red-contrib-ical-events.github.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naimo84/node-red-contrib-ical-events.github.io"
+  },
+  "bugs": {
+    "url": "https://github.com/naimo84/node-red-contrib-ical-events.github.io/issues"
+  },
+  "publisher": "naimo84",
+  "author": "naimo84",
+  "license": "MIT",
+  "dependencies": {
+    "@vuepress/plugin-pwa": "^1.8.2",
+    "@vuepress/theme-default": "^1.8.2",
+    "vuepress": "^1.8.2",
+    "vuepress-plugin-code-copy": "^1.0.6",
+    "vuepress-plugin-flowchart": "^1.4.3"
+  }
+}
