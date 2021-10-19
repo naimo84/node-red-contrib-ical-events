@@ -56,6 +56,8 @@ cd ~/.node-red
 npm install /path/to/node-red-contrib-ical-events
 ```
 
+<img src="https://img.shields.io/npm/dy/node-red-contrib-ical-events?style=for-the-badge"/>
+
 ## :bug: How to debug
 
 [find out here](./help/debug.md)
