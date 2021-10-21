@@ -59,30 +59,22 @@ module.exports = {
         ],
         sidebar: {
           '/guide/': [
-            // '/guide/',
-            // {
-            //   title: 'Installation',
-            //   path: '/guide/installation',
-            //   collapsable: false,
-            //   children: [
-            //     '/guide/installation_cli',
-            //     '/guide/installation_vscode',
-            //     '/guide/installation_httpbook'
-            //   ]
-            // },
-            // {
-            //   title: 'Language',
-            //   collapsable: false,
-            //   children: [
-            //     '/guide/request',
-            //     '/guide/metaData',
-            //     '/guide/variables',
-            //     '/guide/environments',
-            //     '/guide/scripting',
-            //     '/guide/comment',
-            //     '/guide/hooks'
-            //   ]
-            // },
+            '/guide/',
+            {
+              title: 'Debug',
+              path: '/guide/debug',
+              collapsable: false             
+            },
+            {
+              title: 'Nodes',
+              collapsable: false,
+              path: '/guide/nodes',
+              children: [
+                '/guide/upcoming',
+                '/guide/trigger',
+                '/guide/sensors',
+              ]
+            },
             // '/guide/troubleshooting',
             // {
             //   title: 'Examples',
