@@ -8,5 +8,5 @@ This Node RED module gets the events from an ical-URL, a caldav-server or from i
 
 There are three types of nodes:
 - [upcoming](./upcoming.md) - a list of events
-- sensors - check if a event is running currently
-- trigger - trigger a output on event start and event end  
+- [sensors](./sensors.md) - check if a event is running currently
+- [trigger](./trigger.md) - trigger a output on event start and event end  
