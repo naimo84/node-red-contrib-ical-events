@@ -1,7 +1,7 @@
 # Node RED ical events
 
 This Node RED module gets the events from an ical-URL, a caldav-server or from iCloud via [kalender-events](https://github.com/naimo84/kalender-events).
-<img src="https://github.com/naimo84/kalender-events/blob/master/docs/logo.png" width="200" alt="kalender-events">
+<a href="https://github.com/naimo84/kalender-events"><img src="https://github.com/naimo84/kalender-events/blob/master/docs/logo.png" align="right" width="200" alt="kalender-events"></a>
 
 **Please Note** that:
 
