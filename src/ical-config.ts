@@ -1,4 +1,4 @@
-import { Config } from 'kalender-events/types/config';
+import { Config } from 'kalender-events';
 var moment = require('moment-timezone');
 
 export interface IcalEventsConfig extends Config {
@@ -10,8 +10,7 @@ export interface IcalEventsConfig extends Config {
     name: string,
     id: any,
     type: any,
-    combineResponse: boolean
-    
+    combineResponse: boolean    
 }
 
 

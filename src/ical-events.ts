@@ -5,7 +5,7 @@ import * as parser from 'cron-parser';
 import { IcalEventsConfig } from './ical-config';
 import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 import * as NodeCache from 'node-cache';
-import { IKalenderEvent } from 'kalender-events/types/event';
+import { IKalenderEvent } from 'kalender-events';
 import { NodeMessageInFlow, NodeMessage } from "node-red";
 import moment = require("moment");
 module.exports = function (RED: any) {

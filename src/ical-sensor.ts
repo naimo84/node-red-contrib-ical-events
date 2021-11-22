@@ -4,8 +4,7 @@ import { CronJob } from 'cron';
 import { IcalEventsConfig } from './ical-config';
 import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 import * as NodeCache from 'node-cache';
-import { KalenderEvents } from 'kalender-events';
-import { IKalenderEvent } from 'kalender-events/types/event';
+import { IKalenderEvent } from 'kalender-events';
 
 module.exports = function (RED: any) {
     function sensorNode(config: any) {

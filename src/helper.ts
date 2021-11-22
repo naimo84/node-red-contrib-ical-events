@@ -2,8 +2,7 @@ import { IcalEventsConfig } from './ical-config';
 import { CronJob } from 'cron';
 import { Node } from 'node-red';
 import * as NodeCache from 'node-cache';
-import { KalenderEvents } from "kalender-events";
-import { IKalenderEvent } from 'kalender-events/types/event';
+import { KalenderEvents, IKalenderEvent } from 'kalender-events';
 import { DateTime } from "luxon";
 
 export interface Job {
