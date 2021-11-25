@@ -34,10 +34,16 @@
                 name: {
                     value: ""
                 },
+                triggertype: {},
                 trigger: {},
                 timezone: {},
+                timezonetype: {},
                 filterProperty: {},
+                filterPropertytype: {},
                 filterOperator: {},
+                filterOperatortype: {},
+                filtertype: {},
+                filter2type: {},
                 combineResponse: {},
                 filter2: {
                     required: false,
@@ -95,6 +101,64 @@
                 var node = this;
                 $("#node-input-timeout").spinner({ min: 1 });
 
+                $("#node-input-filter").typedInput({
+                    typeField: "#node-input-filtertype",
+                    types: ["str", "msg"]
+                });
+
+                $("#node-input-filter2").typedInput({
+                    typeField: "#node-input-filter2type",
+                    types: ["str", "msg"]
+                });
+
+                $("#node-input-timezone").typedInput({
+                    typeField: "#node-input-timezonetype",
+                    types: ["str", "msg"]
+                });
+
+                $("#node-input-filterProperty").typedInput({
+                    typeField: "#node-input-filterPropertytype",
+                    types: ["str", "msg", {
+                        value: "filterProperty",
+                        options: [
+                            { value: "summary", label: "summary" },
+                            { value: "description", label: "description" },
+                            { value: "attendee", label: "attendee" },
+                            { value: "categories", label: "category" },
+                            { value: "location", label: "location" },
+                            { value: "eventStart", label: "start date" },
+                            { value: "eventEnd", label: "end date" },
+                        ]
+                    }]
+                });
+
+                $("#node-input-filterOperator").typedInput({
+                    typeField: "#node-input-filterOperatortype",
+                    default: "filterOperator",
+                    types: ["str", "msg", {
+                        value: "filterOperator",
+                        options: [
+                            { value: "between", label: "between" },
+                            { value: "before", label: "before" },
+                            { value: "after", label: "after" }
+                        ]
+                    }]
+                });
+
+                $("#node-input-trigger").typedInput({
+                    typeField: "#node-input-triggertype",
+                    default: "trigger",
+                    types: ["str", "msg", {
+                        value: "trigger",
+                        options: [
+                            { value: "always", label: "Always" },
+                            { value: "match", label: "Match" },
+                            { value: "nomatch", label: "No match" }
+                        ]
+                    }]
+                });
+
+
                 $('.ui-spinner-button').on("click", function () {
                     $(this).siblings('input').trigger("change");
                 });
@@ -123,9 +187,9 @@
                 $('#node-input-cron').change(function () {
                     var value = $('#node-input-cron').val();
                     console.log(value);
-                    if(value){
+                    if (value) {
                         $('#timeout-details-for').hide();
-                    }else{
+                    } else {
                         $('#timeout-details-for').show();
                     }
                 });
@@ -316,10 +380,10 @@
         .event {
             display:flex;
         }
-        .event input {
+        .event .red-ui-typedInput-container {
             flex:1
         }
-        .event select {
+        .event .red-ui-typedInput-container {
             flex:1
         }
         .event label {
@@ -352,31 +416,18 @@
     </div>
     <div class="form-row event">
         <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>        
-        <select id="node-input-trigger">          
-          <option value="always">Always</option>
-          <option value="match">Match</option>
-          <option value="nomatch">No match</option>
-        </select>
+        <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important">
+        <input type="hidden" id="node-input-triggertype" style="text-align:end; width:50px !important">
     </div>
     <div class="form-row event">
+        <input type="hidden" id="node-input-filterPropertytype">
         <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
-        <select id="node-input-filterProperty">
-            <option value="summary">summary</option>
-            <option value="description">description</option>
-            <option value="attendee">attendee</option>
-            <option value="categories">category</option>
-            <option value="eventStart">start date</option>
-            <option value="eventEnd">end date</option>
-         
-        </select>
+        <input type="text" id="node-input-filterProperty">       
     </div>
     <div class="form-row event">
+        <input type="hidden" id="node-input-filterOperatortype">
         <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
-        <select id="node-input-filterOperator">
-            <option value="between">between</option>
-            <option value="before">before</option>
-            <option value="after">after</option> 
-        </select>
+        <input type="text" id="node-input-filterOperator">  
     </div>
     <div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
         <i class="fa fa-exclamation"></i>
@@ -386,15 +437,18 @@
         <label for="node-input-filter" id="node-input-filter-label1"><i class="fa fa-filter"></i> Filter</label>
         <label for="node-input-filter" id="node-input-filter-label2"><i class="fa fa-filter"></i> after</label>
         <label for="node-input-filter" id="node-input-filter-label3"><i class="fa fa-filter"></i> before</label>
+        <input type="hidden" id="node-input-filtertype">
         <input type="text" id="node-input-filter" >
     </div>
     <div class="form-row event">
         <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
         <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
+        <input type="hidden" id="node-input-filter2type">
         <input type="text" id="node-input-filter2" >
     </div>
     <div class="form-row event">
         <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
+        <input type="hidden" id="node-input-timezonetype" placeholder="default is UTC">
         <input type="text" id="node-input-timezone" placeholder="default is UTC">
     </div>
     <div class="form-row event">

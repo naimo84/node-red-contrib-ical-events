@@ -18,7 +18,7 @@ module.exports = function (RED: any) {
             node.timezone = config.timezone;
             node.on('input', (msg, send, done) => {
                 send = send || function () { node.send.apply(node, arguments) }
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, config, msg);
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig,RED, config, msg);
                 cronCheckJob(node, msg, send, done);
             });
 

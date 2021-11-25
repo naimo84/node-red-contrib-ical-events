@@ -6,3 +6,4 @@ src/*
 gulpfile.js
 examples/*.png
 *.tgz
+tsconfig.json

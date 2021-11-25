@@ -15,7 +15,7 @@ module.exports = function (RED: any) {
         node.on('input', (msg, send, done) => {
             node.msg = RED.util.cloneMessage(msg);
             send = send || function () { node.send.apply(node, arguments) }
-            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, n, msg);
+            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig,RED, n, msg,);
             cronCheckJob(node, msg, send, done);
         });
 

@@ -1,9 +1,9 @@
 import { IcalEventsConfig } from './ical-config';
 import { CronJob } from 'cron';
-import { Node } from 'node-red';
 import * as NodeCache from 'node-cache';
 import { KalenderEvents, IKalenderEvent } from 'kalender-events';
 import { DateTime } from "luxon";
+import { Node } from 'node-red';
 
 export interface Job {
     id: string,
@@ -30,7 +30,7 @@ export interface CalEvent extends IKalenderEvent {
 }
 
 
-export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): IcalEventsConfig {
+export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?: any,): IcalEventsConfig {
 
     let type = msg?.caldav || msg?.type || config?.caltype;
     if (!type && config?.caldav) {
@@ -41,7 +41,7 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         else if (config.caldav === "icloud")
             type = "icloud"
     }
-
+    
     const icalConfig = {
         url: msg?.url || config?.url,
         name: msg?.calendarName || config?.name,
@@ -54,18 +54,22 @@ export function getConfig(config: IcalEventsConfig, node?: any, msg?: any): Ical
         includeTodo: msg?.includeTodo || config?.includeTodo || false,
         password: msg?.password || config?.credentials?.pass || config?.password,
         calendar: msg?.calendar || config?.calendar,
-        filter: msg?.filter || node?.filter,
-        timezone: msg?.timezone || node?.timezone,
-        filter2: msg?.filter2 || node?.filter2,
-        filterProperty: msg?.filterProperty || node?.filterProperty,
-        filterOperator: msg?.filterOperator || node?.filterOperator,
-        trigger: msg?.trigger || node?.trigger || 'always',
+
+        filter: RED.util.evaluateNodeProperty(node.filter, node.filtertype, node, msg) || msg?.filter || node?.filter,
+        timezone: RED.util.evaluateNodeProperty(node.timezone, node.timezonetype, node, msg) ||  msg?.timezone || node?.timezone,
+        filter2: RED.util.evaluateNodeProperty(node.filter2, node.filter2type, node, msg) || msg?.filter2 || node?.filter2,
+        filterProperty: RED.util.evaluateNodeProperty(node.filterProperty, node.filterPropertytype, node, msg) || msg?.filterProperty || node?.filterProperty,
+        filterOperator: RED.util.evaluateNodeProperty(node.filterOperator, node.filterOperator2type, node, msg) || msg?.filterOperator || node?.filterOperator,
+        trigger: RED.util.evaluateNodeProperty(node.trigger, node.triggertype, node, msg) || msg?.trigger || node?.trigger || 'always',
+
+
         preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
         previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
         pastview: parseInt(msg?.pastview || node?.pastview || 0),
         pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
         offset: parseInt(msg?.offset || node?.offset || 0),
         offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
+
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false,
         cache: new NodeCache()

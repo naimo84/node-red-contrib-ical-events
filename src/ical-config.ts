@@ -2,6 +2,11 @@ import { Config } from 'kalender-events';
 var moment = require('moment-timezone');
 
 export interface IcalEventsConfig extends Config {
+    filterPropertytype: string;
+    filterOperator2type: string;
+    filtertype: string;
+    triggertype: string;
+    filter2type: any;
     credentials: any;
     checkall?: boolean,
     usecache: boolean,
@@ -10,7 +15,7 @@ export interface IcalEventsConfig extends Config {
     name: string,
     id: any,
     type: any,
-    combineResponse: boolean    
+    combineResponse: boolean,
 }
 
 
