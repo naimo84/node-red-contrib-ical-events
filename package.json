@@ -22,9 +22,6 @@
       "url": "https://github.com/naimo84/node-red-contrib-ical-events/blob/master/LICENSE"
     }
   ],
-  "standard-version": {
-    "scripts": {}
-  },
   "keywords": [
     "node-red",
     "ical",
@@ -54,20 +51,16 @@
     "url": "https://github.com/naimo84/node-red-contrib-ical-events"
   },
   "scripts": {
-    "start": "node-red",
-    "test": "mocha \"test/**/*_spec.js\"",
-    "release": "standard-version  --release-as minor",
-    "release-bugfix": "standard-version",
-    "watch": "tsc -w -p ./tsconfig.json",
+    "prepack": "gulp",
+    "release": "release-it",    
     "dev": "gulp develop",
-    "build": "gulp",
-    "beta": "gulp && standard-version  -r major --prerelease beta"
+    "build": "gulp"    
   },
   "dependencies": {
     "cron": "^1.8.2",
     "cron-parser": "^4.1.0",
-    "kalender-events": "0.19.0",
     "crypto-js": "^4.1.1",
+    "kalender-events": "0.19.0",
     "luxon": "^2.0.2",
     "node-cache": "^5.1.2"
   },
@@ -87,8 +80,24 @@
     "node-red": "2.0.6",
     "node-red-node-test-helper": "^0.2.7",
     "nodemon": "^2.0.14",
+    "release-it": "^14.11.8",
     "standard-version": "^9.3.2",
     "typescript": "^4.4.4"
+  },
+  "standard-version": {
+    "skip": {
+      "bump": true,
+      "commit": true,
+      "tag": true
+    }
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release v${version}"
+    },
+    "github": {
+      "release": true
+    }
   },
   "commitlint": {
     "format": {
