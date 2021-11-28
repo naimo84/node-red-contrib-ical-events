@@ -14,13 +14,13 @@
             },
             cron: {
                 value: '',
-            },
+            },         
             timeout: {
                 value: '',
             },
             timeoutUnits: {
                 value: '',
-            },
+            },         
             name: {
                 value: '',
             },
@@ -33,18 +33,22 @@
             endpreviewUnits: {
                 value: '',
             },
+            previewtype: {},
             preview: {
                 value: '',
             },
+            previewUnitstype: {},
             previewUnits: {
                 value: '',
             },
+            pastviewtype: {},
             pastview: {
                 value: '',
             },
             pastviewUnits: {
                 value: '',
             },
+            pastviewUnitstype: {},
             triggertype: {},
             trigger: {},
             timezone: {},
@@ -108,10 +112,7 @@
         paletteLabel: 'upcoming',
         oneditprepare: function () {
             var node = this;
-            $('#node-input-timeout').spinner({ min: 0 });
-            $('#node-input-preview').spinner({ min: 0 });
-            $('#node-input-pastview').spinner({ min: 0 });
-
+            
             $("#node-input-filter").typedInput({
                 typeField: "#node-input-filtertype",
                 types: ["str", "msg"]
@@ -125,6 +126,45 @@
             $("#node-input-timezone").typedInput({
                 typeField: "#node-input-timezonetype",
                 types: ["str", "msg"]
+            });
+
+            $("#node-input-pastview").typedInput({
+                typeField: "#node-input-pastviewtype",
+                types: ["num", "str", "msg"]
+            }).typedInput('width', '200px');
+
+            $("#node-input-pastviewUnits").typedInput({
+                typeField: "#node-input-pastviewUnitstype",
+                default: "pastviewUnits",
+                types: ["str", "msg", {
+                    value: "pastviewUnits",
+                    options: [
+                        { value: "seconds", label: "Seconds" },
+                        { value: "minutes", label: "Minutes" },
+                        { value: "hours", label: "Hours" },
+                        { value: "days", label: "Days" }
+                    ]
+                }]
+            });
+
+            $("#node-input-preview").typedInput({
+                typeField: "#node-input-previewtype",
+                types: ["num", "str", "msg"]
+            }).typedInput('width', '200px');
+
+
+            $("#node-input-previewUnits").typedInput({
+                typeField: "#node-input-previewUnitstype",
+                default: "previewUnits",
+                types: ["str", "msg", {
+                    value: "previewUnits",
+                    options: [
+                        { value: "seconds", label: "Seconds" },
+                        { value: "minutes", label: "Minutes" },
+                        { value: "hours", label: "Hours" },
+                        { value: "days", label: "Days" }
+                    ]
+                }]
             });
 
             $("#node-input-filterProperty").typedInput({
@@ -242,6 +282,23 @@
                     $('#timeout-details-for').show();
                 }
             });
+
+            $('#node-input-preview').on('change', function (event, type, value) {
+                if (type === 'str') {
+                    $('#previewUnits').hide();
+                } else {
+                    $('#previewUnits').show();
+                }
+            });
+
+            $('#node-input-pastview').on('change', function (event, type, value) {
+                if (type === 'str') {
+                    $('#pastviewUnits').hide();
+                } else {
+                    $('#pastviewUnits').show();
+                }
+            });
+        
 
             $('#node-input-trigger').change(function () {
                 var value = $('#node-input-trigger').val();
@@ -416,7 +473,7 @@
         .event .red-ui-typedInput-container {
             flex:1
         }
-        .event .red-ui-typedInput-container {
+        .event span {
             flex:1
         }
         .event label {
@@ -445,28 +502,29 @@
     </div>
     <div class="form-row event" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
-        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
-        <select id="node-input-timeoutUnits" style="width:200px !important">
+        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important" placeholder="0">
+        <select id="node-input-timeoutUnits" style="width:200px !important">          
           <option value="seconds">Seconds</option>
           <option value="minutes">Minutes</option>
           <option value="hours">Hours</option>
           <option value="days">Days</option>
         </select>
+      
     </div>   
     <div class="form-row event">
         <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>
-        <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important">
+        <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important"  placeholder="always">
         <input type="hidden" id="node-input-triggertype" style="text-align:end; width:50px !important">
     </div>
     <div class="form-row event">
         <input type="hidden" id="node-input-filterPropertytype">
         <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
-        <input type="text" id="node-input-filterProperty">          
+        <input type="text" id="node-input-filterProperty" placeholder="summary">          
     </div>
     <div class="form-row event">
         <input type="hidden" id="node-input-filterOperatortype">
         <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
-        <input type="text" id="node-input-filterOperator">  
+        <input type="text" id="node-input-filterOperator"  placeholder="between">  
       
     </div>
     <div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
@@ -488,29 +546,25 @@
     </div>
 
     <div class="form-row event" id="delay-details-for">
+        <input type="hidden" id="node-input-previewtype" style="text-align:end; width:50px !important">
+        <input type="hidden" id="node-input-previewUnitstype" style="text-align:end; width:50px !important">
         <label for="node-input-preview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
         <input type="text" id="node-input-preview" style="text-align:end; width:50px !important">
-        <select id="node-input-previewUnits">
-          <option value="seconds">Seconds</option>
-          <option value="minutes">Minutes</option>
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-        </select>
+        <span class="event" id="previewUnits"><input type="text" id="node-input-previewUnits" style="text-align:end; width:50px !important"  placeholder="timeunit"></span>
+      
     </div>
     <div class="form-row event" id="pastview-details-for">
+        <input type="hidden" id="node-input-pastviewtype" style="text-align:end; width:50px !important">
+        <input type="hidden" id="node-input-pastviewUnitstype" style="text-align:end; width:50px !important">
         <label for="node-input-pastview"><i class="fa fa-clock-o"></i> <span>Past view</span></label>
         <input type="text" id="node-input-pastview" style="text-align:end; width:50px !important">
-        <select id="node-input-pastviewUnits">
-          <option value="seconds">Seconds</option>
-          <option value="minutes">Minutes</option>
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-        </select>
+        <span class="event" id="pastviewUnits"><input type="text" id="node-input-pastviewUnits" style="text-align:end; width:50px !important" placeholder="timeunit"></span>
+      
     </div>
     <div class="form-row event">
         <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
-        <input type="text" id="node-input-timezone" placeholder="default is UTC">
-        <input type="hidden" id="node-input-timezonetype" placeholder="default is UTC">
+        <input type="text" id="node-input-timezone" placeholder="UTC">
+        <input type="hidden" id="node-input-timezonetype">
     </div>
     <div class="form-row event">
         <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>

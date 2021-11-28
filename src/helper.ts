@@ -63,12 +63,12 @@ export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?:
         trigger: RED.util.evaluateNodeProperty(node.trigger, node.triggertype, node, msg) || msg?.trigger || node?.trigger || 'always',
 
 
-        preview: parseInt(msg?.preview || node?.preview || node?.endpreview || 10),
-        previewUnits: msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
-        pastview: parseInt(msg?.pastview || node?.pastview || 0),
-        pastviewUnits: msg?.pastviewUnits || node?.pastviewUnits || 'd',
-        offset: parseInt(msg?.offset || node?.offset || 0),
-        offsetUnits: msg?.offsetUnits || node?.offsetUnits || 'm',
+        preview: parseInt(RED.util.evaluateNodeProperty(node.preview, node.previewtype, node, msg) || msg?.preview || node?.preview || node?.endpreview || 10),
+        previewUnits: RED.util.evaluateNodeProperty(node.previewUnits, node.previewUnitstype, node, msg) || msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
+        pastview: parseInt(RED.util.evaluateNodeProperty(node.pastview, node.pastviewtype, node, msg) || msg?.pastview || node?.pastview || 0),
+        pastviewUnits: RED.util.evaluateNodeProperty(node.pastviewUnits, node.pastviewUnitstype, node, msg) || msg?.pastviewUnits || node?.pastviewUnits || 'd',
+        offset: parseInt(RED.util.evaluateNodeProperty(node.offset, node.offsettype, node, msg) || msg?.offset || node?.offset || 0),
+        offsetUnits: RED.util.evaluateNodeProperty(node.offsetUnits, node.offsetUnitstype, node, msg) || msg?.offsetUnits || node?.offsetUnits || 'm',
 
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false,

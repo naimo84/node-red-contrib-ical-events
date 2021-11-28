@@ -23,9 +23,11 @@
                 name: {
                     value: ""
                 },
+                offsettype: {},
                 offset: {
                     value: ""
                 },
+                offsetUnitstype: {},
                 offsetUnits: {
                     value: ""
                 },
@@ -93,7 +95,7 @@
             paletteLabel: "trigger",
             oneditprepare: function () {
                 var node = this;
-                $("#node-input-timeout").spinner({ min: 0 });
+               
 
                 $("#node-input-filter").typedInput({
                     typeField: "#node-input-filtertype",
@@ -151,6 +153,32 @@
                             { value: "nomatch", label: "No match" }
                         ]
                     }]
+                });
+
+
+                $("#node-input-offsetUnits").typedInput({
+                    typeField: "#node-input-offsetUnitstype",
+                    default: "offsetUnits",
+                    types: ["str", "msg", {
+                        value: "offsetUnits",
+                        options: [
+                            { value: "seconds", label: "Seconds" },
+                            { value: "minutes", label: "Minutes" },
+                            { value: "hours", label: "Hours" },
+                            { value: "days", label: "Days" }
+                        ]
+                    }]
+                });
+                $("#node-input-offset").typedInput({
+                    typeField: "#node-input-offsettype",
+                    types: ["num", "str", "msg"]
+                }).typedInput('width', '200px');
+                $('#node-input-offset').on('change', function (event, type, value) {
+                    if (type === 'str') {
+                        $('#offsetUnits').hide();
+                    } else {
+                        $('#offsetUnits').show();
+                    }
                 });
 
                 $('.ui-spinner-button').on("click", function () {
@@ -370,10 +398,10 @@
         .event {
             display:flex;
         }
-        .event  .red-ui-typedInput-container  {
+        .event .red-ui-typedInput-container {
             flex:1
         }
-        .event  .red-ui-typedInput-container  {
+        .event span {
             flex:1
         }
         .event label {
@@ -396,7 +424,7 @@
     </div>
     <div class="form-row event padding-top" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
-        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
+        <input type="text" id="node-input-timeout" style="width:50px !important">
         <select id="node-input-timeoutUnits" style="width:200px !important">          
           <option value="seconds">Seconds</option>
           <option value="minutes">Minutes</option>
@@ -439,13 +467,14 @@
     </div>
     <div class="form-row event">
         <label for="node-input-offset"><i class="fa fa-clock-o"></i> <span>Offset</span></label>
-        <input type="text" id="node-input-offset" style="text-align:end; width:50px !important; flex:0">
-        <select id="node-input-offsetUnits" >          
-            <option value="seconds">Seconds</option>
-            <option value="minutes">Minutes</option>
-            <option value="hours">Hours</option>
-            <option value="days">Days</option>
-          </select>
+    
+        <input type="hidden" id="node-input-offsettype" style="text-align:end; width:50px !important">
+        <input type="hidden" id="node-input-offsetUnitstype" style="text-align:end; width:50px !important">
+        
+        <input type="text" id="node-input-offset" style="text-align:end; width:50px !important">
+        <span class="event" id="offsetUnits"><input type="text" id="node-input-offsetUnits" style="text-align:end; width:50px !important"></span>
+          
+       
     </div>
     <div class="form-row event">
         <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
