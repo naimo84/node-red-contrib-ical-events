@@ -9,16 +9,16 @@ To do so, you have serveral options:
 
 - add the environment variable directly before the node-red command: 
   ````sh
-  DEBUG=kalender-events node-red
+  DEBUG=kalender-events* node-red
   ````
 - add the environment variable for the current session before executing the node-red command: 
   ````sh
-  export DEBUG=kalender-events 
+  export DEBUG=kalender-events* 
   node-red
   ````
 - add the environment variable at the top of the settings.js file of node-red and restart node-red:
   ````javascript
-  process.env.DEBUG="kalender-events"
+  process.env.DEBUG="kalender-events*"
   module.exports = {
     // the tcp port that the Node-RED web server is listening on
     uiPort: process.env.PORT || 1880,
@@ -38,7 +38,7 @@ To do so, you have serveral options:
         image: nodered/node-red:latest
         environment:
         - TZ=Europe/Amsterdam
-        - DEBUG=kalender-events
+        - DEBUG=kalender-events*
         ports:
         - "1880:1880"
         networks:
@@ -56,6 +56,6 @@ To do so, you have serveral options:
     or: 
 
     ````sh
-    docker run -it -p 1880:1880 --env DEBUG=kalender-events -v node_red_data:/data --name mynodered nodered/node-red
+    docker run -it -p 1880:1880 --env DEBUG=kalender-events* -v node_red_data:/data --name mynodered nodered/node-red
     ````
     
