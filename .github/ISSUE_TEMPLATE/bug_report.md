@@ -2,8 +2,8 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
-assignees: ''
+labels: 'bug'
+assignees: 'naimo84'
 
 ---
 
@@ -27,6 +27,7 @@ If applicable, add screenshots to help explain your problem.
  - Version [e.g. 0.1.22]
  - node-red version
  - nodejs version
+ - is it an ical, caldav or icloud calendar?
 
 **Additional context**
 Add any other context about the problem here.
