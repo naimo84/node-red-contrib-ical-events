@@ -50,6 +50,9 @@
     "type": "git",
     "url": "https://github.com/naimo84/node-red-contrib-ical-events"
   },
+  "npm": {
+    "publish": false
+  },
   "scripts": {
     "prepack": "gulp",
     "release": "release-it",
