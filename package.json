@@ -52,7 +52,7 @@
   },
   "scripts": {
     "prepack": "gulp",
-    "release": "release-it",
+    "release": "release-it --no-npm",
     "dev": "gulp develop",
     "build": "gulp"
   },
@@ -60,7 +60,7 @@
     "cron": "^1.8.2",
     "cron-parser": "^4.1.0",
     "crypto-js": "^4.1.1",
-    "kalender-events": "0.20.0",
+    "kalender-events": "0.20.1",
     "luxon": "^2.0.2",
     "node-cache": "^5.1.2"
   },
