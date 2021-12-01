@@ -52,7 +52,7 @@
   },
   "scripts": {
     "prepack": "gulp",
-    "release": "release-it --no-npm",
+    "release": "release-it",
     "dev": "gulp develop",
     "build": "gulp"
   },
