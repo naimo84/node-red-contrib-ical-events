@@ -3,7 +3,6 @@ import { CronJob } from 'cron';
 import { IcalEventsConfig } from './ical-config';
 import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 var parser = require('cron-parser');
-var ce = require('cloneextend');
 
 module.exports = function (RED: any) {
     function upcomingNode(n: any) {
