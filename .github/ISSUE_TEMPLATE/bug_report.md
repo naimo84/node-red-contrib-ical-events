@@ -29,5 +29,7 @@ If applicable, add screenshots to help explain your problem.
  - nodejs version
  - is it an ical, caldav or icloud calendar?
 
-**Additional context**
+**Logs / Additional context**
 Add any other context about the problem here.
+
+You can send me a debug log, like described here: https://naimo84.github.io/node-red-contrib-ical-events/guide/debug.html
