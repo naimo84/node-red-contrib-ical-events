@@ -31,6 +31,8 @@
                 offsetUnits: {
                     value: ""
                 },
+                eventtypes: {},
+                eventtypestype: {},
                 triggertype: {},
                 trigger: {},
                 timezone: {},
@@ -95,7 +97,36 @@
             paletteLabel: "trigger",
             oneditprepare: function () {
                 var node = this;
-               
+
+                $("#node-input-eventtypes").typedInput({
+                    typeField: "#node-input-eventtypestype",
+                    types: ["str", "msg", {
+                        value: "eventtypes",
+                        multiple: true,
+                        options: [
+                            { value: "todos", label: "todos" },
+                            { value: "events", label: "events" }
+                        ]
+                    }]
+                });
+
+
+                $('#node-input-confignode').change(function () {
+                    var value = $('#node-input-confignode').val();
+                    $.post(`icalconfig`, { id: value }, function (icalconfig) {
+                        if (icalconfig.type !== 'caldav') {
+                            $('#node-input-eventtypes').parent().hide();
+                        } else {
+                            $('#node-input-eventtypes').parent().show();
+                        }
+
+                        if ((!node.eventtypes || node.eventtypes.trim() === '')) {
+                            $("#node-input-eventtypes").typedInput('type', 'eventtypes');
+                            $("#node-input-eventtypes").typedInput('value', icalconfig.includeTodo === true ? 'events,todos' : 'events')
+                        }
+
+                    });
+                });
 
                 $("#node-input-filter").typedInput({
                     typeField: "#node-input-filtertype",
@@ -421,6 +452,13 @@
     <div class="form-row event">
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
+    </div>
+    <div class="form-row event">
+        <label for="node-input-eventtypes"  >
+            <i class="fa fa-asterisk"></i>
+            <span>Event types:</span></label>
+            <input type="text" id="node-input-eventtypes" placeholder="events,todos">
+            <input type="hidden" id="node-input-eventtypestype" placeholder="">
     </div>
     <div class="form-row event padding-top" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>

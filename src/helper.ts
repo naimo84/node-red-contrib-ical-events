@@ -52,6 +52,9 @@ export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?:
         username: msg?.username || config?.credentials?.user || config?.username,
         usecache: msg?.usecache || config?.usecache || false,
         includeTodo: msg?.includeTodo || config?.includeTodo || false,
+
+        eventtypes: RED.util.evaluateNodeProperty(config.eventtypes, config.eventtypestype, config, msg),
+
         password: msg?.password || config?.credentials?.pass || config?.password,
         calendar: msg?.calendar || config?.calendar,
 

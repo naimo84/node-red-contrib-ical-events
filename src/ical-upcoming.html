@@ -14,13 +14,13 @@
             },
             cron: {
                 value: '',
-            },         
+            },
             timeout: {
                 value: '',
             },
             timeoutUnits: {
                 value: '',
-            },         
+            },
             name: {
                 value: '',
             },
@@ -48,6 +48,8 @@
             pastviewUnits: {
                 value: '',
             },
+            eventtypes: {},
+            eventtypestype: {},
             pastviewUnitstype: {},
             triggertype: {},
             trigger: {},
@@ -112,7 +114,38 @@
         paletteLabel: 'upcoming',
         oneditprepare: function () {
             var node = this;
-            
+            $("#node-input-eventtypes").typedInput({
+                typeField: "#node-input-eventtypestype",
+                types: ["str", "msg", {
+                    value: "eventtypes",
+                    multiple: true,
+                    options: [
+                        { value: "events", label: "Events" },
+                        { value: "todos", label: "Todos" }
+                    ]
+                }]
+            });
+
+
+
+            $('#node-input-confignode').change(function () {
+                var value = $('#node-input-confignode').val();
+                $.post(`icalconfig`, { id: value }, function (icalconfig) {
+                    if (icalconfig.type !== 'caldav') {
+                        $('#node-input-eventtypes').parent().hide();
+                    } else {
+                        $('#node-input-eventtypes').parent().show();
+                    }
+
+                    if ((!node.eventtypes || node.eventtypes.trim() === '')) {
+                        $("#node-input-eventtypes").typedInput('type', 'eventtypes');
+                        $("#node-input-eventtypes").typedInput('value', icalconfig.includeTodo === true ? 'events,todos' : 'events')
+                    }
+
+                });
+            });
+
+
             $("#node-input-filter").typedInput({
                 typeField: "#node-input-filtertype",
                 types: ["str", "msg"]
@@ -298,7 +331,7 @@
                     $('#pastviewUnits').show();
                 }
             });
-        
+
 
             $('#node-input-trigger').change(function () {
                 var value = $('#node-input-trigger').val();
@@ -494,11 +527,19 @@
         <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
         <input type="text" id="node-input-confignode">
     </div>
+   
     <div class="form-row padding-top">
         <label for="node-input-checkall" style="width:200px !important">
             <i class="fa fa-asterisk"></i>
             <span>Fetch all configs concurrent</span></label>
         <input type="checkbox" id="node-input-checkall" placeholder="" style="width:16px !important">
+    </div>
+    <div class="form-row event">
+        <label for="node-input-eventtypes"  >
+            <i class="fa fa-asterisk"></i>
+            <span>Event types:</span></label>
+            <input type="text" id="node-input-eventtypes" placeholder="events,todos">
+            <input type="hidden" id="node-input-eventtypestype" placeholder="">
     </div>
     <div class="form-row event" id="timeout-details-for">
         <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>

@@ -25,9 +25,9 @@
                 usecache: {
                     value: false,
                 },
-                username:{},
-                includeTodo:{},
-                password:{},
+                username: {},
+                password: {},
+                includeTodo: {},               
                 calendar: {},
                 pastWeeks: {
                     value: '0',
@@ -58,7 +58,7 @@
                 var node = this;
 
                 if (!node.caltype) {
-                    let caltype='ical';
+                    let caltype = 'ical';
                     if (node.caldav === "false")
                         caltype = "ical"
                     else if (node.caldav === "true")
@@ -112,6 +112,25 @@
 </script>
 
 <script type="text/x-red" data-template-name="ical-config">
+    <style>
+        .event {
+            display:flex;
+        }
+        .event .red-ui-typedInput-container {
+            flex:1
+        }
+        .event span {
+            flex:1
+        }
+        .event label {
+            min-width: 110px;
+            align-self: center;
+        }  
+        .padding-top {
+            padding-top: 10px;
+        }
+    </style>   
+
     <div class="form-row">
         <label for="node-config-input-name" style="width:160px !important">
             <i class="fa fa-user"></i>
@@ -119,16 +138,16 @@
         <input type="text" id="node-config-input-name" placeholder="" style="width:280px !important">
     </div>
     <hr/>
-    <div class="form-row" style="display:flex">
+    <div class="form-row event">
         <label for="node-config-input-url" style="min-width:160px !important">
             <i class="fa fa-link"></i>
             <span>iCal / ics / caldav URL or filepath to ics:</span></label>
         <input type="text" id="node-config-input-url" placeholder="" style="width:100% !important">
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-caltype" style="width:160px !important">
             <i class="fa fa-calendar"></i>
-            <span>Type:</span></label>
+            <span>Calendar type:</span></label>
             <input type="hidden" id="node-config-input-caldav"/>
             <select id="node-config-input-caltype">
                 <option value="ical">iCal</option>
@@ -136,7 +155,7 @@
                 <option value="icloud">iCloud secure</option>
             </select>     
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-includeTodo" style="width:160px !important">
             <i class="fa fa-asterisk"></i>
             <span>include Todos:</span></label>
@@ -146,14 +165,14 @@
         <i class="fa fa-exclamation"></i>
             <b>CAUTION:</b> with v1.0.0 credentials are stored in the node-red internal credential store. It's safer, but you need to reenter credentials.
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-username" style="width:160px !important">
             <i class="fa fa-user"></i>
             <span>Username:</span></label>
         <input type="text" id="node-config-input-user" placeholder="" style="width:280px !important">
         <input type="hidden" id="node-config-input-username" placeholder="" style="display:none">
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-password" style="width:160px !important">
             <i class="fa fa-key"></i>
             <span>Password:</span></label>
@@ -164,20 +183,20 @@
         <i class="fa fa-exclamation"></i>
             <b>CAUTION:</b> for iCloud secure get app a specific password, described like here: <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a>
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-usecache" style="width:160px !important">
             <i class="fa fa-asterisk"></i>
             <span>Use cache in case of an error:</span></label>
         <input type="checkbox" id="node-config-input-usecache" placeholder="" style="width:16px !important">
     </div>
    
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-replacedates" style="width:160px !important">
             <i class="fa fa-edit"></i>
             <span>Replace Dates with name:</span></label>
         <input type="checkbox" id="node-config-input-replacedates" placeholder="" style="width:16px !important">
     </div>
-    <div class="form-row">
+    <div class="form-row event">
         <label for="node-config-input-language" style="width:160px !important">
             <i class="fa fa-language"></i>
             <span>Language:</span></label>
@@ -192,7 +211,7 @@
             <option value="es">Espanol</option>
         </select>
     </div>
-   <div class="form-row">
+   <div class="form-row event">
         <label for="node-config-input-calendar" style="width:160px !important">
             <i class="fa fa-calendar"></i>
             <span>Calendar:</span>

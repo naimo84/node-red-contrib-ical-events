@@ -18,12 +18,22 @@ export interface IcalEventsConfig extends Config {
     combineResponse: boolean,
 }
 
-
-
 module.exports = function (RED: any) {
     RED.httpAdmin.get("/timezones", async (req, res) => {
-        res.json(moment.tz.names());    
+        res.json(moment.tz.names());
     });
+
+    RED.httpAdmin.post("/icalconfig", function (req, res) {
+        RED.log.debug("POST /icalconfig");
+
+        const nodeId = req.body.id;
+        let config = RED.nodes.getNode(nodeId) as IcalEventsConfig;
+        res.json({
+            includeTodo: config.includeTodo,
+            type: config.caltype?config.caltype:config.caldav
+        });
+    });
+
     function icalConfig(config: IcalEventsConfig) {
         RED.nodes.createNode(this, config);
 
@@ -49,9 +59,9 @@ module.exports = function (RED: any) {
         this.replacedates = config.replacedates;
         this.calendar = config.calendar;
         this.usecache = config.usecache;
-        this.username=config.username;
-        this.password=config.password;
-        this.includeTodo=config.includeTodo;
+        this.username = config.username;
+        this.password = config.password;
+        this.includeTodo = config.includeTodo;     
     }
 
     RED.nodes.registerType('ical-config', icalConfig, {
