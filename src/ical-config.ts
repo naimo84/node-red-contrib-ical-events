@@ -2,6 +2,7 @@ import { Config } from 'kalender-events';
 var moment = require('moment-timezone');
 
 export interface IcalEventsConfig extends Config {
+    eventtypestype: string;
     filterPropertytype: string;
     filterOperator2type: string;
     filtertype: string;
