@@ -69,8 +69,7 @@ module.exports = function (RED: any) {
 
 
         node.datesArray = [];
-        getICal(node).then(data => {
-            node.debug('Ical read successfully ' + node.config.url);
+        getICal(node).then(data => {            
             node.datesArray = data || [];
 
             let todayEventcounter = 0;
