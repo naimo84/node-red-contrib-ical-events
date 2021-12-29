@@ -43,13 +43,16 @@ Thank you to all my backers!
 
 ### Become a backer
 
+
 However, if you get some profit from this or just want to encourage me to continue creating stuff, there are few ways you can do it:
 
 - Starring and sharing the projects you like :rocket:
-- **Crypto.&#65279;com** &nbsp; — &nbsp; Use my referral link https://crypto.com/app/f2smbah8fm to sign up for Crypto.&#65279;com and we both get $25 USD :)  
+- **Crypto.&#65279;com** &nbsp;—&nbsp; Use my referral link https://crypto.com/app/f2smbah8fm to sign up for Crypto.&#65279;com and we both get $25 USD :)  
 
-- [![PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge)][paypal-donations] &nbsp; **PayPal** &nbsp; — &nbsp; You can make one-time donations via PayPal. I'll probably buy a ~~coffee~~ tea. :tea:
-- [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T412CXA) &nbsp; **Ko-fi** &nbsp; — &nbsp; I'll buy a ~~tea~~ coffee. :coffee: :wink:
+- [![PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge)][paypal-donations] &nbsp; — &nbsp; You can make one-time donations via PayPal. I'll probably buy a ~~coffee~~ tea. :tea:
+- [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T412CXA) &nbsp;—&nbsp; I'll buy a ~~tea~~ coffee. :coffee: :wink:
+
+Thanks! :heart:
 
 Thanks! :heart:
 ## :cloud: Installation
