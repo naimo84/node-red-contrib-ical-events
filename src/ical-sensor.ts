@@ -67,8 +67,7 @@ module.exports = function (RED: any) {
         //@ts-ignore
         if (!msg) msg = {};
         var dateNow = new Date();
-        getICal(node).then(data => {
-            node.debug('Ical read successfully ' + node.config.url);
+        getICal(node).then(data => {            
             if (!data) return;
 
             let current = false;

@@ -88,8 +88,7 @@ module.exports = function (RED: any) {
         }
         let dateNow = new Date();
         let possibleUids = [];
-        getICal(node).then((data: IKalenderEvent[]) => {
-            node.debug('Ical read successfully ' + node.config.url);
+        getICal(node).then((data: IKalenderEvent[]) => {            
             if (data) {
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {
