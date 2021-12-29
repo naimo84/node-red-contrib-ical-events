@@ -53,8 +53,6 @@ However, if you get some profit from this or just want to encourage me to contin
 - [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T412CXA) &nbsp;—&nbsp; I'll buy a ~~tea~~ coffee. :coffee: :wink:
 
 Thanks! :heart:
-
-Thanks! :heart:
 ## :cloud: Installation
 
 First of all install [Node-RED](http://nodered.org/docs/getting-started/installation)
