@@ -27,7 +27,7 @@ self.addEventListener('message', (event) => {
 self.__precacheManifest = [
   {
     "url": "404.html",
-    "revision": "b6fdd54bf1e0c5867996e50aa0553d67"
+    "revision": "bf998517695e58745926fa809a00b4a2"
   },
   {
     "url": "assets/css/0.styles.c9d52bfa.css",
@@ -98,8 +98,8 @@ self.__precacheManifest = [
     "revision": "68dd01ce2923f7aa3694d31dfd554a62"
   },
   {
-    "url": "assets/js/app.42fc8d67.js",
-    "revision": "89681d2bd22ab9f4ce99120338e3b735"
+    "url": "assets/js/app.ea139ece.js",
+    "revision": "f893867e9e041d381bd4285ef7b13ea3"
   },
   {
     "url": "assets/js/vendors~flowchart.171a5f9d.js",
@@ -107,11 +107,11 @@ self.__precacheManifest = [
   },
   {
     "url": "config/index.html",
-    "revision": "2aa04a545c82871ceed6d47a849a3c28"
+    "revision": "3037051190e07b1bced9edf37a47005a"
   },
   {
     "url": "favicon.png",
-    "revision": "d14c965fe422698a3c614b9883b0d687"
+    "revision": "3bafa54ce075d3f5efd9bad5ed734fdb"
   },
   {
     "url": "github.svg",
@@ -119,79 +119,79 @@ self.__precacheManifest = [
   },
   {
     "url": "guide/debug.html",
-    "revision": "f28b6f02b1e1a3b13cfb71cc7fd304f1"
+    "revision": "d97da947d4f55ed77114f6fb3333b2f7"
   },
   {
     "url": "guide/index.html",
-    "revision": "dd337cec3ce2a14acb3ea4030eb28101"
+    "revision": "9b43e422d5de6d94391b73bffd3055bd"
   },
   {
     "url": "guide/nodes.html",
-    "revision": "c85690a4fbbf3ca6ffd8f4687e1669cc"
+    "revision": "0f4da23f84d26d048b700389806b0130"
   },
   {
     "url": "guide/sensors.html",
-    "revision": "8177da208cb90a02753eda6bfeaf2f38"
+    "revision": "d68efba43e42bb4eb9a619c602b2caf8"
   },
   {
     "url": "guide/trigger.html",
-    "revision": "dfcc5039a874597053ceef1fb6033740"
+    "revision": "fc4f753f4cff0ee74d641986427b675d"
   },
   {
     "url": "guide/upcoming.html",
-    "revision": "759e1513cd5e280816e67bfa695f25ec"
+    "revision": "4e3a2f4266c76efa3237ba162b4f002d"
   },
   {
     "url": "icons/android-chrome-192x192.png",
-    "revision": "2ae129bfbc670ddbc5d83130fdca51fb"
+    "revision": "d11db6a43debb45ba0d20e8c8f3a284f"
   },
   {
     "url": "icons/android-chrome-512x512.png",
-    "revision": "b9a6b0d549941f5938bbbc106f19b0a6"
+    "revision": "071599deccb807ff8f9d38deaaadc36e"
   },
   {
     "url": "icons/apple-touch-icon-120x120.png",
-    "revision": "45a3cf74cc54976ac5eaf03ee8451eac"
+    "revision": "44ceae857825d1f345891eab3cbaf83e"
   },
   {
     "url": "icons/apple-touch-icon-152x152.png",
-    "revision": "c22351d8fe58c26e346cd9d8370e8ff7"
+    "revision": "b367b1caa953e3a6ff06d3c018a3f6b3"
   },
   {
     "url": "icons/apple-touch-icon-180x180.png",
-    "revision": "2409468249cc81a1dba5e16b6cb3fee2"
+    "revision": "7444d6986e036c065287a839928d05f3"
   },
   {
     "url": "icons/apple-touch-icon-60x60.png",
-    "revision": "569ba17f0b57bd947718f5e8b8345868"
+    "revision": "938b7681af2299b0ac47af9b7f2759db"
   },
   {
     "url": "icons/apple-touch-icon-76x76.png",
-    "revision": "172d0bea737e2d830879364b85452448"
+    "revision": "92ded4dd7ddc347f05535ddeea343220"
   },
   {
     "url": "icons/apple-touch-icon.png",
-    "revision": "2409468249cc81a1dba5e16b6cb3fee2"
+    "revision": "7444d6986e036c065287a839928d05f3"
   },
   {
     "url": "icons/favicon-16x16.png",
-    "revision": "b0f966ce21204938666d3b76146f3216"
+    "revision": "cf4b7492f6e85fd8de4c76de2971ef8c"
   },
   {
     "url": "icons/favicon-32x32.png",
-    "revision": "2956e5675d6247e0e540b1ab30681412"
+    "revision": "bb9c62ab93da02a9488963b2d7dc0f0b"
   },
   {
     "url": "icons/msapplication-icon-144x144.png",
-    "revision": "958b57c19149628a3c387108247dc15a"
+    "revision": "bf6d6fd10a317810158361ecfd363f2c"
   },
   {
     "url": "icons/mstile-150x150.png",
-    "revision": "6b18d32232681d531a8c949c8e8beb62"
+    "revision": "866e357ba94d906be308e45d05b5e99e"
   },
   {
     "url": "index.html",
-    "revision": "2396a8d88cbf0dad6ee1f3b1d4034bbd"
+    "revision": "054cae1eeeb71743e4ccab1b161b9b1c"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
