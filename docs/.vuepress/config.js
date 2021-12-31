@@ -61,11 +61,6 @@ module.exports = {
           '/guide/': [
             '/guide/',
             {
-              title: 'Debug',
-              path: '/guide/debug',
-              collapsable: false             
-            },
-            {
               title: 'Nodes',
               collapsable: false,
               path: '/guide/nodes',
@@ -74,6 +69,11 @@ module.exports = {
                 '/guide/trigger',
                 '/guide/sensors',
               ]
+            },
+            {
+              title: 'Debug',
+              path: '/guide/debug',
+              collapsable: false             
             },
             // '/guide/troubleshooting',
             // {
