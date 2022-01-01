@@ -5,9 +5,11 @@ import * as parser from 'cron-parser';
 import { IcalEventsConfig } from './ical-config';
 import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 import * as NodeCache from 'node-cache';
-import { IKalenderEvent } from 'kalender-events';
+import { iCalEvent, IKalenderEvent } from 'kalender-events';
 import { NodeMessageInFlow, NodeMessage } from "node-red";
 import moment = require("moment");
+import timezone = require("moment-timezone");
+
 module.exports = function (RED: any) {
 
     function eventsNode(config: any) {
@@ -22,7 +24,7 @@ module.exports = function (RED: any) {
             node.on('input', (msg, send, done) => {
                 node.msg = RED.util.cloneMessage(msg);
                 send = send || function () { node.send.apply(node, arguments) }
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig,RED, config, msg);
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);
                 cronCheckJob(node, msg, send, done, config.confignode, startedCronJobs);
             });
 
@@ -86,16 +88,16 @@ module.exports = function (RED: any) {
         else {
             node.status({});
         }
-        let dateNow = new Date();
+        let dateNow = moment().utc().toDate();
         let possibleUids = [];
-        getICal(node).then((data: IKalenderEvent[]) => {            
+        getICal(node).then((data: IKalenderEvent[]) => {
             if (data) {
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {
                         let ev = data[k];
 
-                        const eventStart = new Date(ev.eventStart);
-                        const eventEnd = new Date(ev.eventEnd);
+                        const eventStart = moment(ev.eventStart).utc().toDate();
+                        const eventEnd = moment(ev.eventEnd).utc().toDate();
 
                         if (node.config.offset) {
                             if (node.config?.offsetUnits === 'seconds') {
@@ -205,10 +207,16 @@ module.exports = function (RED: any) {
         });
     }
 
-    function cronJobStart(event: any, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
+    function cronJobStart(event: IKalenderEvent, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
+        if (event.rrule?.options?.interval && event.rrule?.options?.tzid) {
+            //@ts-ignore
+            event.lastRunTime = timezone.utc(event.eventStart).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+            //@ts-ignore
+            event.nextRunTime = timezone.utc(moment(event.eventStart).add(event.rrule.options.interval, 'minutes').toDate()).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+        }
         send([Object.assign(msg2, {
             payload: event
         })]);
@@ -217,10 +225,17 @@ module.exports = function (RED: any) {
 
     }
 
-    function cronJobEnd(event: any, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
+    function cronJobEnd(event: IKalenderEvent, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, msg: NodeMessageInFlow) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
+
+        if (event.rrule?.options?.interval && event.originalEvent?.timezone) {
+            //@ts-ignore
+            event.lastRunTime = timezone.utc(event.eventStart).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+            //@ts-ignore
+            event.nextRunTime = timezone.utc(moment(event.eventStart).add(event.rrule.options.interval, 'minutes').toDate()).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+        }
         send([null, Object.assign(msg2, {
             payload: event
         })]);

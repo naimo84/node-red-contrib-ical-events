@@ -61,6 +61,8 @@
     "crypto-js": "^4.1.1",
     "kalender-events": "0.23.0",
     "luxon": "^2.0.2",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
@@ -68,18 +70,18 @@
     "@types/crypto-js": "^4.0.2",
     "@types/luxon": "^2.0.5",
     "@types/node": "^16.11.1",
-    "@types/node-red": "^1.1.1",    
+    "@types/node-red": "^1.1.1",
     "gulp": "^4.0.2",
     "gulp-nodemon": "^2.5.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
-    "gulp-watch": "^5.0.1",   
+    "gulp-watch": "^5.0.1",
     "node-red": "2.0.6",
     "node-red-node-test-helper": "^0.2.7",
     "nodemon": "^2.0.14",
     "release-it": "^14.11.8",
     "typescript": "^4.4.4"
-  }, 
+  },
   "funding": {
     "type": "paypal",
     "url": "https://paypal.me/NeumannBenjamin"
