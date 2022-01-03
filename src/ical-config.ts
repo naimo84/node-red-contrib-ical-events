@@ -29,10 +29,12 @@ module.exports = function (RED: any) {
 
         const nodeId = req.body.id;
         let config = RED.nodes.getNode(nodeId) as IcalEventsConfig;
-        res.json({
-            includeTodo: config.includeTodo,
-            type: config.caltype?config.caltype:config.caldav
-        });
+        if (config) {
+            res.json({
+                includeTodo: config.includeTodo,
+                type: config.caltype ? config.caltype : config.caldav
+            });
+        }
     });
 
     function icalConfig(config: IcalEventsConfig) {
@@ -62,7 +64,7 @@ module.exports = function (RED: any) {
         this.usecache = config.usecache;
         this.username = config.username;
         this.password = config.password;
-        this.includeTodo = config.includeTodo;     
+        this.includeTodo = config.includeTodo;
     }
 
     RED.nodes.registerType('ical-config', icalConfig, {

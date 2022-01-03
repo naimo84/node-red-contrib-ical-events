@@ -211,12 +211,7 @@ module.exports = function (RED: any) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
-        if (event.rrule?.options?.interval && event.rrule?.options?.tzid) {
-            //@ts-ignore
-            event.lastRunTime = timezone.utc(event.eventStart).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-            //@ts-ignore
-            event.nextRunTime = timezone.utc(moment(event.eventStart).add(event.rrule.options.interval, 'minutes').toDate()).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-        }
+     
         send([Object.assign(msg2, {
             payload: event
         })]);
@@ -229,13 +224,7 @@ module.exports = function (RED: any) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
-
-        if (event.rrule?.options?.interval && event.originalEvent?.timezone) {
-            //@ts-ignore
-            event.lastRunTime = timezone.utc(event.eventStart).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-            //@ts-ignore
-            event.nextRunTime = timezone.utc(moment(event.eventStart).add(event.rrule.options.interval, 'minutes').toDate()).tz(event.rrule?.options?.tzid).format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-        }
+      
         send([null, Object.assign(msg2, {
             payload: event
         })]);
