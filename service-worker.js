@@ -27,91 +27,55 @@ self.addEventListener('message', (event) => {
 self.__precacheManifest = [
   {
     "url": "404.html",
-    "revision": "a044b7d6b5f16c62000c464fab74b529"
+    "revision": "74796890ef8df7b48401e0d85ae64e61"
   },
   {
     "url": "assets/css/0.styles.c9d52bfa.css",
     "revision": "e614591d861b652cd0ad15d24b36d40e"
   },
   {
-    "url": "assets/img/nodered-palette-manager.5d6bafe3.png",
-    "revision": "5d6bafe3923dedf761e5faab20cc80e0"
-  },
-  {
     "url": "assets/img/search.83621669.svg",
     "revision": "83621669651b9a3d4bf64d1a670ad856"
   },
   {
-    "url": "assets/js/10.cacc52ed.js",
-    "revision": "61dddf8a5265a4a86148d8381a6f7c85"
+    "url": "assets/js/10.d4299008.js",
+    "revision": "eb0ea394bb2953c8c7e300f7d787f514"
   },
   {
-    "url": "assets/js/11.73c5b210.js",
-    "revision": "1cf53fd03e7867885a41b5fc0848b915"
+    "url": "assets/js/3.8600081c.js",
+    "revision": "27b2d20117df2c05158c58f8e8bb4021"
   },
   {
-    "url": "assets/js/12.cac02ebe.js",
-    "revision": "23bd1803dcc58e3762df623c38e6b7dc"
+    "url": "assets/js/4.305840cb.js",
+    "revision": "4f9e42d05586d08786e83942127f249e"
   },
   {
-    "url": "assets/js/13.1e82e629.js",
-    "revision": "ed3b781823151478801994d5cf90ebbf"
+    "url": "assets/js/5.d6299946.js",
+    "revision": "d223a49aafa0acbbb52036785f916258"
   },
   {
-    "url": "assets/js/14.db8e747a.js",
-    "revision": "03f272e0d7fbe4a7c8d89f61767d8050"
+    "url": "assets/js/6.51181fc4.js",
+    "revision": "fc8566df9bf14ba7edcc29b789c096ad"
   },
   {
-    "url": "assets/js/15.2b6e3988.js",
-    "revision": "69dd6f8f548b08c1bc1d0e50927ccfa5"
+    "url": "assets/js/7.313456ac.js",
+    "revision": "2d25064ea05e8d65869a742911c2243c"
   },
   {
-    "url": "assets/js/16.8012a4e0.js",
-    "revision": "5e2759ac1bf687a15aa767139965935d"
+    "url": "assets/js/8.583c1358.js",
+    "revision": "220c7c71bbf415b1c5147c59344c2870"
   },
   {
-    "url": "assets/js/17.30259829.js",
-    "revision": "b1e7389e2592d7b65a2a51a204f1b22c"
+    "url": "assets/js/9.087df967.js",
+    "revision": "9d85d8d48752238210b38be3fdfd0e38"
   },
   {
-    "url": "assets/js/3.6902006a.js",
-    "revision": "9b0b9cd83e438f66ecaac898641b09d2"
+    "url": "assets/js/app.0cefccd5.js",
+    "revision": "d7816c65d595196f9f6f7f72a9aefff7"
   },
   {
-    "url": "assets/js/4.44163254.js",
-    "revision": "17e16b747893be48bf45e44c8a190b24"
-  },
-  {
-    "url": "assets/js/5.b0a1f306.js",
-    "revision": "d138de6dd6e5834febccdb60696c8dec"
-  },
-  {
-    "url": "assets/js/6.209c4215.js",
-    "revision": "51c652ee6e0347b6ffdac9727cf7f151"
-  },
-  {
-    "url": "assets/js/7.4495dce7.js",
-    "revision": "3f7f5cec10fed881881f0d59943d75c8"
-  },
-  {
-    "url": "assets/js/8.e595f7a8.js",
-    "revision": "9e69c721262fc4d5f3a68df0f819190b"
-  },
-  {
-    "url": "assets/js/9.b8be7a6b.js",
-    "revision": "ad6f4fd5d8ad135e7662f83ce28dc82c"
-  },
-  {
-    "url": "assets/js/app.db5b304e.js",
-    "revision": "4600fb82583f2d3642598266ad728d8a"
-  },
-  {
-    "url": "assets/js/vendors~flowchart.88b6c7aa.js",
-    "revision": "6ec9428eb169bb0b962842f81cc7a3f7"
-  },
-  {
-    "url": "config/index.html",
-    "revision": "92708ebae4319936c32e5a54c4754d2c"
+    "url": "assets/js/vendors~flowchart.9a672344.js",
+    "revision": "c4fc00e394f448fb76ad1a676dbe7dec"
   },
   {
     "url": "favicon.png",
@@ -120,30 +84,6 @@ self.__precacheManifest = [
   {
     "url": "github.svg",
     "revision": "5a14e36c8b0b5e4ba427f47fca304477"
-  },
-  {
-    "url": "guide/debug.html",
-    "revision": "265062687d491365295954f2b55911d5"
-  },
-  {
-    "url": "guide/index.html",
-    "revision": "2352b78608f0da742d2008153fc4b79f"
-  },
-  {
-    "url": "guide/nodes.html",
-    "revision": "17b6a9e23cb1c10c633777f83e4cd5ab"
-  },
-  {
-    "url": "guide/sensors.html",
-    "revision": "794830a54de29412bdcecfa4f319b5c8"
-  },
-  {
-    "url": "guide/trigger.html",
-    "revision": "9b2363622befef9e715de9c897b72a40"
-  },
-  {
-    "url": "guide/upcoming.html",
-    "revision": "60f4605a607073e8306f6973ce175db6"
   },
   {
     "url": "icons/android-chrome-192x192.png",
@@ -195,7 +135,7 @@ self.__precacheManifest = [
   },
   {
     "url": "index.html",
-    "revision": "a461b5c5bddd8ae3cf6dbb562e7cafc9"
+    "revision": "db0796336f9d37183d1a27b7b1458908"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
