@@ -46,53 +46,7 @@ module.exports = {
       '/': {
         label: 'English',
         selectText: 'Languages',
-        lastUpdated: 'Last Updated',
-        nav: [
-          {
-            text: 'Guide',
-            link: '/guide/'
-          },
-          {
-            text: 'Configuration',
-            link: '/config/'
-          }
-        ],
-        sidebar: {
-          '/guide/': [
-            '/guide/',
-            {
-              title: 'Nodes',
-              collapsable: false,
-              path: '/guide/nodes',
-              children: [
-                '/guide/upcoming',
-                '/guide/trigger',
-                '/guide/sensors',
-              ]
-            },
-            {
-              title: 'Debug',
-              path: '/guide/debug',
-              collapsable: false             
-            },
-            // '/guide/troubleshooting',
-            // {
-            //   title: 'Examples',
-            //   collapsable: false,
-            //   path: '/guide/examples',
-            //   children: [
-            //     '/guide/examples_arbeitsagentur',
-            //     '/guide/examples_github',
-            //     '/guide/examples_grpcbin',
-            //     '/guide/examples_httpbin',
-            //     '/guide/examples_learnwebservices',
-            //     '/guide/examples_spacex',
-            //     '/guide/examples_springboot'
-            //   ]
-            // },
-          ]
-          
-        }
+        lastUpdated: 'Last Updated',            
       }
     }
   }
