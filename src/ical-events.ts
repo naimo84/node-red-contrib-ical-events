@@ -116,13 +116,15 @@ module.exports = function (RED: any) {
                         }
 
                         if (eventStart > dateNow) {
-                            let uid = crypto.MD5(ev.uid + ev.summary + "start").toString();
+                            //@ts-ignore
+                            let uid = crypto.MD5(ev.uid + ev.summary?.val ? ev.summary.val : ev.summary + "start").toString();
                             if (ev.uid) {
                                 uid = (ev.uid.uid ? ev.uid.uid : ev.uid) + eventStart.toISOString() + "start";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
-                                topic: ev.summary,
+                                //@ts-ignore
+                                topic: ev.summary?.val ? ev.summary.val : ev.summary,
                                 id: uid,
                                 calendarName: ev.calendarName || node.config.name
                             });
@@ -136,13 +138,15 @@ module.exports = function (RED: any) {
                         }
 
                         if (eventEnd > dateNow) {
-                            let uid = crypto.MD5(ev.uid + ev.summary + "end").toString();
+                            //@ts-ignore
+                            let uid = crypto.MD5(ev.uid +  ev.summary?.val ? ev.summary.val : ev.summary  + "end").toString();
                             if (ev.uid) {
                                 uid = (ev.uid.uid ? ev.uid.uid : ev.uid) + eventEnd.toISOString() + "end";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
-                                topic: ev.summary,
+                                //@ts-ignore
+                                topic:  ev.summary?.val ? ev.summary.val : ev.summary ,
                                 id: uid,
                                 calendarName: ev.calendarName || node.config.name
                             });

@@ -32,4 +32,4 @@ If applicable, add screenshots to help explain your problem.
 **Logs / Additional context**
 Add any other context about the problem here.
 
-You can send me a debug log, like described here: https://naimo84.github.io/node-red-contrib-ical-events/guide/debug.html
+You can send me a debug log, like described here: https://naimo84.github.io/kalender-events/guide/debug.html

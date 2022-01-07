@@ -14,7 +14,7 @@ module.exports = function (RED: any) {
         node.on('input', (msg, send, done) => {
             node.msg = RED.util.cloneMessage(msg);
             send = send || function () { node.send.apply(node, arguments) }
-            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig,RED, n, msg,);
+            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, RED, n, msg,);
             cronCheckJob(node, msg, send, done);
         });
 
@@ -69,7 +69,7 @@ module.exports = function (RED: any) {
 
 
         node.datesArray = [];
-        getICal(node).then(data => {            
+        getICal(node).then(data => {
             node.datesArray = data || [];
 
             let todayEventcounter = 0;
@@ -90,7 +90,7 @@ module.exports = function (RED: any) {
                 if (eventEnd.getTime() > tomorrow.getTime() && eventStart.getTime() < dayAfterTomorrow.getTime()) {
                     tomorrowEventcounter++;
                 }
-                node.datesArray[t].on = (eventStart <= today && eventEnd >= today)               
+                node.datesArray[t].on = (eventStart <= today && eventEnd >= today)
             }
             send = send || function () { node.send.apply(node, arguments); };
             send(Object.assign(node.msg, {
@@ -129,7 +129,8 @@ module.exports = function (RED: any) {
         for (var i = 0; i < datesArray.length; i++) {
             if (text)
                 text += '<br/>\n';
-            text += (datesArray[i].date + ' ' + datesArray[i].summary).trim();
+            //@ts-ignore
+            text += (datesArray[i].date + ' ' + datesArray[i].summary?.val ? datesArray[i].summary.val : datesArray[i].summary).trim();
         }
         text += '</span>';
         return text;

@@ -17,7 +17,7 @@ For bug reports and feature requests, open issues. :bug:
 
 # :memo: Documentation
 
-<a href="https://naimo84.github.io/node-red-contrib-ical-events" target="_blank">
+<a href="https://naimo84.github.io/kalender-events" target="_blank">
 <img src="https://img.shields.io/badge/doku-naimo84.github.io-0078D6?style=for-the-badge&logo=github&logoColor=white"/>
 </a>  
 
@@ -89,7 +89,7 @@ npm install /path/to/node-red-contrib-ical-events
 ## :bug: How to debug
 
 
-<a href="https://naimo84.github.io/node-red-contrib-ical-events/guide/debug.html" target="_blank">
+<a href="https://naimo84.github.io/kalender-events/guide/debug.html" target="_blank">
 <img src="https://img.shields.io/badge/DEBUG-naimo84.github.io-0078D6?style=for-the-badge&logo=github&logoColor=white"/>
 </a>  
 

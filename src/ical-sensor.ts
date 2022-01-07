@@ -18,7 +18,7 @@ module.exports = function (RED: any) {
             node.timezone = config.timezone;
             node.on('input', (msg, send, done) => {
                 send = send || function () { node.send.apply(node, arguments) }
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig,RED, config, msg);
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);
                 cronCheckJob(node, msg, send, done);
             });
 
@@ -67,7 +67,7 @@ module.exports = function (RED: any) {
         //@ts-ignore
         if (!msg) msg = {};
         var dateNow = new Date();
-        getICal(node).then(data => {            
+        getICal(node).then(data => {
             if (!data) return;
 
             let current = false;
@@ -171,7 +171,8 @@ module.exports = function (RED: any) {
 
         if (eventStart <= dateNow && eventEnd >= dateNow) {
             let event: CalEvent = Object.assign(ev, {
-                topic: ev.summary,
+                //@ts-ignore
+                topic: ev.summary?.val ? ev.summary.val : ev.summary,
                 on: true,
                 calendarName: ev.calendarName || node.config.name
             });
