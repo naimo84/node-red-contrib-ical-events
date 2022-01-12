@@ -2,101 +2,34 @@
     $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
         () => RED.nodes.registerType('ical-upcoming', {
             category: 'ical',
-            defaults: {
-                confignode: {
-                    value: '',
-                    type: 'ical-config',
-                    required: false
-                },
-                checkall: {
-                    value: false,
-                },
-                cron: {
-                    value: '',
-                },
-                timeout: {
-                    value: '',
-                },
-                timeoutUnits: {
-                    value: '',
-                },
-                name: {
-                    value: '',
-                },
-                offset: {
-                    value: '',
-                },
-                endpreview: {
-                    value: '',
-                },
-                endpreviewUnits: {
-                    value: '',
-                },
-                previewtype: {},
-                preview: {
-                    value: '',
-                },
-                previewUnitstype: {},
-                previewUnits: {
-                    value: '',
-                },
-                pastviewtype: {},
-                pastview: {
-                    value: '',
-                },
-                pastviewUnits: {
-                    value: '',
-                },
-                eventtypes: {},
-                eventtypestype: {},
-                pastviewUnitstype: {},
-                triggertype: {},
-                trigger: {},
-                timezone: {},
-                timezonetype: {},
-                filterProperty: {},
-                filterPropertytype: {},
-                filterOperator: {},
-                filterOperatortype: {},
-                filtertype: {},
-                filter2type: {},
-                filter2: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter2").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
+            defaults: Object.assign(icalDefaults,
+                {
+                    checkall: {
+                        value: false,
                     },
-                },
-                filter: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
+                    endpreview: {
+                        value: '',
                     },
-                },
-            },
+                    endpreviewUnits: {
+                        value: '',
+                    },
+                    previewtype: {},
+                    preview: {
+                        value: '',
+                    },
+                    previewUnitstype: {},
+                    previewUnits: {
+                        value: '',
+                    },
+                    pastviewtype: {},
+                    pastview: {
+                        value: '',
+                    },
+                    pastviewUnits: {
+                        value: '',
+                    },
+                    pastviewUnitstype: {},
+                }),
             inputs: 1,
             outputs: 1,
             color: '#DEBD5C',
@@ -113,8 +46,9 @@
             paletteLabel: 'upcoming',
             oneditprepare: function () {
                 prepareIcalEvents();
-
                 let node = this;
+                $('#node-input-combineResponse').parent().hide();
+                $('#node-input-offset').parent().hide();
                 $('#node-input-filter2').parent().hide();
 
                 if (!node.previewUnits) {
@@ -200,138 +134,27 @@
         }))
 </script>
 
-<script type="text/x-red" data-template-name="ical-upcoming">
-    <style>
-        .event {
-            display:flex;
-        }
-        .event .red-ui-typedInput-container {
-            flex:1
-        }
-        .event span {
-            flex:1
-        }
-        .event label {
-            min-width: 110px;
-            align-self: center;
-        }  
-        .padding-top {
-            padding-top: 10px;
-        }
-    </style>  
-
-    <div class="form-row event">
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name">
-    </div>
-    <hr/>
-    <div class="form-row event">
-        <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
-        <input type="text" id="node-input-confignode">
-    </div>
-   
-    <div class="form-row padding-top">
-        <label for="node-input-checkall" style="width:200px !important">
-            <i class="fa fa-asterisk"></i>
-            <span>Fetch all configs concurrent</span></label>
-        <input type="checkbox" id="node-input-checkall" placeholder="" style="width:16px !important">
-    </div>
-    <div class="form-row event">
-        <label for="node-input-eventtypes"  >
-            <i class="fa fa-asterisk"></i>
-            <span>Event types:</span></label>
-            <input type="text" id="node-input-eventtypes" placeholder="events,todos">
-            <input type="hidden" id="node-input-eventtypestype" placeholder="">
-    </div>
-    <div class="form-row event" id="timeout-details-for">
-        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
-        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important" placeholder="0">
-        <select id="node-input-timeoutUnits" style="width:200px !important">          
-          <option value="seconds">Seconds</option>
-          <option value="minutes">Minutes</option>
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-        </select>
-      
-    </div>   
-    <div class="form-row event">
-        <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>
-        <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important"  placeholder="always">
-        <input type="hidden" id="node-input-triggertype" style="text-align:end; width:50px !important">
-    </div>
-    <div class="form-row event">
-        <input type="hidden" id="node-input-filterPropertytype">
-        <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
-        <input type="text" id="node-input-filterProperty" placeholder="summary">          
-    </div>
-    <div class="form-row event">
-        <input type="hidden" id="node-input-filterOperatortype">
-        <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
-        <input type="text" id="node-input-filterOperator"  placeholder="between">  
-      
-    </div>
-    <div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
-        <i class="fa fa-exclamation"></i>
-            <b>HINT:</b> filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
-    </div>
-    <div class="form-row event">
-        <label for="node-input-filter" id="node-input-filter-label1"><i class="fa fa-filter"></i> Filter</label>
-        <label for="node-input-filter" id="node-input-filter-label2"><i class="fa fa-filter"></i> after</label>
-        <label for="node-input-filter" id="node-input-filter-label3"><i class="fa fa-filter"></i> before</label>
-        <input type="text" id="node-input-filter">
-        <input type="hidden" id="node-input-filtertype">
-    </div>
-    <div class="form-row event">
-        <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
-        <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
-        <input type="text" id="node-input-filter2" >
-        <input type="hidden" id="node-input-filter2type">
-    </div>
-
-    <div class="form-row event" id="delay-details-for">
-        <input type="hidden" id="node-input-previewtype" style="text-align:end; width:50px !important">
-        <input type="hidden" id="node-input-previewUnitstype" style="text-align:end; width:50px !important">
-        <label for="node-input-preview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
-        <input type="text" id="node-input-preview" style="text-align:end; width:50px !important">
-        <span class="event" id="previewUnits"><input type="text" id="node-input-previewUnits" style="text-align:end; width:50px !important"  placeholder="timeunit"></span>
-      
-    </div>
-    <div class="form-row event" id="pastview-details-for">
-        <input type="hidden" id="node-input-pastviewtype" style="text-align:end; width:50px !important">
-        <input type="hidden" id="node-input-pastviewUnitstype" style="text-align:end; width:50px !important">
-        <label for="node-input-pastview"><i class="fa fa-clock-o"></i> <span>Past view</span></label>
-        <input type="text" id="node-input-pastview" style="text-align:end; width:50px !important">
-        <span class="event" id="pastviewUnits"><input type="text" id="node-input-pastviewUnits" style="text-align:end; width:50px !important" placeholder="timeunit"></span>
-      
-    </div>
-    <div class="form-row event">
-        <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
-        <input type="text" id="node-input-timezone" placeholder="UTC">
-        <input type="hidden" id="node-input-timezonetype">
-    </div>
-    <div class="form-row event">
-        <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
-        <input type="text" id="node-input-cron">
-    </div> 
- 
+<script type="text/javascript" id="icalUpcoming-template" data-template-name="ical-upcoming">
+    $(function () {
+        $("#icalUpcoming-template").load("resources/node-red-contrib-ical-events/icalEvents.html");
+    });
 </script>
 
-<!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-upcoming">
     <h1>A node for upcoming events</h1>
 
     <p>As of the events node, its checked on input or cronjob.</p>
         <img src="https://github.com/naimo84/node-red-contrib-ical-events/raw/master/examples/example.png"/>
     <h3>Configuration</h3>
-    <br/> • <b>"Name"</b>: Displayname of the node
-    <br/> • <b>"Fetch all configs concurrent"</b>: All Configs will be fetched concurrent and only one message will be send
-    <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>       
-    <span><br/> • <b>"Trigger"</b>: possible values:
+    <br/> • <b>"Name"</b>: Displayname of the node
+    <br/> • <b>"Fetch all configs concurrent"</b>: All Configs will be fetched concurrent and only one message will be send
+    <br/> • <b>"Check every"</b>: Value in seconds, minutes, hours or days, how often the calendar is checked for new upcoming events. <i>0 or empty value to disable.</i>       
+    <span><br/> • <b>"Trigger"</b>: possible values:
         <br/>&emsp;     Always (Filter expression is ignored)
         <br/>&emsp;      Match (only events that match the Filter expression are processed)
         <br/>&emsp;      No Match (only events that don't match the Filter expression are processed)
     </span>
-    <span><br/> • <b>"Filter property"</b>: possible values:
+    <span><br/> • <b>"Filter property"</b>: possible values:
         <br/>&emsp;     summary
         <br/>&emsp;     description
         <br/>&emsp;     attendee
@@ -347,10 +170,10 @@
     <br/>&emsp;     before
     <br/>&emsp;     after
 </span>
-    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
-    <br/> • <b>"Preview"</b>: Only Events within now and this <b>future</b> value are checked.
-    <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.   
-    <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
+    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
+    <br/> • <b>"Preview"</b>: Only Events within now and this <b>future</b> value are checked.
+    <br/> • <b>"Past view"</b>: Only Events within now and this <b>past</b> value are checked.   
+    <br/><br/> • <b>"Cron"</b>: Similar to "Check every", but much more configurable. It's a cron expression, how often the calendar is checked for new upcoming events.
     <br/>   If Cron is defined, it wins against "Check every". <i>Empty value to disable.</i>
     <br/><br/>   •  <b>"timezone for output"</b>: default is UTC, so eventStart and eventEnd will be a UTC string  
     <pre>
@@ -365,19 +188,19 @@
     <hr/> 
     <h3>Output</h3>
     <p>The <b>msg.payload</b> contains an array of the following values for each calendar entry
-    <br/> • summary
-    <br/> • id
-    <br/> • location
-    <br/> • eventStart
-    <br/> • eventEnd
-    <br/> • description
-    <br/> • allDay
-    <br/> • attendee
-    <br/> • isRecurring
-    <br/> • calendarName
-    <br/> • organizer
-    <br/> • categories
-    <br/> • duration
+    <br/> • summary
+    <br/> • id
+    <br/> • location
+    <br/> • eventStart
+    <br/> • eventEnd
+    <br/> • description
+    <br/> • allDay
+    <br/> • attendee
+    <br/> • isRecurring
+    <br/> • calendarName
+    <br/> • organizer
+    <br/> • categories
+    <br/> • duration
     </p>
      <br/>
         <p><b>additional msg. values:</b>

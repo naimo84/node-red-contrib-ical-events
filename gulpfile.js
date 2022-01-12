@@ -6,13 +6,16 @@ var nodemon = require('gulp-nodemon');
 var watch = require('gulp-watch');
 
 var paths = {
-    pages: ['src/*.html'],
+    pages: ['src/nodes/*.html'],
     src: 'src',
     dist: 'dist'
 };
 
 function copyHtml() {
-    return gulp.src(paths.pages, { base: paths.src })
+    gulp.src('src/resources/*.html', { base: 'src/resources' })
+        .pipe(gulp.dest('resources'));
+
+    return gulp.src('src/nodes/*.html', { base: 'src/nodes'})
         .pipe(gulp.dest(paths.dist));
 }
 

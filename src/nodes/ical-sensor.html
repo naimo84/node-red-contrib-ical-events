@@ -1,72 +1,17 @@
-<script type="text/javascript">   
+<script type="text/javascript">
     $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
         () => RED.nodes.registerType('ical-sensor', {
             category: 'ical',
-            defaults: {
-                confignode: {
-                    value: "",
-                    type: "ical-config",
-                    required: false
-                },
+            defaults: Object.assign(icalDefaults,
+            {
                 timeout: {
                     value: ""
                 },
                 timeoutUnits: {
                     value: ""
                 },
-                name: {
-                    value: ""
-                },
-                eventtypes: {},
-                eventtypestype: {},
-                triggertype: {},
-                trigger: {},
-                timezone: {},
-                timezonetype: {},
-                filterProperty: {},
-                filterPropertytype: {},
-                filterOperator: {},
-                filterOperatortype: {},
-                filtertype: {},
-                filter2type: {},
-                combineResponse: {},
-                filter2: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter2").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
-                    },
-                },
-                filter: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
-                    },
-                },
-            },
+                combineResponse: {}
+            }),
             inputs: 1,
             outputs: 2,
             outputLabels: ["output on every tick", "output only on changes"],
@@ -84,6 +29,10 @@
             paletteLabel: "sensor",
             oneditprepare: function () {
                 prepareIcalEvents();
+                $('#node-input-offset').parent().hide();
+                $('#node-input-pastview').parent().hide();
+                $('#node-input-preview').parent().hide();
+                $('#node-input-checkall').parent().hide();
 
                 $('#node-input-combineResponse').change(() => {
                     var value = $('#node-input-combineResponse').prop('checked');
@@ -99,112 +48,25 @@
     )
 </script>
 
-<script type="text/x-red" data-template-name="ical-sensor">
-    <style>
-        .event {
-            display:flex;
-        }
-        .event .red-ui-typedInput-container {
-            flex:1
-        }
-        .event .red-ui-typedInput-container {
-            flex:1
-        }
-        .event label {
-            min-width: 110px;
-            align-self: center;
-        }  
-        .padding-top {
-            padding-top: 10px;
-        }
-    </style>  
-
-    <div class="form-row event">        
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
-        <input type="text" id="node-input-name" >
-    </div>   
-    <hr/>
-    <div class="form-row event">
-        <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
-        <input type="text" id="node-input-confignode">
-    </div>    
-    <div class="form-row event">
-        <label for="node-input-eventtypes"  >
-            <i class="fa fa-asterisk"></i>
-            <span>Event types:</span></label>
-            <input type="text" id="node-input-eventtypes" placeholder="events,todos">
-            <input type="hidden" id="node-input-eventtypestype" placeholder="">
-    </div>
-    <div class="form-row event padding-top" id="timeout-details-for">
-        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
-        <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important">
-        <select id="node-input-timeoutUnits" style="width:200px !important">          
-          <option value="seconds">Seconds</option>
-          <option value="minutes">Minutes</option>
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-        </select>
-    </div>
-    <div class="form-row event">
-        <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>        
-        <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important">
-        <input type="hidden" id="node-input-triggertype" style="text-align:end; width:50px !important">
-    </div>
-    <div class="form-row event">
-        <input type="hidden" id="node-input-filterPropertytype">
-        <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
-        <input type="text" id="node-input-filterProperty">       
-    </div>
-    <div class="form-row event">
-        <input type="hidden" id="node-input-filterOperatortype">
-        <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
-        <input type="text" id="node-input-filterOperator">  
-    </div>
-    <div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
-        <i class="fa fa-exclamation"></i>
-            <b>HINT:</b> filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
-    </div>
-    <div class="form-row event">
-        <label for="node-input-filter" id="node-input-filter-label1"><i class="fa fa-filter"></i> Filter</label>
-        <label for="node-input-filter" id="node-input-filter-label2"><i class="fa fa-filter"></i> after</label>
-        <label for="node-input-filter" id="node-input-filter-label3"><i class="fa fa-filter"></i> before</label>
-        <input type="hidden" id="node-input-filtertype">
-        <input type="text" id="node-input-filter" >
-    </div>
-    <div class="form-row event">
-        <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
-        <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
-        <input type="hidden" id="node-input-filter2type">
-        <input type="text" id="node-input-filter2" >
-    </div>
-    <div class="form-row event">
-        <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
-        <input type="hidden" id="node-input-timezonetype" placeholder="default is UTC">
-        <input type="text" id="node-input-timezone" placeholder="default is UTC">
-    </div>
-    <div class="form-row event">
-        <label for="node-input-combineResponse" style="width:190px !important">
-            <i class="fa fa-asterisk"></i>
-            <span>combine to one message</span></label>
-        <input type="checkbox" id="node-input-combineResponse" placeholder="" style="flex:0; width: auto; margin-right: 10px">
-        <span id="combine-response-hint">(payload will be an array)</span>
-    </div>
+<script type="text/javascript" id="icalSensor-template" data-template-name="ical-sensor">
+    $(function () {
+        $("#icalSensor-template").load("resources/node-red-contrib-ical-events/icalEvents.html");
+    });  
 </script>
 
-<!-- Simple Help Text -->
 <script type="text/x-red" data-help-name="ical-sensor">
     <p>A sensor node for events</p>
     
     <p>The calendar is checked for running events on input or configurable timeout.</p>
 
     <h3>Configuration</h3>
-    <br/> • <b>"Check every"</b>: how often the calendar is checked for new events
-    <span><br/> • <b>"Trigger"</b>: possible values: 
+    <br/> • <b>"Check every"</b>: how often the calendar is checked for new events
+    <span><br/> • <b>"Trigger"</b>: possible values: 
         <br/>&emsp;     Always (Filter expression is ignored)
         <br/> &emsp;      Match (only events that match the Filter expression are processed)
         <br/> &emsp;      No Match (only events that don't match the Filter expression are processed)
     </span>
-    <span><br/> • <b>"Filter property"</b>: possible values:
+    <span><br/> • <b>"Filter property"</b>: possible values:
         <br/>&emsp;     summary
         <br/>&emsp;     description
         <br/>&emsp;     attendee
@@ -214,12 +76,12 @@
     </span>
     <br/>&emsp; if filterProperty is set to "start date" or "end date", additonally a filter operator is shown:
     <br/>&emsp;   filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
-    <br/>&emsp; <b>"Filter operator"</b>: possible values:
+    <br/>&emsp; <b>"Filter operator"</b>: possible values:
     <br/>&emsp;     between
     <br/>&emsp;     bofore
     <br/>&emsp;     after
-    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
-    <br/> • <b>"Name"</b>: Displayname
+    <br/> • <b>"Filter"</b>: filter property of the events from above is filtered against this regular expression
+    <br/> • <b>"Name"</b>: Displayname
     <br/><br/>    •  <b>"timezone for output"</b>: default is UTC, so eventStart and eventEnd will be a UTC string  
     <pre>
     <br/>eventStart: "2021-07-05T03:50:00.000Z"
@@ -232,20 +94,20 @@
     <br/></pre>
     <hr/> 
     <h3>Output</h3>
-    <p>If an event is running at time of checking, <b>msg.on</b> is true, otherwise false.</p>
+    <p>If an event is running at time of checking, <b>msg.on</b> is true, otherwise false.</p>
 
     <p>is msg.on=ture, the message additionaly contains the following values of the calendar entry</p>
-    <br/> • summary
-    <br/> • id
-    <br/> • location
-    <br/> • eventStart
-    <br/> • eventEnd
-    <br/> • description
-    <br/> • allDay
-    <br/> • attendee
-    <br/> • isRecurring
-    <br/> • calendarName
-    <br/> • organizer
-    <br/> • categories
-    <br/> • duration
+    <br/> • summary
+    <br/> • id
+    <br/> • location
+    <br/> • eventStart
+    <br/> • eventEnd
+    <br/> • description
+    <br/> • allDay
+    <br/> • attendee
+    <br/> • isRecurring
+    <br/> • calendarName
+    <br/> • organizer
+    <br/> • categories
+    <br/> • duration
 </script>

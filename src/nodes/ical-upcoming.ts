@@ -130,7 +130,8 @@ module.exports = function (RED: any) {
             if (text)
                 text += '<br/>\n';
             //@ts-ignore
-            text += (datesArray[i].date + ' ' + datesArray[i].summary?.val ? datesArray[i].summary.val : datesArray[i].summary).trim();
+            let summary = (datesArray[i].summary && datesArray[i].summary.val ? datesArray[i].summary.val : datesArray[i].summary);
+            text += `${datesArray[i].date} ${summary}`.trim();
         }
         text += '</span>';
         return text;

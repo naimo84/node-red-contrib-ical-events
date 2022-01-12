@@ -1,0 +1,125 @@
+<style>
+    .event {
+        display:flex;
+    }
+    .event .red-ui-typedInput-container {
+        flex:1
+    }
+    .event span {
+        flex:1
+    }
+    .event label {
+        min-width: 110px;
+        align-self: center;
+    }  
+    .padding-top {
+        padding-top: 10px;
+    }
+</style>   
+
+<div class="form-row event">        
+    <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+    <input type="text" id="node-input-name">
+</div>
+<hr/>
+<div class="form-row event">
+    <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
+    <input type="text" id="node-input-confignode">
+</div>
+
+<div class="form-row padding-top">
+    <label for="node-input-checkall" style="width:200px !important">
+        <i class="fa fa-asterisk"></i>
+        <span>Fetch all configs concurrent</span></label>
+    <input type="checkbox" id="node-input-checkall" placeholder="" style="width:16px !important">
+</div>
+<div class="form-row event">
+    <label for="node-input-eventtypes"  >
+        <i class="fa fa-asterisk"></i>
+        <span>Event types:</span></label>
+        <input type="text" id="node-input-eventtypes" placeholder="events,todos">
+        <input type="hidden" id="node-input-eventtypestype" placeholder="">
+</div>
+<div class="form-row event padding-top" id="timeout-details-for">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
+    <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important" placeholder="0">
+    <select id="node-input-timeoutUnits" style="width:200px !important">          
+      <option value="seconds">Seconds</option>
+      <option value="minutes">Minutes</option>
+      <option value="hours">Hours</option>
+      <option value="days">Days</option>
+    </select>
+</div>
+<div class="form-row event">
+    <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>
+    <input type="text" id="node-input-trigger" style="text-align:end; width:50px !important"  placeholder="always">
+    <input type="hidden" id="node-input-triggertype" style="text-align:end; width:50px !important">
+</div>
+<div class="form-row event">
+    <input type="hidden" id="node-input-filterPropertytype">
+    <label for="node-input-filterProperty"><i class="fa fa-filter"></i> Filter property</label>
+    <input type="text" id="node-input-filterProperty" placeholder="summary">          
+</div>
+<div class="form-row event">
+    <input type="hidden" id="node-input-filterOperatortype">
+    <label for="node-input-filterOperator"><i class="fa fa-filter"></i> Filter operator</label>
+    <input type="text" id="node-input-filterOperator" placeholder="between">  
+  
+</div>
+<div class="form-tips" id="filter-tip" style="margin-bottom: 10px">     
+    <i class="fa fa-exclamation"></i>
+        <b>HINT:</b> filter format for dates is <b>YYYY-MM-DD_hh:mm:sss</b>
+</div>
+<div class="form-row event">
+    <label for="node-input-filter" id="node-input-filter-label1"><i class="fa fa-filter"></i> Filter</label>
+    <label for="node-input-filter" id="node-input-filter-label2"><i class="fa fa-filter"></i> after</label>
+    <label for="node-input-filter" id="node-input-filter-label3"><i class="fa fa-filter"></i> before</label>
+    <input type="text" id="node-input-filter">
+    <input type="hidden" id="node-input-filtertype">
+</div>
+<div class="form-row event">
+    <label for="node-input-filter2" id="node-input-filter2-label1"><i class="fa fa-filter"></i> Filter2</label>
+    <label for="node-input-filter2" id="node-input-filter2-label2"><i class="fa fa-filter"></i> before</label>
+    <input type="text" id="node-input-filter2" >
+    <input type="hidden" id="node-input-filter2type">
+</div>
+<div class="form-row event" id="delay-details-for">
+    <input type="hidden" id="node-input-previewtype" style="text-align:end; width:50px !important">
+    <input type="hidden" id="node-input-previewUnitstype" style="text-align:end; width:50px !important">
+    <label for="node-input-preview"><i class="fa fa-clock-o"></i> <span>Preview</span></label>
+    <input type="text" id="node-input-preview" style="text-align:end; width:50px !important">
+    <span class="event" id="previewUnits"><input type="text" id="node-input-previewUnits" style="text-align:end; width:50px !important"  placeholder="timeunit"></span>
+</div>
+<div class="form-row event" id="pastview-details-for">
+    <input type="hidden" id="node-input-pastviewtype" style="text-align:end; width:50px !important">
+    <input type="hidden" id="node-input-pastviewUnitstype" style="text-align:end; width:50px !important">
+    <label for="node-input-pastview"><i class="fa fa-clock-o"></i> <span>Past view</span></label>
+    <input type="text" id="node-input-pastview" style="text-align:end; width:50px !important">
+    <span class="event" id="pastviewUnits"><input type="text" id="node-input-pastviewUnits" style="text-align:end; width:50px !important" placeholder="timeunit"></span>
+</div>
+<div class="form-row event">
+    <label for="node-input-offset"><i class="fa fa-clock-o"></i> <span>Offset</span></label>    
+    <input type="hidden" id="node-input-offsettype">
+    <input type="hidden" id="node-input-offsetUnitstype">        
+    <input type="text" id="node-input-offset">
+    <span class="event" id="offsetUnits">
+        <input type="text" id="node-input-offsetUnits">
+    </span>   
+</div>
+<div class="form-row event">
+    <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
+    <input type="text" id="node-input-timezone" placeholder="UTC">
+    <input type="hidden" id="node-input-timezonetype">
+</div>
+<div class="form-row event">
+    <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
+    <input type="text" id="node-input-cron">
+</div>
+
+<div class="form-row event">
+    <label for="node-input-combineResponse" style="width:190px !important">
+        <i class="fa fa-asterisk"></i>
+        <span>combine to one message</span></label>
+    <input type="checkbox" id="node-input-combineResponse" placeholder="" style="flex:0; width: auto; margin-right: 10px">
+    <span id="combine-response-hint">(payload will be an array)</span>
+</div>
