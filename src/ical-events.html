@@ -1,427 +1,139 @@
 <script type="text/javascript">
 
-
-    RED
-        .nodes
-        .registerType('ical-events', {
-            category: 'ical',
-            defaults: {
-                confignode: {
-                    value: "",
-                    type: "ical-config",
-                    required: false
-                },
-                timeout: {
-                    value: ""
-                },
-                timeoutUnits: {
-                    value: ""
-                },
-                cron: {
-                    value: ""
-                },
-                name: {
-                    value: ""
-                },
-                offsettype: {},
-                offset: {
-                    value: ""
-                },
-                offsetUnitstype: {},
-                offsetUnits: {
-                    value: ""
-                },
-                eventtypes: {},
-                eventtypestype: {},
-                triggertype: {},
-                trigger: {},
-                timezone: {},
-                timezonetype: {},
-                filterProperty: {},
-                filterPropertytype: {},
-                filterOperator: {},
-                filterOperatortype: {},
-                filtertype: {},
-                filter2type: {},
-                filter2: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter2").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
-                    },
-                },
-                filter: {
-                    required: false,
-                    validate: function (v) {
-                        let val = $("#node-input-filter").val();
-                        if (!val) return true;
-                        try {
-                            if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
-                                let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
-                                return reg.test(v)
-                            } else {
-                                new RegExp(v);
-                                return true;
-                            }
-                        } catch (e) {
-                            return false;
-                        }
-                    },
-                },
-            },
-            inputs: 1,
-            outputs: 2,
-            outputLabels: ["Start Message", "End Message"],
-            color: "#DEBD5C",
-            label: function () {
-                if (this.name) {
-                    return this.name;
-                } else if (this.confignode.name) {
-                    return this.confignode.name;
-                }
-
-                return "event trigger";
-            },
-            icon: "font-awesome/fa-calendar",
-            paletteLabel: "trigger",
-            oneditprepare: function () {
-                var node = this;
-
-                $("#node-input-eventtypes").typedInput({
-                    typeField: "#node-input-eventtypestype",
-                    types: ["str", "msg", {
-                        value: "eventtypes",
-                        multiple: true,
-                        options: [
-                            { value: "todos", label: "todos" },
-                            { value: "events", label: "events" }
-                        ]
-                    }]
-                });
-
-
-                $('#node-input-confignode').change(function () {
-                    var value = $('#node-input-confignode').val();
-                    $.post(`icalconfig`, { id: value }, function (icalconfig) {
-                        if (icalconfig.type !== 'caldav') {
-                            $('#node-input-eventtypes').parent().hide();
-                        } else {
-                            $('#node-input-eventtypes').parent().show();
-                        }
-
-                        if ((!node.eventtypes || node.eventtypes.trim() === '')) {
-                            $("#node-input-eventtypes").typedInput('type', 'eventtypes');
-                            $("#node-input-eventtypes").typedInput('value', icalconfig.includeTodo === true ? 'events,todos' : 'events')
-                        }
-
-                    });
-                });
-
-                $("#node-input-filter").typedInput({
-                    typeField: "#node-input-filtertype",
-                    types: ["str", "msg"]
-                });
-
-                $("#node-input-filter2").typedInput({
-                    typeField: "#node-input-filter2type",
-                    types: ["str", "msg"]
-                });
-
-                $("#node-input-timezone").typedInput({
-                    typeField: "#node-input-timezonetype",
-                    types: ["str", "msg"]
-                });
-
-                $("#node-input-filterProperty").typedInput({
-                    typeField: "#node-input-filterPropertytype",
-                    default: "filterProperty",
-                    types: ["str", "msg", {
-                        value: "filterProperty",
-                        options: [
-                            { value: "summary", label: "summary" },
-                            { value: "description", label: "description" },
-                            { value: "attendee", label: "attendee" },
-                            { value: "categories", label: "category" },
-                            { value: "location", label: "location" },
-                            { value: "eventStart", label: "start date" },
-                            { value: "eventEnd", label: "end date" },
-                        ]
-                    }]
-                });
-
-                $("#node-input-filterOperator").typedInput({
-                    typeField: "#node-input-filterOperatortype",
-                    default: "filterOperator",
-                    types: ["str", "msg", {
-                        value: "filterOperator",
-                        options: [
-                            { value: "between", label: "between" },
-                            { value: "before", label: "before" },
-                            { value: "after", label: "after" }
-                        ]
-                    }]
-                });
-
-                $("#node-input-trigger").typedInput({
-                    typeField: "#node-input-triggertype",
-                    default: "trigger",
-                    types: ["str", "msg", {
-                        value: "trigger",
-                        options: [
-                            { value: "always", label: "Always" },
-                            { value: "match", label: "Match" },
-                            { value: "nomatch", label: "No match" }
-                        ]
-                    }]
-                });
-
-
-                $("#node-input-offsetUnits").typedInput({
-                    typeField: "#node-input-offsetUnitstype",
-                    default: "offsetUnits",
-                    types: ["str", "msg", {
-                        value: "offsetUnits",
-                        options: [
-                            { value: "seconds", label: "Seconds" },
-                            { value: "minutes", label: "Minutes" },
-                            { value: "hours", label: "Hours" },
-                            { value: "days", label: "Days" }
-                        ]
-                    }]
-                });
-                $("#node-input-offset").typedInput({
-                    typeField: "#node-input-offsettype",
-                    types: ["num", "str", "msg"]
-                }).typedInput('width', '200px');
-                $('#node-input-offset').on('change', function (event, type, value) {
-                    if (type === 'str') {
-                        $('#offsetUnits').hide();
-                    } else {
-                        $('#offsetUnits').show();
-                    }
-                });
-
-                $('.ui-spinner-button').on("click", function () {
-                    $(this).siblings('input').trigger("change");
-                });
-
-                if (!this.timeoutUnits) {
-                    $("#node-input-timeoutUnits option").filter(function () {
-                        return $(this).val() == 'seconds';
-                    }).attr('selected', true);
-                }
-
-                if (!this.offsetUnits) {
-                    $("#node-input-offsetUnits option").filter(function () {
-                        return $(this).val() == 'minutes';
-                    }).attr('selected', true);
-                }
-
-                if (!this.trigger) {
-                    $("#node-input-trigger option").filter(function () {
-                        return $(this).val() == 'always';
-                    }).attr('selected', true);
-                }
-
-                if (node.trigger && !node.filterProperty) {
-                    $('#node-input-filterProperty option')
-                        .filter(function () {
-                            return $(this).val() == 'summary';
-                        })
-                        .attr('selected', true);
-                }
-                if (node.trigger && node.filterProperty && node.filterProperty.indexOf('event') >= 0 && !node.filterOperator) {
-                    $('#node-input-filterOperator option')
-                        .filter(function () {
-                            return $(this).val() == 'between';
-                        })
-                        .attr('selected', true);
-                }
-                $("#node-input-timezone").focusin(timezones);
-
-                $('#node-input-cron').change(function () {
-                    var value = $('#node-input-cron').val();
-                    console.log(value);
-                    if (value) {
-                        $('#timeout-details-for').hide();
-                    } else {
-                        $('#timeout-details-for').show();
-                    }
-                });
-                $('#node-input-trigger').change(function () {
-                    var value = $('#node-input-trigger').val();
-                    let filterProperty = $('#node-input-filterProperty').val();
-                    if (value && value === 'always') {
-                        $('#node-input-filterProperty').parent().hide();
-                        $('#node-input-filter').parent().hide();
-                        $('#node-input-filter2').parent().hide();
-                        $('#node-input-filterOperator').parent().hide();
-                        $('#filter-tip').hide();
-
-                        return;
-                    } else {
-                        $('#node-input-filterProperty').parent().show();
-                        $('#node-input-filter').parent().show();
-                        if (!node.filterProperty) {
-                            $('#node-input-filterProperty option')
-                                .filter(function () {
-                                    return $(this).val() == 'summary';
-                                })
-                                .attr('selected', true);
-                        }
-
-                        if (!node.filterOperator) {
-
-                            $('#node-input-filterOperator option')
-                                .filter(function () {
-                                    return $(this).val() == 'between';
-                                })
-                                .attr('selected', true);
-                            $('#node-input-filter-label1').hide();
-                            $('#node-input-filter-label2').show();
-                            $('#node-input-filter2-label1').hide();
-                            $('#node-input-filter2-label2').show();
-                            $('#node-input-filter-label3').hide();
-                        }
-                        if (filterProperty && filterProperty.indexOf('event') >= 0) {
-                            $('#node-input-filter2').parent().show();
-                            $('#node-input-filterOperator').parent().show();
-                            $('#filter-tip').show();
-                            var filterOperator = $('#node-input-filterOperator').val();
-                            if (filterOperator === 'between') {
-                                $('#node-input-filter-label1').hide();
-                                $('#node-input-filter-label2').show();
-                                $('#node-input-filter2-label1').hide();
-                                $('#node-input-filter2-label2').show();
-                                $('#node-input-filter-label3').hide();
-                            } else {
-                                $('#node-input-filter2-label2').hide();
-                                $('#node-input-filter2-label1').show();
-                                if (filterOperator === 'before') {
-                                    $('#node-input-filter-label2').hide();
-                                    $('#node-input-filter-label3').show();
-                                    $('#node-input-filter-label1').hide();
-                                } else {
-                                    $('#node-input-filter-label2').show();
-                                    $('#node-input-filter-label3').hide();
-                                    $('#node-input-filter-label1').hide();
+    $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
+        () =>
+            RED
+                .nodes
+                .registerType('ical-events', {
+                    category: 'ical',
+                    defaults: {
+                        confignode: {
+                            value: "",
+                            type: "ical-config",
+                            required: false
+                        },
+                        timeout: {
+                            value: ""
+                        },
+                        timeoutUnits: {
+                            value: ""
+                        },
+                        cron: {
+                            value: ""
+                        },
+                        name: {
+                            value: ""
+                        },
+                        offsettype: {},
+                        offset: {
+                            value: ""
+                        },
+                        offsetUnitstype: {},
+                        offsetUnits: {
+                            value: ""
+                        },
+                        eventtypes: {},
+                        eventtypestype: {},
+                        triggertype: {},
+                        trigger: {},
+                        timezone: {},
+                        timezonetype: {},
+                        filterProperty: {},
+                        filterPropertytype: {},
+                        filterOperator: {},
+                        filterOperatortype: {},
+                        filtertype: {},
+                        filter2type: {},
+                        filter2: {
+                            required: false,
+                            validate: function (v) {
+                                let val = $("#node-input-filter2").val();
+                                if (!val) return true;
+                                try {
+                                    if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
+                                        let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
+                                        return reg.test(v)
+                                    } else {
+                                        new RegExp(v);
+                                        return true;
+                                    }
+                                } catch (e) {
+                                    return false;
                                 }
-                            }
-                        } else {
-                            $('#node-input-filter2').parent().hide();
-                            $('#node-input-filterOperator').parent().hide();
-                            $('#filter-tip').hide();
-                            $('#node-input-filter-label2').hide();
-                            $('#node-input-filter-label1').show();
-                            $('#node-input-filter-label3').hide();
-
+                            },
+                        },
+                        filter: {
+                            required: false,
+                            validate: function (v) {
+                                let val = $("#node-input-filter").val();
+                                if (!val) return true;
+                                try {
+                                    if ($("#node-input-filterProperty").val().indexOf('event') >= 0) {
+                                        let reg = new RegExp(/^(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[12][0-9]|3[01])_([0-1][0-9]|2[0-3])[:]([0-5][0-9])[:]([0-5][0-9])$/)
+                                        return reg.test(v)
+                                    } else {
+                                        new RegExp(v);
+                                        return true;
+                                    }
+                                } catch (e) {
+                                    return false;
+                                }
+                            },
+                        },
+                    },
+                    inputs: 1,
+                    outputs: 2,
+                    outputLabels: ["Start Message", "End Message"],
+                    color: "#DEBD5C",
+                    label: function () {
+                        if (this.name) {
+                            return this.name;
+                        } else if (this.confignode.name) {
+                            return this.confignode.name;
                         }
-                    }
-                });
 
-                $('#node-input-filterProperty').change(function () {
-                    var value = $('#node-input-filterProperty').val();
-                    var trigger = $('#node-input-trigger').val();
-                    if (!node.filterProperty) {
-                        $('#node-input-filterProperty option')
-                            .filter(function () {
-                                return $(this).val() == 'summary';
-                            })
-                            .attr('selected', true);
-                    }
+                        return "event trigger";
+                    },
+                    icon: "font-awesome/fa-calendar",
+                    paletteLabel: "trigger",
+                    oneditprepare: function () {
+                        prepareIcalEvents()
+                        
+                        $("#node-input-offsetUnits").typedInput({
+                            typeField: "#node-input-offsetUnitstype",
+                            default: "offsetUnits",
+                            types: ["str", "msg", {
+                                value: "offsetUnits",
+                                options: [
+                                    { value: "seconds", label: "Seconds" },
+                                    { value: "minutes", label: "Minutes" },
+                                    { value: "hours", label: "Hours" },
+                                    { value: "days", label: "Days" }
+                                ]
+                            }]
+                        });
+                        $("#node-input-offset").typedInput({
+                            typeField: "#node-input-offsettype",
+                            types: ["num", "str", "msg"]
+                        }).typedInput('width', '200px');
 
-                    if (!node.filterOperator) {
-                        $('#node-input-filterOperator option')
-                            .filter(function () {
-                                return $(this).val() == 'between';
-                            })
-                            .attr('selected', true);
-                        $('#node-input-filter-label1').hide();
-                        $('#node-input-filter-label2').show();
-                        $('#node-input-filter2-label1').hide();
-                        $('#node-input-filter2-label2').show();
-                        $('#node-input-filter-label3').hide();
-                    }
-                    if (trigger === "always") return;
-                    if (value && value.indexOf('event') >= 0) {
-                        $('#node-input-filter2').parent().show();
-                        $('#node-input-filterOperator').parent().show();
-
-                        $('#filter-tip').show();
-                        var filterOperator = $('#node-input-filterOperator').val();
-                        if (filterOperator === 'between') {
-                            $('#node-input-filter-label1').hide();
-                            $('#node-input-filter-label2').show();
-                            $('#node-input-filter2-label1').hide();
-                            $('#node-input-filter2-label2').show();
-                            $('#node-input-filter-label3').hide();
-                        } else {
-                            $('#node-input-filter2-label2').hide();
-                            $('#node-input-filter2-label1').show();
-                            if (filterOperator === 'before') {
-                                $('#node-input-filter-label2').hide();
-                                $('#node-input-filter-label3').show();
-                                $('#node-input-filter-label1').hide();
+                        $('#node-input-offset').on('change', function (event, type, value) {
+                            if (type === 'str') {
+                                $('#offsetUnits').hide();
                             } else {
-                                $('#node-input-filter-label2').show();
-                                $('#node-input-filter-label3').hide();
-                                $('#node-input-filter-label1').hide();
+                                $('#offsetUnits').show();
                             }
+                        });
+
+                        if (!this.offsetUnits) {
+                            $("#node-input-offsetUnits option").filter(function () {
+                                return $(this).val() == 'minutes';
+                            }).attr('selected', true);
                         }
-                    } else {
-                        $('#node-input-filter2').parent().hide();
-                        $('#node-input-filterOperator').parent().hide();
-                        $('#filter-tip').hide();
-                        $('#node-input-filter-label2').hide();
-                        $('#node-input-filter-label1').show();
-                        $('#node-input-filter-label3').hide();
 
+                        
                     }
-
-                });
-
-                $('#node-input-filterOperator').change(function () {
-                    var value = $('#node-input-filterOperator').val();
-                    var trigger = $('#node-input-trigger').val();
-                    var filterProperty = $('#node-input-filterProperty').val();
-                    if (trigger === "always") return;
-                    if (filterProperty && ['eventStart', 'eventEnd'].indexOf(filterProperty) >= 0) {
-                        if (value === 'between') {
-                            $('#node-input-filter2').parent().show();
-                            $('#node-input-filter-label1').hide();
-                            $('#node-input-filter-label2').show();
-                            $('#node-input-filter2-label1').hide();
-                            $('#node-input-filter2-label2').show();
-                            $('#node-input-filter-label3').hide();
-                        } else {
-                            $('#node-input-filter2').parent().hide();
-                            $('#node-input-filter2-label2').hide();
-                            $('#node-input-filter2-label1').show();
-                            if (value === 'before') {
-                                $('#node-input-filter-label2').hide();
-                                $('#node-input-filter-label3').show();
-                                $('#node-input-filter-label1').hide();
-                            } else {
-                                $('#node-input-filter-label2').show();
-                                $('#node-input-filter-label3').hide();
-                                $('#node-input-filter-label1').hide();
-                            }
-                        }
-                    }
-                });
-            }
-        });
+                }))
 </script>
 
 <script type="text/x-red" data-template-name="ical-events">
@@ -504,15 +216,13 @@
         <input type="hidden" id="node-input-filter2type">
     </div>
     <div class="form-row event">
-        <label for="node-input-offset"><i class="fa fa-clock-o"></i> <span>Offset</span></label>
-    
-        <input type="hidden" id="node-input-offsettype" style="text-align:end; width:50px !important">
-        <input type="hidden" id="node-input-offsetUnitstype" style="text-align:end; width:50px !important">
-        
-        <input type="text" id="node-input-offset" style="text-align:end; width:50px !important">
-        <span class="event" id="offsetUnits"><input type="text" id="node-input-offsetUnits" style="text-align:end; width:50px !important"></span>
-          
-       
+        <label for="node-input-offset"><i class="fa fa-clock-o"></i> <span>Offset</span></label>    
+        <input type="hidden" id="node-input-offsettype">
+        <input type="hidden" id="node-input-offsetUnitstype">        
+        <input type="text" id="node-input-offset">
+        <span class="event" id="offsetUnits">
+            <input type="text" id="node-input-offsetUnits">
+        </span>   
     </div>
     <div class="form-row event">
         <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
