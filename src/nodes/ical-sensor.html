@@ -1,20 +1,4 @@
-<script type="text/javascript">
-    function timezones() {
-        $.getJSON(`timezones`, function (data) {
-            var dataArray = [];
-            $.each(data, function (i, element) {
-                dataArray.push(element);
-            });
-            $("#node-input-timezone").autocomplete({
-                source: dataArray,
-                minLength: 0,
-                close: function (event, ui) {
-                    $("#node-input-timezone").autocomplete("destroy");
-                }
-            }).autocomplete("search", "");
-        });
-    }
-
+<script type="text/javascript">   
     $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
         () => RED.nodes.registerType('ical-sensor', {
             category: 'ical',

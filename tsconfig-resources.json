@@ -2,11 +2,11 @@
     "compilerOptions": {    
         "baseUrl": ".",
         "paths": { "*": ["types/*"] },
-        "outDir": "./dist",
+        "outDir": "./resources",
         "target": "es5",
         "moduleResolution": "node"
     },
     "include": [
-        "./src/nodes/**/*"
+        "./src/resources/**/*"
     ]
 }

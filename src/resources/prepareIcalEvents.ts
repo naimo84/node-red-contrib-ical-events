@@ -1,3 +1,22 @@
+function timezones() {
+    $.getJSON(`timezones`, function (data) {
+        var dataArray = [];
+        $.each(data, function (i, element) {
+            dataArray.push(element);
+        });
+        //@ts-ignore
+        $("#node-input-timezone").autocomplete({
+            source: dataArray,
+            minLength: 0,
+            close: function (event, ui) {
+                //@ts-ignore
+
+                $("#node-input-timezone").autocomplete("destroy");
+            }
+        }).autocomplete("search", "");
+    });
+}
+
 function prepareIcalEvents() {
     var node = this;
     $("#node-input-eventtypes").typedInput({
@@ -6,7 +25,9 @@ function prepareIcalEvents() {
             value: "eventtypes",
             multiple: true,
             options: [
+                //@ts-ignore
                 { value: "events", label: "Events" },
+                //@ts-ignore
                 { value: "todos", label: "Todos" }
             ]
         }]
@@ -50,12 +71,19 @@ function prepareIcalEvents() {
         types: ["str", "msg", {
             value: "filterProperty",
             options: [
+                //@ts-ignore
                 { value: "summary", label: "summary" },
+                //@ts-ignore
                 { value: "description", label: "description" },
+                //@ts-ignore
                 { value: "attendee", label: "attendee" },
+                //@ts-ignore
                 { value: "categories", label: "category" },
+                //@ts-ignore
                 { value: "location", label: "location" },
+                //@ts-ignore
                 { value: "eventStart", label: "start date" },
+                //@ts-ignore
                 { value: "eventEnd", label: "end date" },
             ]
         }]
@@ -67,8 +95,11 @@ function prepareIcalEvents() {
         types: ["str", "msg", {
             value: "filterOperator",
             options: [
+                //@ts-ignore
                 { value: "between", label: "between" },
+                //@ts-ignore
                 { value: "before", label: "before" },
+                //@ts-ignore
                 { value: "after", label: "after" }
             ]
         }]
@@ -80,8 +111,11 @@ function prepareIcalEvents() {
         types: ["str", "msg", {
             value: "trigger",
             options: [
+                //@ts-ignore
                 { value: "always", label: "Always" },
+                //@ts-ignore
                 { value: "match", label: "Match" },
+                //@ts-ignore
                 { value: "nomatch", label: "No match" }
             ]
         }]
@@ -99,7 +133,7 @@ function prepareIcalEvents() {
             .filter(function () {
                 return $(this).val() == 'seconds';
             })
-            .attr('selected', true);
+            .attr('selected', 'true');
     }
 
     if (!node.trigger) {
@@ -107,7 +141,7 @@ function prepareIcalEvents() {
             .filter(function () {
                 return $(this).val() == 'always';
             })
-            .attr('selected', true);
+            .attr('selected', 'true');
     }
 
     if (node.trigger && !node.filterProperty) {
@@ -115,12 +149,12 @@ function prepareIcalEvents() {
             .filter(function () {
                 return $(this).val() == 'summary';
             })
-            .attr('selected', true);
+            .attr('selected', 'true');
     }
 
     $("#node-input-timezone").focusin(timezones);
     $('#node-input-cron').change(function () {
-        var value = $('#node-input-cron').val();      
+        var value = $('#node-input-cron').val();
         if (value) {
             $('#timeout-details-for').hide();
         } else {
@@ -132,9 +166,9 @@ function prepareIcalEvents() {
             .filter(function () {
                 return $(this).val() == 'between';
             })
-            .attr('selected', true);
+            .attr('selected', 'true');
     }
-    
+
     $('#node-input-trigger').change(function () {
         var value = $('#node-input-trigger').val();
         let filterProperty = $('#node-input-filterProperty').val();
@@ -154,7 +188,7 @@ function prepareIcalEvents() {
                     .filter(function () {
                         return $(this).val() == 'summary';
                     })
-                    .attr('selected', true);
+                    .attr('selected', 'true');
             }
 
             if (!node.filterOperator) {
@@ -163,13 +197,14 @@ function prepareIcalEvents() {
                     .filter(function () {
                         return $(this).val() == 'between';
                     })
-                    .attr('selected', true);
+                    .attr('selected', 'true');
                 $('#node-input-filter-label1').hide();
                 $('#node-input-filter-label2').show();
                 $('#node-input-filter2-label1').hide();
                 $('#node-input-filter2-label2').show();
                 $('#node-input-filter-label3').hide();
             }
+            //@ts-ignore
             if (filterProperty && filterProperty.indexOf('event') >= 0) {
                 $('#node-input-filter2').parent().show();
                 $('#node-input-filterOperator').parent().show();
@@ -214,7 +249,7 @@ function prepareIcalEvents() {
                 .filter(function () {
                     return $(this).val() == 'summary';
                 })
-                .attr('selected', true);
+                .attr('selected', 'true');
         }
 
         if (!node.filterOperator) {
@@ -222,7 +257,7 @@ function prepareIcalEvents() {
                 .filter(function () {
                     return $(this).val() == 'between';
                 })
-                .attr('selected', true);
+                .attr('selected', 'true');
             $('#node-input-filter-label1').hide();
             $('#node-input-filter-label2').show();
             $('#node-input-filter2-label1').hide();
@@ -230,6 +265,7 @@ function prepareIcalEvents() {
             $('#node-input-filter-label3').hide();
         }
         if (trigger === "always") return;
+        //@ts-ignore
         if (value && value.indexOf('event') >= 0) {
             $('#node-input-filter2').parent().show();
             $('#node-input-filterOperator').parent().show();
@@ -262,9 +298,7 @@ function prepareIcalEvents() {
             $('#node-input-filter-label2').hide();
             $('#node-input-filter-label1').show();
             $('#node-input-filter-label3').hide();
-
         }
-
     });
 
     $('#node-input-filterOperator').change(function () {
@@ -272,6 +306,7 @@ function prepareIcalEvents() {
         var trigger = $('#node-input-trigger').val();
         var filterProperty = $('#node-input-filterProperty').val();
         if (trigger === "always") return;
+        //@ts-ignore
         if (filterProperty && ['eventStart', 'eventEnd'].indexOf(filterProperty) >= 0) {
             if (value === 'between') {
                 $('#node-input-filter2').parent().show();

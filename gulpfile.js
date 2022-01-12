@@ -69,7 +69,15 @@ gulp.task('develop', function (done) {
 gulp.task("default", gulp.series(
     gulp.parallel('copy-html'),
     () => {
-        var tsProject = ts.createProject("tsconfig.json");
+        let tsProjectresources = ts.createProject("tsconfig-resources.json");
+        tsProjectresources.src()
+            .pipe(sourcemaps.init())
+            .pipe(tsProjectresources())
+            .js
+            .pipe(sourcemaps.write('.'))
+            .pipe(gulp.dest('resources'));
+
+        let tsProject = ts.createProject("tsconfig.json");
         return tsProject.src()
             .pipe(sourcemaps.init())
             .pipe(tsProject())

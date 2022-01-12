@@ -2,3 +2,4 @@ node_modules/*
 test/test_spec.js
 dist/
 *.tgz
+resources/*
