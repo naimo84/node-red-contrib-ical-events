@@ -1,4 +1,4 @@
-name: publish
+name: publish-prerelease
 on:
   release:
     types: [ prereleased ]
