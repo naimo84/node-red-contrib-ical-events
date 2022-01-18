@@ -1,11 +1,11 @@
-var gulp = require("gulp");
-var ts = require("gulp-typescript");
+const gulp = require("gulp");
+const ts = require("gulp-typescript");
 
-var sourcemaps = require('gulp-sourcemaps');
-var nodemon = require('gulp-nodemon');
-var watch = require('gulp-watch');
+const sourcemaps = require('gulp-sourcemaps');
+const nodemon = require('gulp-nodemon');
+const watch = require('gulp-watch');
 
-var paths = {
+const paths = {
     pages: ['src/nodes/*.html'],
     src: 'src',
     dist: 'dist'
@@ -15,14 +15,14 @@ function copyHtml() {
     gulp.src('src/resources/*.html', { base: 'src/resources' })
         .pipe(gulp.dest('resources'));
 
-    return gulp.src('src/nodes/*.html', { base: 'src/nodes'})
+    return gulp.src('src/nodes/*.html', { base: 'src/nodes' })
         .pipe(gulp.dest(paths.dist));
 }
 
 gulp.task("copy-html", copyHtml);
 
 gulp.task('develop', function (done) {
-    var stream = nodemon({
+    const stream = nodemon({
         legacyWatch: true,
         exec: 'node --inspect=9229 --preserve-symlinks      --experimental-modules       --trace-warnings     /usr/lib/node_modules/node-red/red.js',
         ext: '*.js',
@@ -35,7 +35,16 @@ gulp.task('develop', function (done) {
     });
 
     copyHtml();
-    var tsProject = ts.createProject("tsconfig.json");
+    const tsProject = ts.createProject("tsconfig.json");
+    const tsProjectresources = ts.createProject("tsconfig-resources.json");
+
+    tsProjectresources.src()
+        .pipe(sourcemaps.init())
+        .pipe(tsProjectresources())
+        .js
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('resources'));
+
     tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject())
@@ -48,7 +57,15 @@ gulp.task('develop', function (done) {
         stream.emit('restart', 10)
     });
 
-    watch('src/*.ts').on('change', () => {
+    watch('src/**/*.ts').on('change', () => {
+
+        tsProjectresources.src()
+            .pipe(sourcemaps.init())
+            .pipe(tsProjectresources())
+            .js
+            .pipe(sourcemaps.write('.'))
+            .pipe(gulp.dest('resources'));
+
         tsProject.src()
             .pipe(sourcemaps.init())
             .pipe(tsProject())
@@ -72,7 +89,7 @@ gulp.task('develop', function (done) {
 gulp.task("default", gulp.series(
     gulp.parallel('copy-html'),
     () => {
-        let tsProjectresources = ts.createProject("tsconfig-resources.json");
+        const tsProjectresources = ts.createProject("tsconfig-resources.json");
         tsProjectresources.src()
             .pipe(sourcemaps.init())
             .pipe(tsProjectresources())
@@ -80,7 +97,7 @@ gulp.task("default", gulp.series(
             .pipe(sourcemaps.write('.'))
             .pipe(gulp.dest('resources'));
 
-        let tsProject = ts.createProject("tsconfig.json");
+        const tsProject = ts.createProject("tsconfig.json");
         return tsProject.src()
             .pipe(sourcemaps.init())
             .pipe(tsProject())

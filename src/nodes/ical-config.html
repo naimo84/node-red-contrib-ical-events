@@ -48,6 +48,7 @@
                 user: { type: "text" },
                 pass: { type: "password" }
             },
+            paletteLabel: "config",
             label: function () {
                 if (this.name) {
                     return this.name;
@@ -111,7 +112,7 @@
         });
 </script>
 
-<script type="text/x-red" data-template-name="ical-config">
+<script type="text/html" data-template-name="ical-config">
     <style>
         .event {
             display:flex;
@@ -220,19 +221,11 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="ical-config">
-    <p>Configuration</p>
-    <ul>
-        <li><b>URL</b> URL to Calendar
-        <li><b>Replace Dates with name</b> Dates are formated in a readable way, like today, tommorrow, in 3 weeks,...
-        <li><b>Language</b> if dates are replaced with names, the following languages are available at the moment Deutsch, English, русский, polski, Nederlands, français, Italiano, Espanol
-        <li><b>Cron</b> cron-expression for checking the url, if no cron is specified, it's only checked on input.
-        <li><b>Username</b> HTTP Basic authentication user
-        <li><b>Password</b> HTTP Basic authentication user, <b>CAUTION:</b> for iCloud secure get app a specific password, described like here: <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a>
-        <li><b>Type</b> Type can be ical, caldav or iCloud secure (for iCloud, see <a href="https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL">https://github.com/naimo84/kalender-events/wiki/Get-iCloud-secure-URL</a> to find the url, username and password to access an iCloud calendar)
-        <li><b>Calendar</b> <i>Type "caldav" only</i> Calendar name
-        <li><b>Past Weeks</b> <i>Type "caldav" only</i> Number of weeks ago to load events
-        <li><b>Future Weeks</b> <i>Type "caldav" only</i> Number of weeks in the future to load events
-    </ul>
+<script type="text/html" data-help-name="ical-config">
+    <div class="form-row">
+        <a href="https://naimo84.github.io/kalender-events/config/">
+            <img src="https://img.shields.io/badge/doku-naimo84.github.io-0078D6?style=for-the-badge&logo=github&logoColor=white"/>
+        </a>
+    </div>
 
 </script>

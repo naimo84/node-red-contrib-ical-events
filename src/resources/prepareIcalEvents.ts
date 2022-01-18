@@ -1,3 +1,4 @@
+//@ts-nocheck
 const icalDefaults = {
     confignode: {
         value: "",
@@ -77,26 +78,41 @@ const icalDefaults = {
 }
 
 function timezones() {
+    var dataArray = [];
     $.getJSON(`timezones`, function (data) {
-        var dataArray = [];
         $.each(data, function (i, element) {
             dataArray.push(element);
         });
-        //@ts-ignore
-        $("#node-input-timezone").autocomplete({
-            source: dataArray,
-            minLength: 0,
-            close: function (event, ui) {
-                //@ts-ignore
+    });
 
-                $("#node-input-timezone").autocomplete("destroy");
-            }
-        }).autocomplete("search", "");
+    $("#node-input-timezone").typedInput({
+        typeField: "#node-input-timezonetype",
+        default: "timezone",
+        types: ["msg",
+            {
+                value: "timezone",
+                label: "timezone",
+                autoComplete: function (val) { 
+                    var matches = [];
+                    dataArray.forEach(v => {
+                        var i = v.toLowerCase().indexOf(val.toLowerCase());
+                        if (i > -1) {
+                            matches.push({
+                                value: v,
+                                label: v,
+                                i: i
+                            });
+                        }
+                    });
+                    matches.sort(function (A, B) { return A.i - B.i });
+                    return matches;
+                }
+            }],
     });
 }
 
-function prepareIcalEvents() {
-    var node = this;
+function prepareIcalEvents(node) {
+    timezones();
     $("#node-input-eventtypes").typedInput({
         typeField: "#node-input-eventtypestype",
         types: ["str", "msg", {
@@ -123,6 +139,7 @@ function prepareIcalEvents() {
             if ((!node.eventtypes || node.eventtypes.trim() === '')) {
                 $("#node-input-eventtypes").typedInput('type', 'eventtypes');
                 $("#node-input-eventtypes").typedInput('value', icalconfig.includeTodo === true ? 'events,todos' : 'events')
+                node.eventtypes = icalconfig.includeTodo === true ? 'events,todos' : 'events';
             }
 
         });
@@ -138,10 +155,7 @@ function prepareIcalEvents() {
         types: ["str", "msg"]
     });
 
-    $("#node-input-timezone").typedInput({
-        typeField: "#node-input-timezonetype",
-        types: ["str", "msg"]
-    });
+
 
     $("#node-input-filterProperty").typedInput({
         typeField: "#node-input-filterPropertytype",
@@ -199,13 +213,6 @@ function prepareIcalEvents() {
         }]
     });
 
-
-    $('.ui-spinner-button').on('click', function () {
-        $(this)
-            .siblings('input')
-            .trigger('change');
-    });
-
     if (!node.timeoutUnits) {
         $('#node-input-timeoutUnits option')
             .filter(function () {
@@ -230,10 +237,10 @@ function prepareIcalEvents() {
             .attr('selected', 'true');
     }
 
-    $("#node-input-timezone").focusin(timezones);
+
     $('#node-input-cron').change(function () {
-        var value = $('#node-input-cron').val();
-        if (value) {
+        var value = $('#node-input-cron').val() as string;
+        if (value && value.length > 0) {
             $('#timeout-details-for').hide();
         } else {
             $('#timeout-details-for').show();
