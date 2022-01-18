@@ -52,6 +52,7 @@
   },
   "scripts": {
     "release": "release-it",
+    "release-beta": "release-it -- --preReleaseId=beta --npm.tag=next --github.preRelease",
     "dev": "gulp develop",
     "build": "gulp"
   },
