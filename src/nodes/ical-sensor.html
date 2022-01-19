@@ -1,8 +1,9 @@
 <script type="text/javascript">
-    $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
-        () => RED.nodes.registerType('ical-sensor', {
-            category: 'ical',
-            defaults: Object.assign(icalDefaults,
+    { { icalEventsConfig } }
+    { { icalEventsTimezones } }
+    RED.nodes.registerType('ical-sensor', {
+        category: 'ical',
+        defaults: Object.assign(icalDefaults,
             {
                 timeout: {
                     value: ""
@@ -12,40 +13,40 @@
                 },
                 combineResponse: {}
             }),
-            inputs: 1,
-            outputs: 2,
-            outputLabels: ["output on every tick", "output only on changes"],
-            color: "#DEBD5C",
-            label: function () {
-                if (this.name) {
-                    return this.name;
-                } else if (this.confignode.name) {
-                    return this.confignode.name;
-                }
-
-                return "event sensor";
-            },
-            icon: "font-awesome/fa-calendar",
-            paletteLabel: "sensor",
-            oneditprepare: function () {
-                prepareIcalEvents(this);
-                $('#node-input-offset').parent().hide();
-                $('#node-input-pastview').parent().hide();
-                $('#node-input-preview').parent().hide();
-                $('#node-input-checkall').parent().hide();
-
-                $('#node-input-combineResponse').change(() => {
-                    var value = $('#node-input-combineResponse').prop('checked');
-                    if (value) {
-                        $('#combine-response-hint').show();
-                    } else {
-                        $('#combine-response-hint').hide();
-
-                    }
-                });
+        inputs: 1,
+        outputs: 2,
+        outputLabels: ["output on every tick", "output only on changes"],
+        color: "#DEBD5C",
+        label: function () {
+            if (this.name) {
+                return this.name;
+            } else if (this.confignode.name) {
+                return this.confignode.name;
             }
-        })
-    )
+
+            return "event sensor";
+        },
+        icon: "font-awesome/fa-calendar",
+        paletteLabel: "sensor",
+        oneditprepare: function () {
+            { { prepareIcalEvents } }
+            $('#node-input-offset').parent().hide();
+            $('#node-input-pastview').parent().hide();
+            $('#node-input-preview').parent().hide();
+            $('#node-input-checkall').parent().hide();
+
+            $('#node-input-combineResponse').change(() => {
+                var value = $('#node-input-combineResponse').prop('checked');
+                if (value) {
+                    $('#combine-response-hint').show();
+                } else {
+                    $('#combine-response-hint').hide();
+
+                }
+            });
+        }
+    })
+
 </script>
 
 <script type="text/html" id="icalSensor-template" data-template-name="ical-sensor">

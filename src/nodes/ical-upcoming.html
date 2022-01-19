@@ -1,137 +1,137 @@
 <script type="text/javascript">
-    $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
-        () => RED.nodes.registerType('ical-upcoming', {
-            category: 'ical',
-            defaults: Object.assign(icalDefaults,
-                {
-                    checkall: {
-                        value: false,
-                    },
-                    endpreview: {
-                        value: '',
-                    },
-                    endpreviewUnits: {
-                        value: '',
-                    },
-                    previewtype: {},
-                    preview: {
-                        value: '',
-                    },
-                    previewUnitstype: {},
-                    previewUnits: {
-                        value: '',
-                    },
-                    pastviewtype: {},
-                    pastview: {
-                        value: '',
-                    },
-                    pastviewUnits: {
-                        value: '',
-                    },
-                    pastviewUnitstype: {},
-                }),
-            inputs: 1,
-            outputs: 1,
-            color: '#DEBD5C',
-            label: function () {
-                if (this.name) {
-                    return this.name;
-                } else if (this.confignode.name) {
-                    return this.confignode.name;
-                }
-
-                return 'upcoming events';
-            },
-            icon: "font-awesome/fa-calendar",
-            paletteLabel: 'upcoming',
-            oneditprepare: function () {
-                prepareIcalEvents(this);
-                let node = this;
-                $('#node-input-combineResponse').parent().hide();
-                $('#node-input-offset').parent().hide();
-                $('#node-input-filter2').parent().hide();
-
-                if (!node.previewUnits) {
-                    $('#node-input-previewUnits option')
-                        .filter(function () {
-                            if (node.endpreviewUnits) {
-                                return $(this).val() == node.endpreviewUnits;
-                            } else {
-                                return $(this).val() == 'days';
-                            }
-                        })
-                        .attr('selected', true);
-                }
-
-                if (!node.preview && node.endpreview) {
-                    $('#node-input-preview').val(node.endpreview);
-                }
-
-                if (!node.pastviewUnits) {
-                    $('#node-input-pastviewUnits option')
-                        .filter(function () {
-                            return $(this).val() == 'days';
-                        })
-                        .attr('selected', true);
-                }
-
-                $('#node-input-preview').on('change', function (event, type, value) {
-                    if (type === 'str') {
-                        $('#previewUnits').hide();
-                    } else {
-                        $('#previewUnits').show();
-                    }
-                });
-
-                $('#node-input-pastview').on('change', function (event, type, value) {
-                    if (type === 'str') {
-                        $('#pastviewUnits').hide();
-                    } else {
-                        $('#pastviewUnits').show();
-                    }
-                });
-
-                $("#node-input-pastview").typedInput({
-                    typeField: "#node-input-pastviewtype",
-                    types: ["num", "str", "msg"]
-                }).typedInput('width', '200px');
-
-                $("#node-input-pastviewUnits").typedInput({
-                    typeField: "#node-input-pastviewUnitstype",
-                    default: "pastviewUnits",
-                    types: ["str", "msg", {
-                        value: "pastviewUnits",
-                        options: [
-                            { value: "seconds", label: "Seconds" },
-                            { value: "minutes", label: "Minutes" },
-                            { value: "hours", label: "Hours" },
-                            { value: "days", label: "Days" }
-                        ]
-                    }]
-                });
-
-                $("#node-input-preview").typedInput({
-                    typeField: "#node-input-previewtype",
-                    types: ["num", "str", "msg"]
-                }).typedInput('width', '200px');
-
-
-                $("#node-input-previewUnits").typedInput({
-                    typeField: "#node-input-previewUnitstype",
-                    default: "previewUnits",
-                    types: ["str", "msg", {
-                        value: "previewUnits",
-                        options: [
-                            { value: "seconds", label: "Seconds" },
-                            { value: "minutes", label: "Minutes" },
-                            { value: "hours", label: "Hours" },
-                            { value: "days", label: "Days" }
-                        ]
-                    }]
-                });
-
+    { { icalEventsConfig } }
+    { { icalEventsTimezones } }
+    RED.nodes.registerType('ical-upcoming', {
+        category: 'ical',
+        defaults: Object.assign(icalDefaults,
+            {
+                checkall: {
+                    value: false,
+                },
+                endpreview: {
+                    value: '',
+                },
+                endpreviewUnits: {
+                    value: '',
+                },
+                previewtype: {},
+                preview: {
+                    value: '',
+                },
+                previewUnitstype: {},
+                previewUnits: {
+                    value: '',
+                },
+                pastviewtype: {},
+                pastview: {
+                    value: '',
+                },
+                pastviewUnits: {
+                    value: '',
+                },
+                pastviewUnitstype: {},
+            }),
+        inputs: 1,
+        outputs: 1,
+        color: '#DEBD5C',
+        label: function () {
+            if (this.name) {
+                return this.name;
+            } else if (this.confignode.name) {
+                return this.confignode.name;
             }
-        }))
+
+            return 'upcoming events';
+        },
+        icon: "font-awesome/fa-calendar",
+        paletteLabel: 'upcoming',
+        oneditprepare: function () {
+            { { prepareIcalEvents } }
+
+            $('#node-input-combineResponse').parent().hide();
+            $('#node-input-offset').parent().hide();
+            $('#node-input-filter2').parent().hide();
+
+            if (!node.previewUnits) {
+                $('#node-input-previewUnits option')
+                    .filter(function () {
+                        if (node.endpreviewUnits) {
+                            return $(this).val() == node.endpreviewUnits;
+                        } else {
+                            return $(this).val() == 'days';
+                        }
+                    })
+                    .attr('selected', true);
+            }
+
+            if (!node.preview && node.endpreview) {
+                $('#node-input-preview').val(node.endpreview);
+            }
+
+            if (!node.pastviewUnits) {
+                $('#node-input-pastviewUnits option')
+                    .filter(function () {
+                        return $(this).val() == 'days';
+                    })
+                    .attr('selected', true);
+            }
+
+            $('#node-input-preview').on('change', function (event, type, value) {
+                if (type === 'str') {
+                    $('#previewUnits').hide();
+                } else {
+                    $('#previewUnits').show();
+                }
+            });
+
+            $('#node-input-pastview').on('change', function (event, type, value) {
+                if (type === 'str') {
+                    $('#pastviewUnits').hide();
+                } else {
+                    $('#pastviewUnits').show();
+                }
+            });
+
+            $("#node-input-pastview").typedInput({
+                typeField: "#node-input-pastviewtype",
+                types: ["num", "str", "msg"]
+            }).typedInput('width', '200px');
+
+            $("#node-input-pastviewUnits").typedInput({
+                typeField: "#node-input-pastviewUnitstype",
+                default: "pastviewUnits",
+                types: ["str", "msg", {
+                    value: "pastviewUnits",
+                    options: [
+                        { value: "seconds", label: "Seconds" },
+                        { value: "minutes", label: "Minutes" },
+                        { value: "hours", label: "Hours" },
+                        { value: "days", label: "Days" }
+                    ]
+                }]
+            });
+
+            $("#node-input-preview").typedInput({
+                typeField: "#node-input-previewtype",
+                types: ["num", "str", "msg"]
+            }).typedInput('width', '200px');
+
+
+            $("#node-input-previewUnits").typedInput({
+                typeField: "#node-input-previewUnitstype",
+                default: "previewUnits",
+                types: ["str", "msg", {
+                    value: "previewUnits",
+                    options: [
+                        { value: "seconds", label: "Seconds" },
+                        { value: "minutes", label: "Minutes" },
+                        { value: "hours", label: "Hours" },
+                        { value: "days", label: "Days" }
+                    ]
+                }]
+            });
+        }
+    })
 </script>
 
 <script type="text/html" id="icalUpcoming-template" data-template-name="ical-upcoming">

@@ -4,22 +4,37 @@ const ts = require("gulp-typescript");
 const sourcemaps = require('gulp-sourcemaps');
 const nodemon = require('gulp-nodemon');
 const watch = require('gulp-watch');
+const replace = require('gulp-replace');
 
+const fs = require('fs')
 const paths = {
     pages: ['src/nodes/*.html'],
     src: 'src',
     dist: 'dist'
 };
 
-function copyHtml() {
-    gulp.src('src/resources/*.html', { base: 'src/resources' })
+function copyResources() {
+    const tsProjectresources = ts.createProject("tsconfig-resources.json");
+    return tsProjectresources.src()
+        .pipe(sourcemaps.init())
+        .pipe(tsProjectresources())
+        .js
         .pipe(gulp.dest('resources'));
+}
 
+function copyHtml() {
+    const prepareIcalEvents = fs.readFileSync('./resources/prepareIcalEvents.js', 'utf8');
+    const config = fs.readFileSync('./resources/config.js', 'utf8');
+    const timezones = fs.readFileSync('./resources/timezones.js', 'utf8');
     return gulp.src('src/nodes/*.html', { base: 'src/nodes' })
+        .pipe(replace('{ { prepareIcalEvents } }', prepareIcalEvents))
+        .pipe(replace('{ { icalEventsConfig } }', config))
+        .pipe(replace('{ { icalEventsTimezones } }', timezones))
         .pipe(gulp.dest(paths.dist));
 }
 
 gulp.task("copy-html", copyHtml);
+gulp.task("copy-resources", copyResources);
 
 gulp.task('develop', function (done) {
     const stream = nodemon({
@@ -34,6 +49,7 @@ gulp.task('develop', function (done) {
         env: { "NO_UPDATE_NOTIFIER": "1" }
     });
 
+    copyResources();
     copyHtml();
     const tsProject = ts.createProject("tsconfig.json");
     const tsProjectresources = ts.createProject("tsconfig-resources.json");
@@ -86,23 +102,15 @@ gulp.task('develop', function (done) {
         })
 })
 
-gulp.task("default", gulp.series(
-    gulp.parallel('copy-html'),
-    () => {
-        const tsProjectresources = ts.createProject("tsconfig-resources.json");
-        tsProjectresources.src()
-            .pipe(sourcemaps.init())
-            .pipe(tsProjectresources())
-            .js
-            .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest('resources'));
-
-        const tsProject = ts.createProject("tsconfig.json");
-        return tsProject.src()
-            .pipe(sourcemaps.init())
-            .pipe(tsProject())
-            .js
-            .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest(paths.dist));
-    })
+gulp.task("default",
+    gulp.series('copy-resources', 'copy-html',
+        () => {
+            const tsProject = ts.createProject("tsconfig.json");
+            return tsProject.src()
+                .pipe(sourcemaps.init())
+                .pipe(tsProject())
+                .js
+                .pipe(sourcemaps.write('.'))
+                .pipe(gulp.dest(paths.dist));
+        })
 );

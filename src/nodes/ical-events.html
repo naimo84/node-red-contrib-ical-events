@@ -1,79 +1,80 @@
 <script type="text/javascript">
-
-    $.getScript("resources/node-red-contrib-ical-events/prepareIcalEvents.js",
-        () =>
-            RED
-                .nodes
-                .registerType('ical-events', {
-                    category: 'ical',
-                    defaults: Object.assign(icalDefaults,
-                        {
-                            offsettype: {},
-                            offset: {
-                                value: ""
-                            },
-                            offsetUnitstype: {},
-                            offsetUnits: {
-                                value: ""
-                            },
-                        }),
-                    inputs: 1,
-                    outputs: 2,
-                    outputLabels: ["Start Message", "End Message"],
-                    color: "#DEBD5C",
-                    label: function () {
-                        if (this.name) {
-                            return this.name;
-                        } else if (this.confignode.name) {
-                            return this.confignode.name;
-                        }
-
-                        return "event trigger";
+    { { icalEventsConfig } }
+    { { icalEventsTimezones } }
+    RED
+        .nodes
+        .registerType('ical-events', {
+            category: 'ical',
+            defaults: Object.assign(icalDefaults,
+                {
+                    offsettype: {},
+                    offset: {
+                        value: ""
                     },
-                    icon: "font-awesome/fa-calendar",
-                    paletteLabel: "trigger",
-                    oneditprepare: function () {
-                        prepareIcalEvents(this)
-                        $('#node-input-combineResponse').parent().hide();
-                        $('#node-input-pastview').parent().hide();
-                        $('#node-input-preview').parent().hide();
-                        $('#node-input-checkall').parent().hide();
+                    offsetUnitstype: {},
+                    offsetUnits: {
+                        value: ""
+                    },
+                }),
+            inputs: 1,
+            outputs: 2,
+            outputLabels: ["Start Message", "End Message"],
+            color: "#DEBD5C",
+            label: function () {
+                if (this.name) {
+                    return this.name;
+                } else if (this.confignode.name) {
+                    return this.confignode.name;
+                }
 
-                        $("#node-input-offsetUnits").typedInput({
-                            typeField: "#node-input-offsetUnitstype",
-                            default: "offsetUnits",
-                            types: ["str", "msg", {
-                                value: "offsetUnits",
-                                options: [
-                                    { value: "seconds", label: "Seconds" },
-                                    { value: "minutes", label: "Minutes" },
-                                    { value: "hours", label: "Hours" },
-                                    { value: "days", label: "Days" }
-                                ]
-                            }]
-                        });
-                        $("#node-input-offset").typedInput({
-                            typeField: "#node-input-offsettype",
-                            types: ["num", "str", "msg"]
-                        }).typedInput('width', '200px');
+                return "event trigger";
+            },
+            icon: "font-awesome/fa-calendar",
+            paletteLabel: "trigger",
+            oneditprepare: function () {
 
-                        $('#node-input-offset').on('change', function (event, type, value) {
-                            if (type === 'str') {
-                                $('#offsetUnits').hide();
-                            } else {
-                                $('#offsetUnits').show();
-                            }
-                        });
+                { { prepareIcalEvents } }
 
-                        if (!this.offsetUnits) {
-                            $("#node-input-offsetUnits option").filter(function () {
-                                return $(this).val() == 'minutes';
-                            }).attr('selected', true);
-                        }
+                $('#node-input-combineResponse').parent().hide();
+                $('#node-input-pastview').parent().hide();
+                $('#node-input-preview').parent().hide();
+                $('#node-input-checkall').parent().hide();
 
+                $("#node-input-offsetUnits").typedInput({
+                    typeField: "#node-input-offsetUnitstype",
+                    default: "offsetUnits",
+                    types: ["str", "msg", {
+                        value: "offsetUnits",
+                        options: [
+                            { value: "seconds", label: "Seconds" },
+                            { value: "minutes", label: "Minutes" },
+                            { value: "hours", label: "Hours" },
+                            { value: "days", label: "Days" }
+                        ]
+                    }]
+                });
+                $("#node-input-offset").typedInput({
+                    typeField: "#node-input-offsettype",
+                    types: ["num", "str", "msg"]
+                }).typedInput('width', '200px');
 
+                $('#node-input-offset').on('change', function (event, type, value) {
+                    if (type === 'str') {
+                        $('#offsetUnits').hide();
+                    } else {
+                        $('#offsetUnits').show();
                     }
-                }))
+                });
+
+                if (!this.offsetUnits) {
+                    $("#node-input-offsetUnits option").filter(function () {
+                        return $(this).val() == 'minutes';
+                    }).attr('selected', true);
+                }
+
+
+            }
+        })
 </script>
 
 <script type="text/html" id="icalEvents-template" data-template-name="ical-events">
