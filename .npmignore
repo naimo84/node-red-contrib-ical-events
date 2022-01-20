@@ -6,9 +6,10 @@ src/*
 gulpfile.js
 examples/*.png
 *.tgz
-tsconfig.json
+tsconfig*.json
 CHANGELOG.md
 CONTRIBUTING.md
 commitlint.config.js
 .release-it.js
 help/*
+resources/*

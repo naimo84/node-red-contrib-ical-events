@@ -4,6 +4,7 @@ const ts = require("gulp-typescript");
 const sourcemaps = require('gulp-sourcemaps');
 const nodemon = require('gulp-nodemon');
 const watch = require('gulp-watch');
+const minify = require('gulp-minify');
 const replace = require('gulp-replace');
 
 const fs = require('fs')
@@ -106,11 +107,15 @@ gulp.task("default",
     gulp.series('copy-resources', 'copy-html',
         () => {
             const tsProject = ts.createProject("tsconfig.json");
-            return tsProject.src()
-                .pipe(sourcemaps.init())
+            return tsProject.src()               
                 .pipe(tsProject())
                 .js
-                .pipe(sourcemaps.write('.'))
+                .pipe(minify({
+                    ext: {
+                        min: '.js' // Set the file extension for minified files to just .js
+                    },
+                    noSource: true // Don’t output a copy of the source file
+                }))               
                 .pipe(gulp.dest(paths.dist));
         })
 );
