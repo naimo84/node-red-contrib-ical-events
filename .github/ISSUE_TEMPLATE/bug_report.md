@@ -1,10 +1,9 @@
 ---
-name: Bug report
+name: 🐛 Bug report
 about: Create a report to help us improve
-title: ''
+title: '[BUG]: '
 labels: 'bug'
 assignees: 'naimo84'
-
 ---
 
 **Describe the bug**

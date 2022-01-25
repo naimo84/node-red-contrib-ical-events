@@ -1,10 +1,9 @@
 ---
-name: Feature request
+name: ✨ Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
+title: '[FEAT]: '
+labels: 'enhancement'
+assignees: 'naimo84'
 ---
 
 **Is your feature request related to a problem? Please describe.**
