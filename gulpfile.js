@@ -27,7 +27,9 @@ function copyHtml() {
     const prepareIcalEvents = fs.readFileSync('./resources/prepareIcalEvents.js', 'utf8');
     const config = fs.readFileSync('./resources/config.js', 'utf8');
     const timezones = fs.readFileSync('./resources/timezones.js', 'utf8');
+    const template = fs.readFileSync('./src/resources/template.html', 'utf8');
     return gulp.src('src/nodes/*.html', { base: 'src/nodes' })
+        .pipe(replace('<!-- template.html -->', template))
         .pipe(replace('{ { prepareIcalEvents } }', prepareIcalEvents))
         .pipe(replace('{ { icalEventsConfig } }', config))
         .pipe(replace('{ { icalEventsTimezones } }', timezones))

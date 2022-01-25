@@ -67,7 +67,7 @@ module.exports = function (RED: any) {
         //@ts-ignore
         if (!msg) msg = {};
         var dateNow = new Date();
-        getICal(node).then(data => {
+        getICal(node, RED).then(data => {
             if (!data) return;
 
             let current = false;

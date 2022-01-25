@@ -24,7 +24,7 @@ module.exports = function (RED: any) {
             node.on('input', (msg, send, done) => {
                 node.msg = RED.util.cloneMessage(msg);
                 send = send || function () { node.send.apply(node, arguments) }
-                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);
+                node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);              
                 cronCheckJob(node, msg, send, done, config.confignode, startedCronJobs);
             });
 
@@ -90,7 +90,7 @@ module.exports = function (RED: any) {
         }
         let dateNow = moment().utc().toDate();
         let possibleUids = [];
-        getICal(node).then((data: IKalenderEvent[]) => {
+        getICal(node, RED).then((data: IKalenderEvent[]) => {
             if (data) {
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {
@@ -139,14 +139,14 @@ module.exports = function (RED: any) {
 
                         if (eventEnd > dateNow) {
                             //@ts-ignore
-                            let uid = crypto.MD5(ev.uid +  ev.summary?.val ? ev.summary.val : ev.summary  + "end").toString();
+                            let uid = crypto.MD5(ev.uid + ev.summary?.val ? ev.summary.val : ev.summary + "end").toString();
                             if (ev.uid) {
                                 uid = (ev.uid.uid ? ev.uid.uid : ev.uid) + eventEnd.toISOString() + "end";
                             }
                             possibleUids.push(uid);
                             let event: CalEvent = Object.assign(ev, {
                                 //@ts-ignore
-                                topic:  ev.summary?.val ? ev.summary.val : ev.summary ,
+                                topic: ev.summary?.val ? ev.summary.val : ev.summary,
                                 id: uid,
                                 calendarName: ev.calendarName || node.config.name
                             });
@@ -215,7 +215,7 @@ module.exports = function (RED: any) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
-     
+
         send([Object.assign(msg2, {
             payload: event
         })]);
@@ -228,7 +228,7 @@ module.exports = function (RED: any) {
         let msg2 = RED.util.cloneMessage(msg);
         delete msg2._msgid;
         delete event.id;
-      
+
         send([null, Object.assign(msg2, {
             payload: event
         })]);

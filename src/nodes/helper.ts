@@ -4,6 +4,7 @@ import * as NodeCache from 'node-cache';
 import { KalenderEvents, IKalenderEvent } from 'kalender-events';
 import { DateTime } from "luxon";
 import { Node } from 'node-red';
+import moment = require('moment');
 
 export interface Job {
     id: string,
@@ -11,6 +12,7 @@ export interface Job {
 }
 
 export interface IcalNode extends Node {
+    nodeconfig: any;
     datesArray_old: any;
     datesArray: any;
     job: CronJob;
@@ -30,7 +32,7 @@ export interface CalEvent extends IKalenderEvent {
 }
 
 
-export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?: any,): IcalEventsConfig {
+export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: any,): IcalEventsConfig {
 
     let type = msg?.caldav || msg?.type || config?.caltype;
     if (!type && config?.caldav) {
@@ -41,8 +43,9 @@ export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?:
         else if (config.caldav === "icloud")
             type = "icloud"
     }
-    
+
     const icalConfig = {
+        nodeconfig: node,
         url: msg?.url || config?.url,
         name: msg?.calendarName || config?.name,
         language: msg?.language || config?.language,
@@ -53,25 +56,25 @@ export function getConfig(config: IcalEventsConfig,  RED: any, node?: any, msg?:
         usecache: msg?.usecache || config?.usecache || false,
         includeTodo: msg?.includeTodo || config?.includeTodo || false,
 
-        eventtypes: RED.util.evaluateNodeProperty(config.eventtypes, config.eventtypestype, config, msg),
+        eventtypes: RED?.util.evaluateNodeProperty(node.eventtypes, node.eventtypestype, node, msg) || 'events',
 
         password: msg?.password || config?.credentials?.pass || config?.password,
         calendar: msg?.calendar || config?.calendar,
 
-        filter: RED.util.evaluateNodeProperty(node.filter, node.filtertype, node, msg) || msg?.filter || node?.filter,
-        timezone: RED.util.evaluateNodeProperty(node.timezone, node.timezonetype, node, msg) ||  msg?.timezone || node?.timezone,
-        filter2: RED.util.evaluateNodeProperty(node.filter2, node.filter2type, node, msg) || msg?.filter2 || node?.filter2,
-        filterProperty: RED.util.evaluateNodeProperty(node.filterProperty, node.filterPropertytype, node, msg) || msg?.filterProperty || node?.filterProperty,
-        filterOperator: RED.util.evaluateNodeProperty(node.filterOperator, node.filterOperator2type, node, msg) || msg?.filterOperator || node?.filterOperator,
-        trigger: RED.util.evaluateNodeProperty(node.trigger, node.triggertype, node, msg) || msg?.trigger || node?.trigger || 'always',
+        filter: RED?.util.evaluateNodeProperty(node.filter, node.filtertype, node, msg) || msg?.filter || node?.filter,
+        timezone: RED?.util.evaluateNodeProperty(node.timezone, node.timezonetype, node, msg) || msg?.timezone || node?.timezone,
+        filter2: RED?.util.evaluateNodeProperty(node.filter2, node.filter2type, node, msg) || msg?.filter2 || node?.filter2,
+        filterProperty: RED?.util.evaluateNodeProperty(node.filterProperty, node.filterPropertytype, node, msg) || msg?.filterProperty || node?.filterProperty,
+        filterOperator: RED?.util.evaluateNodeProperty(node.filterOperator, node.filterOperator2type, node, msg) || msg?.filterOperator || node?.filterOperator,
+        trigger: RED?.util.evaluateNodeProperty(node.trigger, node.triggertype, node, msg) || msg?.trigger || node?.trigger || 'always',
 
 
-        preview: parseInt(RED.util.evaluateNodeProperty(node.preview, node.previewtype, node, msg) || msg?.preview || node?.preview || node?.endpreview || 10),
-        previewUnits: RED.util.evaluateNodeProperty(node.previewUnits, node.previewUnitstype, node, msg) || msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
-        pastview: parseInt(RED.util.evaluateNodeProperty(node.pastview, node.pastviewtype, node, msg) || msg?.pastview || node?.pastview || 0),
-        pastviewUnits: RED.util.evaluateNodeProperty(node.pastviewUnits, node.pastviewUnitstype, node, msg) || msg?.pastviewUnits || node?.pastviewUnits || 'd',
-        offset: parseInt(RED.util.evaluateNodeProperty(node.offset, node.offsettype, node, msg) || msg?.offset || node?.offset || 0),
-        offsetUnits: RED.util.evaluateNodeProperty(node.offsetUnits, node.offsetUnitstype, node, msg) || msg?.offsetUnits || node?.offsetUnits || 'm',
+        preview: parseInt(RED?.util.evaluateNodeProperty(node.preview, node.previewtype, node, msg) || msg?.preview || node?.preview || node?.endpreview || 10),
+        previewUnits: RED?.util.evaluateNodeProperty(node.previewUnits, node.previewUnitstype, node, msg) || msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
+        pastview: parseInt(RED?.util.evaluateNodeProperty(node.pastview, node.pastviewtype, node, msg) || msg?.pastview || node?.pastview || 0),
+        pastviewUnits: RED?.util.evaluateNodeProperty(node.pastviewUnits, node.pastviewUnitstype, node, msg) || msg?.pastviewUnits || node?.pastviewUnits || 'd',
+        offset: parseInt(RED?.util.evaluateNodeProperty(node.offset, node.offsettype, node, msg) || msg?.offset || node?.offset || 0),
+        offsetUnits: RED?.util.evaluateNodeProperty(node.offsetUnits, node.offsetUnitstype, node, msg) || msg?.offsetUnits || node?.offsetUnits || 'm',
 
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false,
@@ -93,7 +96,7 @@ function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEv
     return event;
 }
 
-export async function getICal(node: IcalNode) {
+export async function getICal(node: IcalNode, RED) {
     const kalenderEvents = new KalenderEvents()
 
     let configs: IcalEventsConfig[] = [];
@@ -108,25 +111,19 @@ export async function getICal(node: IcalNode) {
     }
 
     let datas = [];
+
     for (let config of configs) {
         try {
-            if (configs.length === 1) {
-                let icalConfig = node.config;
-                if ((new Date(node.msg.payload)).getTime() > 1) {
-                    icalConfig = Object.assign(icalConfig, { now: new Date(node.msg.payload) })
-                }
-                let data = await kalenderEvents.getEvents(icalConfig)
-                for (let d in data) {
-                    datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
-                }
+            let icalConfig = configs.length === 1 ? node.config : getConfig(config, RED, node.config?.nodeconfig);
+
+            if (moment(node.msg.payload, moment.ISO_8601).isValid()) {
+                icalConfig = Object.assign(icalConfig, { now: moment(node.msg.payload).toDate() })
             }
-            else {
-                let icalConfig = getConfig(config, node.config);
-                let data = await kalenderEvents.getEvents(icalConfig)
-                for (let d in data) {
-                    datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
-                }
-            }
+
+            let data = await kalenderEvents.getEvents(icalConfig)
+            for (let d in data) {
+                datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
+            }            
         }
         catch (err) {
             if (node.config.usecache && node.cache) {
@@ -138,7 +135,7 @@ export async function getICal(node: IcalNode) {
 
     if (node.config.usecache && node.cache) {
         node.cache.set("events", datas);
-    }
+    }    
     return datas;
 }
 

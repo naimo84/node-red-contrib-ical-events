@@ -17,6 +17,7 @@ export interface IcalEventsConfig extends Config {
     id: any,
     type: any,
     combineResponse: boolean,
+    nodeconfig:any
 }
 
 module.exports = function (RED: any) {
