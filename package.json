@@ -7,7 +7,7 @@
     "email": "git@neumann-benjamin.de"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=12.0.0"
   },
   "contributors": [
     {
@@ -39,6 +39,7 @@
     "home automation"
   ],
   "node-red": {
+    "version": ">=1.0.0",
     "nodes": {
       "ical-config": "dist/ical-config.js",
       "ical-events": "dist/ical-events.js",
