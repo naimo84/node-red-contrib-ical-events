@@ -52,11 +52,7 @@ module.exports = function (RED: any) {
         } else {
             this.caltype = config.caltype;
         }
-
-        if (config.username) {
-            RED.nodes.addCredentials(this.id, { user: config.username, pass: config.password })
-        }
-
+      
         this.name = config.name;
         this.caldav = config.caldav;
         this.language = config.language;

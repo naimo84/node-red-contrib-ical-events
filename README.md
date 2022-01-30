@@ -8,7 +8,7 @@ This Node RED module gets the events from an ical-URL, a caldav-server or from i
 * v1+ requires Node.js v12+ and recommends Node-RED v2.0.0+
 
 
-<img src="https://img.shields.io/npm/dy/node-red-contrib-ical-events?style=for-the-badge"/>
+
 
 ## :question: Get Help
 
@@ -71,6 +71,7 @@ Then run
 ```
 node-red
 ```
+<img src="https://img.shields.io/npm/dy/node-red-contrib-ical-events?style=for-the-badge"/>
 
 ## :yum: How to contribute
 
