@@ -72,6 +72,13 @@ gulp.task('develop', function (done) {
         .pipe(gulp.dest(paths.dist));
 
     watch(paths.pages).on('change', () => {
+        
+        copyHtml();
+        stream.emit('restart', 10)
+    });
+
+    watch('src/resources/*.html').on('change', () => {
+       
         copyHtml();
         stream.emit('restart', 10)
     });

@@ -1,4 +1,4 @@
-import { Config } from 'kalender-events';
+import { Config, getVersion } from 'kalender-events';
 var moment = require('moment-timezone');
 
 export interface IcalEventsConfig extends Config {
@@ -17,7 +17,7 @@ export interface IcalEventsConfig extends Config {
     id: any,
     type: any,
     combineResponse: boolean,
-    nodeconfig:any
+    nodeconfig: any
 }
 
 module.exports = function (RED: any) {
@@ -35,7 +35,20 @@ module.exports = function (RED: any) {
                 includeTodo: config.includeTodo,
                 type: config.caltype ? config.caltype : config.caldav
             });
+        } else {
+            res.json({});
         }
+    });
+
+    RED.httpAdmin.get("/kalender-events-version", async function (req, res) {
+        RED.log.debug("POST /kalender-events-version");
+
+        const version = await getVersion();
+
+        res.json({
+            version
+        });
+
     });
 
     function icalConfig(config: IcalEventsConfig) {
@@ -52,7 +65,7 @@ module.exports = function (RED: any) {
         } else {
             this.caltype = config.caltype;
         }
-      
+
         this.name = config.name;
         this.caldav = config.caldav;
         this.language = config.language;

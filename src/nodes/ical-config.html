@@ -71,6 +71,10 @@
                     }).attr('selected', true);
                 }
 
+                $.getJSON(`kalender-events-version`, function (data) {                    
+                    $('#version').text(data?.version)
+                });
+
                 if (node.user || (!node.username && !node.user)) {
                     $('#hint_v1').hide()
                 }
@@ -213,11 +217,18 @@
         </label>
         <input type="text" id="node-config-input-calendar" placeholder="" style="width:280px !important">
     </div>
+    <hr>
+    <div class="form-row event">
+        <span  style="min-width:160px !important">
+            <i class="fa fa-info"></i>
+            <span> <a href="https://github.com/naimo84/kalender-events">kalender-events</a> version: </span></span>
+        <span id="version" placeholder="" style="width:100% !important">
+    </div>
 </script>
 
 <script type="text/html" data-help-name="ical-config">
     <div class="form-row">
-        <a href="https://naimo84.github.io/kalender-events/config/">
+        <a href="https://naimo84.github.io/kalender-events/config/" target="_blank">
             <img src="https://img.shields.io/badge/doku-naimo84.github.io-0078D6?style=for-the-badge&logo=github&logoColor=white"/>
         </a>
     </div>

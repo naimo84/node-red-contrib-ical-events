@@ -59,7 +59,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
         eventtypes: RED?.util.evaluateNodeProperty(node.eventtypes, node.eventtypestype, node, msg) || 'events',
 
         password: msg?.password || config?.credentials?.pass || config?.password,
-        calendar: msg?.calendar || config?.calendar,
+        calendar: msg?.calendar || RED?.util.evaluateNodeProperty(node.calendar, node.calendartype, node, msg) || config?.calendar,
 
         filter: RED?.util.evaluateNodeProperty(node.filter, node.filtertype, node, msg) || msg?.filter || node?.filter,
         timezone: RED?.util.evaluateNodeProperty(node.timezone, node.timezonetype, node, msg) || msg?.timezone || node?.timezone,
@@ -78,7 +78,8 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
 
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false,
-        cache: new NodeCache()
+        cache: new NodeCache(),
+
     } as IcalEventsConfig;
 
     return icalConfig;
