@@ -27,16 +27,20 @@ const icalDefaults = {
     },
     eventtypes: {},
     eventtypestype: {},
+    calendar: {},
+    calendartype: {},
     triggertype: {},
     trigger: {},
     timezone: {},
     timezonetype: {},
+   
     filterProperty: {},
     filterPropertytype: {},
     filterOperator: {},
     filterOperatortype: {},
     filtertype: {},
     filter2type: {},
+    
     filter2: {
         required: false,
         validate: function (v) {

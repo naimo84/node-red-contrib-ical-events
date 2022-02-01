@@ -20,8 +20,10 @@ $('#node-input-confignode').change(function () {
     $.post(`icalconfig`, { id: value }, function (icalconfig) {
         if (icalconfig.type !== 'caldav') {
             $('#node-input-eventtypes').parent().hide();
+            $('#node-input-calendar').parent().hide();
         } else {
             $('#node-input-eventtypes').parent().show();
+            $('#node-input-calendar').parent().show();
         }
 
         if ((!node.eventtypes || node.eventtypes.trim() === '')) {
@@ -33,6 +35,7 @@ $('#node-input-confignode').change(function () {
     });
 });
 
+
 $("#node-input-filter").typedInput({
     typeField: "#node-input-filtertype",
     types: ["str", "msg"]
@@ -43,7 +46,10 @@ $("#node-input-filter2").typedInput({
     types: ["str", "msg"]
 });
 
-
+$("#node-input-calendar").typedInput({
+    typeField: "#node-input-calendartype",
+    types: ["str", "msg"]
+});
 
 $("#node-input-filterProperty").typedInput({
     typeField: "#node-input-filterPropertytype",
