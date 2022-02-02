@@ -12,7 +12,7 @@
     }
 
     .event label {
-        min-width: 110px;
+        min-width: 140px;
         align-self: center;
     }
 
@@ -26,8 +26,9 @@
     <input type="text" id="node-input-name">
 </div>
 <hr />
+<h3>Config</h3>
 <div class="form-row event">
-    <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Config</span></label>
+    <label for="node-input-confignode"><i class="fa fa-globe"></i> <span>Calendar config</span></label>
     <input type="text" id="node-input-confignode">
 </div>
 <div class="form-row padding-top">
@@ -39,7 +40,7 @@
 <div class="form-row event padding-top">
     <label for="node-input-calendar">
         <i class="fa fa-calendar"></i>
-        <span>Calendar:</span>
+        <span>Calendar</span>
     </label>
     <input type="text" id="node-input-calendar" placeholder="">
     <input type="hidden" id="node-input-calendartype" placeholder="">
@@ -47,10 +48,12 @@
 <div class="form-row event">
     <label for="node-input-eventtypes">
         <i class="fa fa-asterisk"></i>
-        <span>Event types:</span></label>
+        <span>Event types</span></label>
     <input type="text" id="node-input-eventtypes" placeholder="events,todos">
     <input type="hidden" id="node-input-eventtypestype" placeholder="">
 </div>
+<hr>
+<h3>Check, trigger and filter</h3>
 <div class="form-row event padding-top" id="timeout-details-for">
     <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span>Check every</span></label>
     <input type="text" id="node-input-timeout" style="text-align:end; width:50px !important" placeholder="0">
@@ -60,6 +63,10 @@
         <option value="hours">Hours</option>
         <option value="days">Days</option>
     </select>
+</div>
+<div class="form-row event">
+    <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
+    <input type="text" id="node-input-cron">
 </div>
 <div class="form-row event">
     <label for="node-input-trigger"><i class="fa fa-filter"></i> <span>Trigger</span></label>
@@ -119,15 +126,25 @@
         <input type="text" id="node-input-offsetUnits">
     </span>
 </div>
+<hr>
+<h3>Dateformat</h3>
 <div class="form-row event">
-    <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for output</label>
+    <label for="node-input-timezone"><i class="fa fa-filter"></i> Timezone for eventStart / eventEnd</label>
     <input type="text" id="node-input-timezone" placeholder="UTC">
     <input type="hidden" id="node-input-timezonetype">
 </div>
 <div class="form-row event">
-    <label for="node-input-cron"><i class="fa fa-clock-o"></i> <span>Cron</span></label>
-    <input type="text" id="node-input-cron">
+    <label for="node-input-dateformat"><i class="fa fa-filter"></i> Dateformat</label>
+    <input type="text" id="node-input-dateformat" placeholder="">
+    <input type="hidden" id="node-input-dateformattype">
 </div>
+<div class="form-row event">
+    <label for="node-input-language"> <i class="fa fa-language"></i> Date language</label>
+    <input type="text" id="node-input-language">
+    <input type="hidden" id="node-input-languagetype">  
+</div>
+<hr>
+
 
 <div class="form-row event">
     <label for="node-input-combineResponse" style="width:190px !important">

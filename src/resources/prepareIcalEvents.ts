@@ -35,6 +35,14 @@ $('#node-input-confignode').change(function () {
     });
 });
 
+$("#node-input-dateformat").typedInput({
+    typeField: "#node-input-dateformattype",
+    types: ["json", "msg"]
+});
+
+if (!node.dateformat) {
+    $('#node-input-dateformat').typedInput('value', '{ "timeStyle": "short", "dateStyle": "short" }')
+}
 
 $("#node-input-filter").typedInput({
     typeField: "#node-input-filtertype",
@@ -71,6 +79,24 @@ $("#node-input-filterProperty").typedInput({
             { value: "eventStart", label: "start date" },
             //@ts-ignore
             { value: "eventEnd", label: "end date" },
+        ]
+    }]
+});
+
+$("#node-input-language").typedInput({
+    typeField: "#node-input-languagetype",
+    default: "language",
+    types: ["str", "msg", {
+        value: "language",
+        options: [
+            { value: "en", label: "English" },
+            { value: "de", label: "Deutsch" },
+            { value: "ru", label: "русский" },
+            { value: "pl", label: "polski" },
+            { value: "nl", label: "Nederlands" },
+            { value: "fr", label: "français" },
+            { value: "it", label: "Italiano" },
+            { value: "es", label: "Espanol" },
         ]
     }]
 });

@@ -33,7 +33,10 @@ const icalDefaults = {
     trigger: {},
     timezone: {},
     timezonetype: {},
-   
+    dateformat: {},
+    dateformattype: {},
+    language: {},
+    languagetype: {},
     filterProperty: {},
     filterPropertytype: {},
     filterOperator: {},

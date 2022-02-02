@@ -48,7 +48,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
         nodeconfig: node,
         url: msg?.url || config?.url,
         name: msg?.calendarName || config?.name,
-        language: msg?.language || config?.language,
+        language: RED?.util.evaluateNodeProperty(node.language, node.languagetype, node, msg) ||  msg?.language || config?.language,
         checkall: msg?.checkall || node?.checkall || false,
         replacedates: msg?.replacedates || config?.replacedates,
         type: type,
@@ -67,7 +67,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
         filterProperty: RED?.util.evaluateNodeProperty(node.filterProperty, node.filterPropertytype, node, msg) || msg?.filterProperty || node?.filterProperty,
         filterOperator: RED?.util.evaluateNodeProperty(node.filterOperator, node.filterOperator2type, node, msg) || msg?.filterOperator || node?.filterOperator,
         trigger: RED?.util.evaluateNodeProperty(node.trigger, node.triggertype, node, msg) || msg?.trigger || node?.trigger || 'always',
-
+        dateformat: RED?.util.evaluateNodeProperty(node.dateformat, node.dateformattype, node, msg) || { timeStyle: "short", dateStyle: "short" },
 
         preview: parseInt(RED?.util.evaluateNodeProperty(node.preview, node.previewtype, node, msg) || msg?.preview || node?.preview || node?.endpreview || 10),
         previewUnits: RED?.util.evaluateNodeProperty(node.previewUnits, node.previewUnitstype, node, msg) || msg?.previewUnits || node?.previewUnits || node?.endpreviewUnits || 'd',
@@ -81,7 +81,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
         cache: new NodeCache(),
 
     } as IcalEventsConfig;
-
+    
     return icalConfig;
 }
 

@@ -72,33 +72,33 @@ gulp.task('develop', function (done) {
         .pipe(gulp.dest(paths.dist));
 
     watch(paths.pages).on('change', () => {
-        
+
         copyHtml();
         stream.emit('restart', 10)
     });
 
     watch('src/resources/*.html').on('change', () => {
-       
+
         copyHtml();
         stream.emit('restart', 10)
     });
 
     watch('src/**/*.ts').on('change', () => {
-
-        tsProjectresources.src()
-            .pipe(sourcemaps.init())
-            .pipe(tsProjectresources())
-            .js
-            .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest('resources'));
-
-        tsProject.src()
-            .pipe(sourcemaps.init())
-            .pipe(tsProject())
-            .js
-            .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest(paths.dist));
-
+        gulp.series(() => {
+            tsProjectresources.src()
+                .pipe(sourcemaps.init())
+                .pipe(tsProjectresources())
+                .js
+                .pipe(sourcemaps.write('.'))
+                .pipe(gulp.dest('resources'));
+        }, () => {
+            tsProject.src()
+                .pipe(sourcemaps.init())
+                .pipe(tsProject())
+                .js
+                .pipe(sourcemaps.write('.'))
+                .pipe(gulp.dest(paths.dist));
+        })
         stream.emit('restart', 10)
     });
 
@@ -116,7 +116,7 @@ gulp.task("default",
     gulp.series('copy-resources', 'copy-html',
         () => {
             const tsProject = ts.createProject("tsconfig.json");
-            return tsProject.src()               
+            return tsProject.src()
                 .pipe(tsProject())
                 .js
                 .pipe(minify({
@@ -124,7 +124,7 @@ gulp.task("default",
                         min: '.js' // Set the file extension for minified files to just .js
                     },
                     noSource: true // Don’t output a copy of the source file
-                }))               
+                }))
                 .pipe(gulp.dest(paths.dist));
         })
 );
