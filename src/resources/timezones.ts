@@ -9,8 +9,8 @@ function timezones() {
 
     $("#node-input-timezone").typedInput({
         typeField: "#node-input-timezonetype",
-        default: "timezone",
-        types: ["msg",
+        default: "str",
+        types: ["str", "msg",
             {
                 value: "timezone",
                 label: "timezone",
