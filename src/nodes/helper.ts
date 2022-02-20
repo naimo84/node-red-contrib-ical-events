@@ -23,6 +23,7 @@ export interface IcalNode extends Node {
     ke: KalenderEvents;
     combineResponse: boolean;
     timezone: string;
+    event:any;
 }
 
 export interface CalEvent extends IKalenderEvent {

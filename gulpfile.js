@@ -42,7 +42,7 @@ gulp.task("copy-resources", copyResources);
 gulp.task('develop', function (done) {
     const stream = nodemon({
         legacyWatch: true,
-        exec: 'node --inspect=9229 --preserve-symlinks      --experimental-modules       --trace-warnings     /usr/lib/node_modules/node-red/red.js',
+        exec: 'node --inspect=9229 --preserve-symlinks      --experimental-modules       --trace-warnings     /usr/local/lib/node_modules/node-red/red.js',
         ext: '*.js',
         watch: [paths.dist],
         ignore: ["*.map"],
