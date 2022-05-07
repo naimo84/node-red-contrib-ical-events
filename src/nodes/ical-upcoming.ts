@@ -1,6 +1,7 @@
 import { NodeMessage, NodeMessageInFlow } from 'node-red';
 import { CronJob } from 'cron';
 import { IcalEventsConfig } from './ical-config';
+import * as NodeCache from 'node-cache';
 import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 var parser = require('cron-parser');
 
@@ -8,6 +9,7 @@ module.exports = function (RED: any) {
     function upcomingNode(n: any) {
         RED.nodes.createNode(this, n);
         let node: IcalNode = this;
+        node.cache = new NodeCache();
         node.red = RED;
         node.msg = {};
 
