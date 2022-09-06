@@ -83,9 +83,9 @@
                     var value = $('#node-config-input-caltype').val();
                     if (!value || value === 'ical') {
                         $('#icloud-tip').hide();
-                        $('#node-config-input-includeTodo').parent().show();
-                        $('#node-config-input-username').parent().hide();
-                        $('#node-config-input-password').parent().hide();
+                        $('#node-config-input-includeTodo').parent().show();     
+                        $('#node-config-input-username').parent().show();
+                        $('#node-config-input-password').parent().show();                 
                         $('#node-config-input-calendar').parent().hide();
                         return;
                     } else if (value === 'caldav') {
