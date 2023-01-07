@@ -25,7 +25,7 @@ module.exports = function (RED: any) {
                 node.msg = RED.util.cloneMessage(msg);
                 send = send || function () { node.send.apply(node, arguments) }
                 node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);              
-                cronCheckJob(node, msg, send, done, config.confignode, startedCronJobs);
+                cronCheckJob(node, msg, send, done, config.confignode, startedCronJobs,config);
             });
 
             node.on('close', () => {
@@ -80,7 +80,7 @@ module.exports = function (RED: any) {
         }
     }
 
-    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config, startedCronJobs) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void, config, startedCronJobs,n) {
         let newCronJobs = new Map();
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
@@ -90,7 +90,7 @@ module.exports = function (RED: any) {
         }
         let dateNow = moment().utc().toDate();
         let possibleUids = [];
-        getICal(node, RED).then((data: IKalenderEvent[]) => {
+        getICal(node, RED,n).then((data: IKalenderEvent[]) => {
             if (data) {
                 for (let k in data) {
                     if (data.hasOwnProperty(k)) {

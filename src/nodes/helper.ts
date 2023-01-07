@@ -97,14 +97,15 @@ function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEv
     return event;
 }
 
-export async function getICal(node: IcalNode, RED) {
+export async function getICal(node: IcalNode, RED,n:any) {
     const kalenderEvents = new KalenderEvents()
 
     let configs: IcalEventsConfig[] = [];
     if (node.config.checkall) {
-        node.red.nodes.eachNode(n => {
-            if (n.type === 'ical-config') {
-                configs.push(node.red.nodes.getNode(n.id));
+        node.red.nodes.eachNode(configNode => {
+            if (configNode.type === 'ical-config') {             
+                const config = getConfig(node.red.nodes.getNode(configNode.id) as unknown as IcalEventsConfig, RED, n, node.msg) 
+                configs.push(config);
             }
         })
     } else {
@@ -115,7 +116,7 @@ export async function getICal(node: IcalNode, RED) {
 
     for (let config of configs) {
         try {
-            let icalConfig = configs.length === 1 ? node.config : getConfig(config, RED, node.config?.nodeconfig);
+            let icalConfig = config;
 
             if (moment(node.msg.payload, moment.ISO_8601).isValid()) {
                 icalConfig = Object.assign(icalConfig, { now: moment(node.msg.payload).toDate() })

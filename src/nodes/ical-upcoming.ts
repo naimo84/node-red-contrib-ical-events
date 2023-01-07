@@ -6,8 +6,8 @@ import { getConfig, getICal, CalEvent, IcalNode } from './helper';
 var parser = require('cron-parser');
 
 module.exports = function (RED: any) {
-    function upcomingNode(n: any) {
-        RED.nodes.createNode(this, n);
+    function upcomingNode(config: any) {
+        RED.nodes.createNode(this, config);
         let node: IcalNode = this;
         node.cache = new NodeCache();
         node.red = RED;
@@ -16,35 +16,35 @@ module.exports = function (RED: any) {
         node.on('input', (msg, send, done) => {
             node.msg = RED.util.cloneMessage(msg);
             send = send || function () { node.send.apply(node, arguments) }
-            node.config = getConfig(RED.nodes.getNode(n.confignode) as unknown as IcalEventsConfig, RED, n, msg);           
-            cronCheckJob(node, msg, send, done);
+            node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);           
+            cronCheckJob(node, msg, send, done,config);
         });
 
 
         try {
             let cron = '';
-            if (n.timeout && n.timeout !== '' && parseInt(n.timeout) > 0 && n.timeoutUnits && n.timeoutUnits !== '') {
-                switch (n.timeoutUnits) {
+            if (config.timeout && config.timeout !== '' && parseInt(config.timeout) > 0 && config.timeoutUnits && config.timeoutUnits !== '') {
+                switch (config.timeoutUnits) {
                     case 'seconds':
-                        cron = `*/${n.timeout} * * * * *`;
+                        cron = `*/${config.timeout} * * * * *`;
                         break;
                     case 'minutes':
-                        cron = `0 */${n.timeout} * * * *`;
+                        cron = `0 */${config.timeout} * * * *`;
                         break;
                     case 'hours':
-                        cron = `0 0 */${n.timeout} * * *`;
+                        cron = `0 0 */${config.timeout} * * *`;
                         break;
                     case 'days':
-                        cron = `0 0 0 */${n.timeout} * *`;
+                        cron = `0 0 0 */${config.timeout} * *`;
 
                         break;
                     default:
                         break;
                 }
             }
-            if (n.cron && n.cron !== '') {
-                parser.parseExpression(n.cron);
-                cron = n.cron;
+            if (config.cron && config.cron !== '') {
+                parser.parseExpression(config.cron);
+                cron = config.cron;
             }
 
             if (cron !== '') {
@@ -61,7 +61,7 @@ module.exports = function (RED: any) {
         }
     }
 
-    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void,n:any) {
 
         if (node.job && node.job.running) {
             node.status({ fill: 'green', shape: 'dot', text: `next check: ${node.job.nextDate().toISOString()}` });
@@ -71,7 +71,7 @@ module.exports = function (RED: any) {
 
 
         node.datesArray = [];
-        getICal(node, RED).then(data => {
+        getICal(node, RED,n).then(data => {
             node.datesArray = data || [];
 
             let todayEventcounter = 0;

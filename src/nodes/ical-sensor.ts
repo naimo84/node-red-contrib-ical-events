@@ -19,7 +19,7 @@ module.exports = function (RED: any) {
             node.on('input', (msg, send, done) => {
                 send = send || function () { node.send.apply(node, arguments) }
                 node.config = getConfig(RED.nodes.getNode(config.confignode) as unknown as IcalEventsConfig, RED, config, msg);
-                cronCheckJob(node, msg, send, done);
+                cronCheckJob(node, msg, send, done,config);
             });
 
             if (config.timeout && config.timeout !== "" && config.timeoutUnits && config.timeoutUnits !== "") {
@@ -57,7 +57,7 @@ module.exports = function (RED: any) {
     }
 
 
-    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void) {
+    function cronCheckJob(node: IcalNode, msg: NodeMessageInFlow, send: (msg: NodeMessage | NodeMessage[]) => void, done: (err?: Error) => void,config) {
         if (node.job && node.job.running) {
             node.status({ fill: "green", shape: "dot", text: `next check: ${node.job.nextDate().toLocaleString()}` });
         }
@@ -67,7 +67,7 @@ module.exports = function (RED: any) {
         //@ts-ignore
         if (!msg) msg = {};
         var dateNow = new Date();
-        getICal(node, RED).then(data => {
+        getICal(node, RED,config).then(data => {
             if (!data) return;
 
             let current = false;
