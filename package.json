@@ -81,7 +81,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-watch": "^5.0.1",
     "nodemon": "^2.0.14",
-    "release-it": "^14.11.8",
+    "release-it": "^15.6.0",
     "typescript": "^4.4.4"
   },
   "funding": {
