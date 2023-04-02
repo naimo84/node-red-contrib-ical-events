@@ -117,7 +117,7 @@ module.exports = function (RED: any) {
 
                         if (eventStart > dateNow) {
                             //@ts-ignore
-                            let uid = crypto.MD5(ev.uid + ev.summary?.val ? ev.summary.val : ev.summary + "start").toString();
+                            let uid = crypto.MD5(ev.uid + (ev.summary?.val ? ev.summary.val : ev.summary) + "start").toString();
                             if (ev.uid) {
                                 uid = (ev.uid.uid ? ev.uid.uid : ev.uid) + eventStart.toISOString() + "start";
                             }
@@ -139,7 +139,7 @@ module.exports = function (RED: any) {
 
                         if (eventEnd > dateNow) {
                             //@ts-ignore
-                            let uid = crypto.MD5(ev.uid + ev.summary?.val ? ev.summary.val : ev.summary + "end").toString();
+                            let uid = crypto.MD5(ev.uid + (ev.summary?.val ? ev.summary.val : ev.summary) + "end").toString();
                             if (ev.uid) {
                                 uid = (ev.uid.uid ? ev.uid.uid : ev.uid) + eventEnd.toISOString() + "end";
                             }
