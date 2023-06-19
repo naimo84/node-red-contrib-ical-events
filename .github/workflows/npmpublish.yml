@@ -2,6 +2,8 @@ name: publish-gh-pages
 on:
   push:
     branches: [ docs ]
+env: 
+  NODE_OPTIONS: --openssl-legacy-provider
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
