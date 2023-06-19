@@ -46,7 +46,23 @@ module.exports = {
       '/': {
         label: 'English',
         selectText: 'Languages',
-        lastUpdated: 'Last Updated',            
+        lastUpdated: 'Last Updated',
+        nav: [
+          {
+            text: 'Guide',
+            link: '/guide/'
+          },
+        ],
+        sidebar: {
+          '/guide/': [
+            '/guide/',
+            {
+              title: 'Debug',
+              path: '/guide/debug',
+              collapsable: false
+            },
+          ]
+        }
       }
     }
   }

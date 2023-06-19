@@ -5,7 +5,7 @@
   "description": "github pages of node-red-contrib-ical-events",
   "main": "index.js",
   "scripts": {
-    "serve": "export NODE_OPTIONS=--openssl-legacy-provider && vuepress dev docs",
+    "serve": "vuepress dev docs",
     "build": "vuepress build docs"
   },
   "keywords": [
