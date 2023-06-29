@@ -1,8 +1,8 @@
 import { IcalEventsConfig } from './ical-config';
 import { CronJob } from 'cron';
 import * as NodeCache from 'node-cache';
-import { KalenderEvents, IKalenderEvent } from 'kalender-events';
-import { DateTime } from "luxon";
+import { IKalenderEvent, KalenderEvents } from 'kalender-events';
+import { DateTime } from 'luxon';
 import { Node } from 'node-red';
 import moment = require('moment');
 
@@ -33,7 +33,6 @@ export interface CalEvent extends IKalenderEvent {
 
 
 export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: any,): IcalEventsConfig {
-
     let type = msg?.caldav || msg?.type || config?.caltype;
     if (!type && config?.caldav) {
         if (config.caldav === "false")
@@ -44,11 +43,10 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
             type = "icloud"
     }
 
-    const icalConfig = {
-        nodeconfig: node,
+    return {
         url: msg?.url || config?.url,
         name: msg?.calendarName || config?.name,
-        language: RED?.util.evaluateNodeProperty(node.language, node.languagetype, node, msg) ||  msg?.language || config?.language,
+        language: RED?.util.evaluateNodeProperty(node.language, node.languagetype, node, msg) || msg?.language || config?.language,
         checkall: msg?.checkall || node?.checkall || false,
         replacedates: msg?.replacedates || config?.replacedates,
         type: type,
@@ -78,11 +76,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
 
         rejectUnauthorized: msg?.rejectUnauthorized || node?.rejectUnauthorized || false,
         combineResponse: msg?.combineResponse || node?.combineResponse || false,
-        cache: new NodeCache(),
-
     } as IcalEventsConfig;
-    
-    return icalConfig;
 }
 
 function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEvents?: KalenderEvents) {
@@ -98,13 +92,14 @@ function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEv
 }
 
 export async function getICal(node: IcalNode, RED,n:any) {
-    const kalenderEvents = new KalenderEvents()
+    const kalenderEvents = node.ke ? node.ke : new KalenderEvents();
+    node.ke = kalenderEvents;
 
     let configs: IcalEventsConfig[] = [];
     if (node.config.checkall) {
         node.red.nodes.eachNode(configNode => {
-            if (configNode.type === 'ical-config') {             
-                const config = getConfig(node.red.nodes.getNode(configNode.id) as unknown as IcalEventsConfig, RED, n, node.msg) 
+            if (configNode.type === 'ical-config') {
+                const config = getConfig(node.red.nodes.getNode(configNode.id) as unknown as IcalEventsConfig, RED, n, node.msg)
                 configs.push(config);
             }
         })
@@ -125,7 +120,7 @@ export async function getICal(node: IcalNode, RED,n:any) {
             let data = await kalenderEvents.getEvents(icalConfig)
             for (let d in data) {
                 datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
-            }            
+            }
         }
         catch (err) {
             if (node.config.usecache && node.cache) {
@@ -137,7 +132,7 @@ export async function getICal(node: IcalNode, RED,n:any) {
 
     if (node.config.usecache && node.cache) {
         node.cache.set("events", datas);
-    }    
+    }
     return datas;
 }
 
