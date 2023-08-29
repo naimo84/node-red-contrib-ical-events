@@ -91,7 +91,7 @@ function extendEvent(event: IKalenderEvent, config: IcalEventsConfig, kalenderEv
     return event;
 }
 
-export async function getICal(node: IcalNode, RED,n:any) {
+export async function getICal(node: IcalNode, RED, n: any) {
     const kalenderEvents = node.ke ? node.ke : new KalenderEvents();
     node.ke = kalenderEvents;
 
@@ -125,8 +125,8 @@ export async function getICal(node: IcalNode, RED,n:any) {
         catch (err) {
             if (node.config.usecache && node.cache) {
                 datas = node.cache.get("events");
-            }
-            node.error(err);
+            }           
+            throw err;
         }
     }
 

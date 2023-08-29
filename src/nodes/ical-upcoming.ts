@@ -107,8 +107,20 @@ module.exports = function (RED: any) {
             }
         }).catch(err => {
             node.status({ fill: 'red', shape: 'ring', text: err.message });
+            let datas = [];
+            if (node.config.usecache && node.cache) {
+                datas = node.cache.get("events");
+            }
+            node.datesArray = datas || [];
             //@ts-ignore
-            send({ error: err });
+            send(Object.assign(node.msg, {
+                // today: todayEventcounter,
+                // tomorrow: tomorrowEventcounter,
+                total: node.datesArray.length,
+                htmlTable: brSeparatedList(node.datesArray, node.config),
+                payload: node.datesArray,
+                error: err }
+            ));
             if (done) {
                 done(err);
             } else {
