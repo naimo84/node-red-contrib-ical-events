@@ -65,7 +65,8 @@
     "luxon": "^2.0.2",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "piscina": "^4.1.0"
   },
   "devDependencies": {
     "@types/cron": "^1.7.2",

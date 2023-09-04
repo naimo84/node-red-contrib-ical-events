@@ -13,6 +13,7 @@ export interface IcalEventsConfig extends Config {
     usecache: boolean,
     caltype?: "icloud" | "caldav" | "ical",
     caldav?: string,
+    experimental?: boolean,
     name: string,
     id: any,
     type: any,
@@ -74,6 +75,7 @@ module.exports = function (RED: any) {
         this.username = config.username;
         this.password = config.password;
         this.includeTodo = config.includeTodo;
+        this.experimental = config.experimental;
     }
 
     RED.nodes.registerType('ical-config', icalConfig, {

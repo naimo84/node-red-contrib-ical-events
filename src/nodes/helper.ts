@@ -53,6 +53,7 @@ export function getConfig(config: IcalEventsConfig, RED: any, node?: any, msg?: 
         username: msg?.username || config?.credentials?.user || config?.username,
         usecache: msg?.usecache || config?.usecache || false,
         includeTodo: msg?.includeTodo || config?.includeTodo || false,
+        experimental: msg?.experimental || config?.experimental || false,
 
         eventtypes: RED?.util.evaluateNodeProperty(node.eventtypes, node.eventtypestype, node, msg) || 'events',
 
@@ -116,8 +117,22 @@ export async function getICal(node: IcalNode, RED, n: any) {
             if (moment(node.msg.payload, moment.ISO_8601).isValid()) {
                 icalConfig = Object.assign(icalConfig, { now: moment(node.msg.payload).toDate() })
             }
+            
+            let data = []
+            if (icalConfig.experimental) {
+                const path = require('path');
+                const Piscina = require('piscina');
 
-            let data = await kalenderEvents.getEvents(icalConfig)
+                const piscina = new Piscina({
+                    filename: path.resolve(__dirname, 'worker.js')
+                });
+
+
+                data = JSON.parse(await piscina.run(icalConfig));
+            } else {
+                data = await kalenderEvents.getEvents(icalConfig)
+            }
+
             for (let d in data) {
                 datas.push(extendEvent(data[d], icalConfig, kalenderEvents));
             }
@@ -125,7 +140,7 @@ export async function getICal(node: IcalNode, RED, n: any) {
         catch (err) {
             if (node.config.usecache && node.cache) {
                 datas = node.cache.get("events");
-            }           
+            }
             throw err;
         }
     }
