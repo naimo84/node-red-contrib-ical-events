@@ -61,7 +61,7 @@
     "cron": "^1.8.2",
     "cron-parser": "^4.1.0",
     "crypto-js": "^4.1.1",
-    "kalender-events": "0.28.3",
+    "kalender-events": "^0.28.3",
     "luxon": "^2.0.2",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
